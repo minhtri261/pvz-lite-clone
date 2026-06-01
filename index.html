@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plants vs. Zombies — Fan Clone</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="game-wrap">
+
+    <!-- ══ PLANT SELECTION BAR ══════════════════════════════════ -->
+    <div id="plant-bar">
+        <div id="sun-display">
+            <div id="sun-orb"></div>
+            <span id="sun-count">150</span>
+        </div>
+        <div id="cards-row">
+
+            <div class="pcard" id="card-sunflower" data-type="sunflower">
+                <canvas class="card-art" id="art-sunflower" width="58" height="58"></canvas>
+                <div class="card-name">Sunflower</div>
+                <div class="card-cost"><span class="cost-sun">☀</span>50</div>
+                <div class="cd-bar"><div class="cd-fill" id="cd-sunflower"></div></div>
+            </div>
+
+            <div class="pcard" id="card-peashooter" data-type="peashooter">
+                <canvas class="card-art" id="art-peashooter" width="58" height="58"></canvas>
+                <div class="card-name">Peashooter</div>
+                <div class="card-cost"><span class="cost-sun">☀</span>100</div>
+                <div class="cd-bar"><div class="cd-fill" id="cd-peashooter"></div></div>
+            </div>
+
+            <div class="pcard" id="card-wallnut" data-type="wallnut">
+                <canvas class="card-art" id="art-wallnut" width="58" height="58"></canvas>
+                <div class="card-name">Wall-nut</div>
+                <div class="card-cost"><span class="cost-sun">☀</span>50</div>
+                <div class="cd-bar"><div class="cd-fill" id="cd-wallnut"></div></div>
+            </div>
+
+            <div class="pcard" id="card-cherrybomb" data-type="cherrybomb">
+                <canvas class="card-art" id="art-cherrybomb" width="58" height="58"></canvas>
+                <div class="card-name">Cherry Bomb</div>
+                <div class="card-cost"><span class="cost-sun">☀</span>150</div>
+                <div class="cd-bar"><div class="cd-fill" id="cd-cherrybomb"></div></div>
+            </div>
+
+            <div class="pcard" id="card-potatomine" data-type="potatomine">
+                <canvas class="card-art" id="art-potatomine" width="58" height="58"></canvas>
+                <div class="card-name">Potato Mine</div>
+                <div class="card-cost"><span class="cost-sun">☀</span>25</div>
+                <div class="cd-bar"><div class="cd-fill" id="cd-potatomine"></div></div>
+            </div>
+
+            <div class="pcard" id="card-snowpea" data-type="snowpea">
+                <canvas class="card-art" id="art-snowpea" width="58" height="58"></canvas>
+                <div class="card-name">Snow Pea</div>
+                <div class="card-cost"><span class="cost-sun">☀</span>175</div>
+                <div class="cd-bar"><div class="cd-fill" id="cd-snowpea"></div></div>
+            </div>
+
+        </div>
+        <!-- Shovel button -->
+        <div class="pcard" id="shovel-btn" title="Dig up a plant (S)">
+            <canvas class="card-art" id="art-shovel" width="58" height="58"></canvas>
+            <div class="card-name">Shovel</div>
+        </div>
+
+        <div id="wave-label">Wave <span id="wave-num">—</span></div>
+    </div>
+
+    <!-- ══ MAIN CANVAS ══════════════════════════════════════════ -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- ══ OVERLAYS ═════════════════════════════════════════════ -->
+
+    <!-- Start Screen / Level Select -->
+    <div id="screen-start" class="fullscreen-overlay">
+        <div class="screen-box">
+            <div class="pvz-logo">
+                <span class="logo-p">Plants</span>
+                <span class="logo-vs">vs.</span>
+                <span class="logo-z">Zombies</span>
+            </div>
+            <p class="logo-sub">Fan Clone</p>
+
+            <div id="level-select-grid">
+                <div class="lvl-btn-wrap" id="lvlwrap-1">
+                    <button class="lvl-btn unlocked" id="lvl-btn-1" onclick="game.startLevel(1)">
+                        <span class="lvl-num">1</span>
+                        <span class="lvl-name">First Steps</span>
+                    </button>
+                </div>
+                <div class="lvl-btn-wrap" id="lvlwrap-2">
+                    <button class="lvl-btn locked" id="lvl-btn-2" onclick="game.startLevel(2)">
+                        <span class="lvl-num">2</span>
+                        <span class="lvl-name">More Lawn</span>
+                    </button>
+                </div>
+                <div class="lvl-btn-wrap" id="lvlwrap-3">
+                    <button class="lvl-btn locked" id="lvl-btn-3" onclick="game.startLevel(3)">
+                        <span class="lvl-num">3</span>
+                        <span class="lvl-name">Full Garden</span>
+                    </button>
+                </div>
+                <div class="lvl-btn-wrap" id="lvlwrap-4">
+                    <button class="lvl-btn locked" id="lvl-btn-4" onclick="game.startLevel(4)">
+                        <span class="lvl-num">4</span>
+                        <span class="lvl-name">Cherry Season</span>
+                    </button>
+                </div>
+                <div class="lvl-btn-wrap" id="lvlwrap-5">
+                    <button class="lvl-btn locked" id="lvl-btn-5" onclick="game.startLevel(5)">
+                        <span class="lvl-num">5</span>
+                        <span class="lvl-name">Potato Field</span>
+                    </button>
+                </div>
+                <div class="lvl-btn-wrap" id="lvlwrap-6">
+                    <button class="lvl-btn locked" id="lvl-btn-6" onclick="game.startLevel(6)">
+                        <span class="lvl-num">6</span>
+                        <span class="lvl-name">Bucket Brigade</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="tips-box">
+                <p>☀ Click falling/produced sun to collect</p>
+                <p>🌻 Sunflower generates more sun</p>
+                <p>🫛 Peashooter fires peas at zombies</p>
+                <p>🪨 Wall-nut blocks zombies · 🍒 Cherry Bomb = area nuke</p>
+                <p>❄ Snow Pea slows · Right-click to dig up plants</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wave Banner -->
+    <div id="wave-banner" class="hidden">
+        <span id="wave-banner-text">Wave 1!</span>
+    </div>
+
+    <!-- Level Complete -->
+    <div id="screen-levelcomplete" class="fullscreen-overlay hidden">
+        <div class="screen-box">
+            <h1 class="levelcomplete-title" id="levelcomplete-title">Level 1 Complete!</h1>
+            <p class="levelcomplete-sub" id="levelcomplete-sub">Well done!</p>
+            <button class="big-btn green-btn" id="btn-nextlevel">Next Level ▶</button>
+        </div>
+    </div>
+
+    <!-- Game Over -->
+    <div id="screen-gameover" class="fullscreen-overlay hidden">
+        <div class="screen-box">
+            <h1 class="defeat-title">The Zombies Ate<br>Your Brains!</h1>
+            <button class="big-btn red-btn" id="btn-retry">Try Again</button>
+            <button class="big-btn" id="btn-menu" style="margin-top:8px;background:linear-gradient(180deg,#6060c0,#303080);border-color:#202060;color:#e0e0ff;">
+                Menu
+            </button>
+        </div>
+    </div>
+
+    <!-- Victory (all 5 levels) -->
+    <div id="screen-win" class="fullscreen-overlay hidden">
+        <div class="screen-box">
+            <h1 class="win-title">🌻 Victory! 🌻</h1>
+            <p class="win-sub">You saved the garden across all 5 levels!</p>
+            <button class="big-btn green-btn" id="btn-winplay">Play Again</button>
+        </div>
+    </div>
+
+</div><!-- end #game-wrap -->
+
+<!-- §1 Constants + utils (must be first) -->
+<script src="src/constants.js"></script>
+
+<!-- §2 Data definitions -->
+<script src="src/data/plantDefs.js"></script>
+<script src="src/data/zombieDefs.js"></script>
+
+<!-- §3 Level data (one file per level, then assembled) -->
+<script src="src/data/levels/level1.js"></script>
+<script src="src/data/levels/level2.js"></script>
+<script src="src/data/levels/level3.js"></script>
+<script src="src/data/levels/level4.js"></script>
+<script src="src/data/levels/level5.js"></script>
+<script src="src/data/levels/level6.js"></script>
+<script src="src/data/levels/levelDefs.js"></script>
+
+<!-- §4 Sprites (pure draw functions, no classes) -->
+<script src="src/sprites/background.js"></script>
+<script src="src/sprites/plantSprites.js"></script>
+<script src="src/sprites/zombieSprites.js"></script>
+<script src="src/sprites/miscSprites.js"></script>
+<script src="src/sprites/cardThumbnails.js"></script>
+
+<!-- §5 Particle system -->
+<script src="src/particles/Particle.js"></script>
+
+<!-- §6 Plant classes (base → subclasses → factory) -->
+<script src="src/plants/Plant.js"></script>
+<script src="src/plants/Sunflower.js"></script>
+<script src="src/plants/Peashooter.js"></script>
+<script src="src/plants/WallNut.js"></script>
+<script src="src/plants/CherryBomb.js"></script>
+<script src="src/plants/PotatoMine.js"></script>
+<script src="src/plants/SnowPea.js"></script>
+<script src="src/plants/createPlant.js"></script>
+
+<!-- §7 Zombie classes (base → subclasses → factory) -->
+<script src="src/zombies/Zombie.js"></script>
+<script src="src/zombies/BasicZombie.js"></script>
+<script src="src/zombies/FlagZombie.js"></script>
+<script src="src/zombies/ConeheadZombie.js"></script>
+<script src="src/zombies/BucketZombie.js"></script>
+<script src="src/zombies/createZombie.js"></script>
+
+<!-- §8 Other game entities -->
+<script src="src/entities/Projectile.js"></script>
+<script src="src/entities/Sun.js"></script>
+<script src="src/entities/LawnMower.js"></script>
+<script src="src/entities/Grid.js"></script>
+
+<!-- §9 Game class + entry point (must be last) -->
+<script src="src/Game.js"></script>
+<script src="src/main.js"></script>
+</body>
+</html>

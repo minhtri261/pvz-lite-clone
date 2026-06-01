@@ -1,0 +1,340 @@
+/* ═══════════════════════════════════════════════
+   PLANTS VS ZOMBIES FAN CLONE — style.css
+   ═══════════════════════════════════════════════ */
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background: #0a1a0a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Arial Rounded MT Bold', 'Arial Black', Arial, sans-serif;
+    overflow: hidden;
+    user-select: none;
+}
+
+/* ── Game wrapper ──────────────────────────────── */
+#game-wrap {
+    position: relative;
+    display: inline-block;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 60px rgba(0,0,0,0.9), 0 0 20px rgba(80,200,80,0.3);
+}
+
+/* ── Canvas ────────────────────────────────────── */
+#gameCanvas { display: block; background: #1a3a0a; }
+
+/* ── Plant Selection Bar ───────────────────────── */
+#plant-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(180deg, #3a6e1a 0%, #2a5010 60%, #1e3a0a 100%);
+    border-bottom: 4px solid #1a2e08;
+    padding: 8px 12px;
+    height: 88px;
+    position: relative;
+}
+
+/* Sun counter */
+#sun-display {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(145deg, #ffe000 0%, #ffa000 100%);
+    border: 3px solid #b87800;
+    border-radius: 14px;
+    padding: 7px 12px 7px 8px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.4);
+    min-width: 82px;
+    flex-shrink: 0;
+}
+
+#sun-orb {
+    width: 26px; height: 26px;
+    background: radial-gradient(circle at 35% 35%, #fff9a0, #ffd000 45%, #ff8c00);
+    border-radius: 50%;
+    border: 2px solid #c47800;
+    box-shadow: 0 0 10px rgba(255,220,0,0.7), inset -2px -2px 4px rgba(180,80,0,0.3);
+    flex-shrink: 0;
+    animation: sunPulse 2s ease-in-out infinite;
+}
+
+@keyframes sunPulse {
+    0%,100% { transform: scale(1); box-shadow: 0 0 10px rgba(255,220,0,0.7); }
+    50%      { transform: scale(1.1); box-shadow: 0 0 20px rgba(255,220,0,1); }
+}
+
+#sun-count {
+    font-size: 24px;
+    font-weight: 900;
+    color: #5c2e00;
+    text-shadow: 1px 1px 0 rgba(255,255,255,0.6);
+    letter-spacing: -1px;
+}
+
+/* Cards row */
+#cards-row { display: flex; gap: 5px; }
+
+/* Individual plant card */
+.pcard {
+    position: relative;
+    width: 68px;
+    height: 72px;
+    background: linear-gradient(180deg, #2e5e16 0%, #1a3c08 100%);
+    border: 3px solid #4a8a20;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 3px 3px 3px;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+    overflow: hidden;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+.pcard:hover {
+    transform: translateY(-4px) scale(1.04);
+    border-color: #78c030;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.6), 0 0 12px rgba(120,192,48,0.4);
+}
+
+.pcard.selected {
+    border-color: #FFD700;
+    box-shadow: 0 0 22px rgba(255,215,0,0.8), 0 4px 12px rgba(0,0,0,0.5);
+    transform: translateY(-5px) scale(1.06);
+}
+
+.pcard.disabled {
+    filter: saturate(0.3) brightness(0.6);
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+}
+.pcard.disabled:hover { transform: none; border-color: #4a8a20; }
+
+/* Hidden cards (not available in this level) */
+.pcard.card-hidden { display: none; }
+
+/* Shovel button — earthy brown scheme */
+#shovel-btn {
+    background: linear-gradient(180deg, #7a5a1a 0%, #4a3008 100%);
+    border-color: #c49020;
+    margin-left: 8px;
+}
+#shovel-btn:hover   { border-color: #f0b830; }
+#shovel-btn.selected {
+    border-color: #FFD700;
+    box-shadow: 0 0 22px rgba(255,215,0,0.8), 0 4px 12px rgba(0,0,0,0.5);
+    transform: translateY(-5px) scale(1.06);
+}
+
+.card-art { border-radius: 4px; display: block; }
+
+.card-name {
+    font-size: 7.5px;
+    color: #c8f080;
+    text-align: center;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.2px;
+    line-height: 1;
+}
+
+.card-cost {
+    font-size: 11px;
+    color: #FFD700;
+    font-weight: 900;
+    background: rgba(0,0,0,0.45);
+    border-radius: 5px;
+    padding: 1px 4px;
+    line-height: 1;
+}
+
+.cost-sun { font-size: 9px; }
+
+/* Cooldown bar */
+.cd-bar {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 5px;
+    background: rgba(0,0,0,0.5);
+    border-radius: 0 0 8px 8px;
+    overflow: hidden;
+}
+.cd-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #60c820, #a0ff40);
+    transition: width 0.1s linear;
+}
+
+/* ── Wave label ─────────────────────────────────── */
+#wave-label {
+    margin-left: auto;
+    font-size: 14px;
+    color: #a0e860;
+    font-weight: bold;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* ── Wave banner ────────────────────────────────── */
+#wave-banner {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 80;
+    pointer-events: none;
+    text-align: center;
+}
+#wave-banner-text {
+    display: inline-block;
+    font-size: 52px;
+    font-weight: 900;
+    color: #FFD700;
+    text-shadow: 4px 4px 0 #7a4a00, -2px -2px 0 #7a4a00,
+                 2px -2px 0 #7a4a00, -2px 2px 0 #7a4a00;
+    letter-spacing: 2px;
+    animation: wavePop 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+@keyframes wavePop {
+    0%  { transform: scale(0.2); opacity: 0; }
+    100%{ transform: scale(1);   opacity: 1; }
+}
+
+/* ── Full-screen overlays ───────────────────────── */
+.fullscreen-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    backdrop-filter: blur(4px);
+}
+#screen-start        { background: rgba(10, 40, 5, 0.90); }
+#screen-gameover     { background: rgba(60, 0, 0, 0.88); }
+#screen-win          { background: rgba(0, 60, 10, 0.88); }
+#screen-levelcomplete{ background: rgba(0, 50, 20, 0.88); }
+
+.screen-box {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 20px;
+}
+
+/* Logo */
+.pvz-logo { font-size: 48px; font-weight: 900; line-height: 1; letter-spacing: -1px; }
+.logo-p  { color: #60e820; text-shadow: 3px 3px 0 #1a6000; }
+.logo-vs { color: #ffffff; font-size: 34px; margin: 0 8px; }
+.logo-z  { color: #c0ff60; text-shadow: 3px 3px 0 #3a8a00; }
+.logo-sub { font-size: 15px; color: #a0e060; letter-spacing: 4px; text-transform: uppercase; margin-top: -6px; }
+
+/* Level select grid */
+#level-select-grid {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 420px;
+}
+
+.lvl-btn {
+    width: 78px; height: 70px;
+    background: linear-gradient(180deg, #4a9a2a, #2a5e10);
+    border: 3px solid #6aca38;
+    border-radius: 12px;
+    color: #e0ff90;
+    cursor: pointer;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 4px;
+    transition: transform 0.12s, box-shadow 0.12s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    font-family: inherit;
+}
+.lvl-btn:hover { transform: translateY(-4px); box-shadow: 0 8px 18px rgba(0,0,0,0.6); }
+
+.lvl-btn.locked {
+    background: linear-gradient(180deg, #333, #1a1a1a);
+    border-color: #444;
+    color: #555;
+    cursor: not-allowed;
+}
+.lvl-btn.locked:hover { transform: none; }
+
+.lvl-num {
+    font-size: 24px; font-weight: 900;
+    line-height: 1;
+}
+.lvl-name {
+    font-size: 9px; font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    line-height: 1;
+}
+
+/* Level complete screen */
+.levelcomplete-title {
+    font-size: 40px; color: #80FF80;
+    text-shadow: 3px 3px 0 #006600, -1px -1px 0 #004400;
+    line-height: 1.2;
+}
+.levelcomplete-sub { font-size: 18px; color: #c8ffb0; }
+
+/* Screen titles */
+.defeat-title {
+    font-size: 40px; color: #ff4444;
+    text-shadow: 3px 3px 0 #6a0000, -1px -1px 0 #6a0000;
+    line-height: 1.2;
+}
+.win-title {
+    font-size: 46px; color: #FFD700;
+    text-shadow: 3px 3px 0 #7a5000, -1px -1px 0 #7a5000;
+}
+.win-sub { font-size: 18px; color: #c8ffb0; }
+
+/* Big buttons */
+.big-btn {
+    font-family: inherit;
+    font-size: 24px;
+    font-weight: 900;
+    padding: 12px 40px;
+    border-radius: 12px;
+    border: 4px solid;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: transform 0.12s, box-shadow 0.12s;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.4);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.5);
+}
+.big-btn:hover  { transform: translateY(-4px); box-shadow: 0 10px 24px rgba(0,0,0,0.6); }
+.big-btn:active { transform: translateY(1px); }
+.green-btn { background: linear-gradient(180deg, #80e040, #40a000); border-color: #2a6800; color: #0d2800; }
+.red-btn   { background: linear-gradient(180deg, #ff6040, #c02000); border-color: #6a0000; color: #fff0ee; }
+
+/* Tips box */
+.tips-box {
+    background: rgba(0,0,0,0.4);
+    border: 2px solid rgba(120,200,60,0.3);
+    border-radius: 10px;
+    padding: 10px 18px;
+    max-width: 420px;
+    text-align: left;
+    display: flex; flex-direction: column; gap: 5px;
+}
+.tips-box p { font-size: 12px; color: #c0f080; }
+
+/* ── Utility ────────────────────────────────────── */
+.hidden { display: none !important; }
+#gameCanvas.placing { cursor: crosshair; }
