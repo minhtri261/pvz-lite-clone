@@ -21,7 +21,7 @@ class Game {
         this._initWaveSystem();
         this.selectedType = null;
         this.shovelMode   = false;
-        this.cooldowns = { sunflower: 0, peashooter: 0, wallnut: 0, cherrybomb: 0, potatomine: 0, snowpea: 0 };
+        this.cooldowns = { sunflower: 0, peashooter: 0, wallnut: 0, cherrybomb: 0, potatomine: 0, chomper: 0, repeater: 0, sunshooter: 0, snowpea: 0 };
         this.hoverCol = -1; this.hoverRow = -1; // ô đang hover (-1 = ngoài lưới)
         this.mouseX = 0;    this.mouseY = 0;
         this.skySunTimer = 4000;    // ms cho đến khi sun tiếp theo rơi từ trời
@@ -77,7 +77,7 @@ class Game {
         this.selectedType = null;
         this.shovelMode   = false;
         document.getElementById('shovel-btn').classList.remove('selected');
-        this.cooldowns = { sunflower: 0, peashooter: 0, wallnut: 0, cherrybomb: 0, potatomine: 0, snowpea: 0 };
+        this.cooldowns = { sunflower: 0, peashooter: 0, wallnut: 0, cherrybomb: 0, potatomine: 0, chomper: 0, repeater: 0, sunshooter: 0, snowpea: 0 };
         this.skySunTimer = 4000;
         this.sun = this.levelDef.startingSun;
         this.state = 'playing';
@@ -300,10 +300,10 @@ class Game {
         // Chờ 2 giây rồi mới hiện màn hình thắng (cho zombie chết hết animation)
         setTimeout(() => {
             if (this.state !== 'playing') return;
-            if (this.currentLevelId === 6) {
+            if (this.currentLevelId === 8) {
                 // Màn cuối → màn hình chiến thắng tổng
                 this.state = 'win';
-                highestUnlocked = 6;
+                highestUnlocked = 8;
                 document.getElementById('screen-win').classList.remove('hidden');
             } else {
                 // Còn màn tiếp → màn hình hoàn thành màn + mở khóa màn kế
@@ -441,7 +441,7 @@ class Game {
     _updateUI() {
         document.getElementById('sun-count').textContent = this.sun;
         const available = this.levelDef.availablePlants;
-        const all = ['sunflower', 'peashooter', 'wallnut', 'cherrybomb', 'potatomine', 'snowpea'];
+        const all = ['sunflower', 'peashooter', 'wallnut', 'cherrybomb', 'potatomine', 'chomper', 'repeater', 'sunshooter', 'snowpea'];
         for (const type of all) {
             const card    = document.getElementById(`card-${type}`);
             const cdFill  = document.getElementById(`cd-${type}`);
@@ -459,14 +459,14 @@ class Game {
 
     // Cập nhật viền vàng "selected" trên các thẻ cây
     _updateCardSelection() {
-        ['sunflower', 'peashooter', 'wallnut', 'cherrybomb', 'potatomine', 'snowpea'].forEach(t => {
+        ['sunflower', 'peashooter', 'wallnut', 'cherrybomb', 'potatomine', 'chomper', 'repeater', 'sunshooter', 'snowpea'].forEach(t => {
             document.getElementById(`card-${t}`).classList.toggle('selected', this.selectedType === t);
         });
     }
 
     // Cập nhật giao diện chọn màn: nút unlocked = xanh, locked = xám
     _updateLevelSelectUI() {
-        for (let i = 1; i <= 6; i++) {
+        for (let i = 1; i <= 8; i++) {
             const btn = document.getElementById(`lvl-btn-${i}`);
             if (i <= highestUnlocked) { btn.classList.add('unlocked'); btn.classList.remove('locked'); }
             else                      { btn.classList.add('locked');   btn.classList.remove('unlocked'); }
@@ -510,7 +510,10 @@ class Game {
                 case 'peashooter': drawPeashooter(ctx, px, py, 0, 0);           break;
                 case 'wallnut':    drawWallNut(ctx, px, py, 0, 1);              break;
                 case 'cherrybomb': drawCherryBomb(ctx, px, py, 0, 0, false, 0);       break;
-                case 'potatomine': drawPotatoMine(ctx, px, py, 0, false, false, 0); break;
+                case 'potatomine': drawPotatoMine(ctx, px, py, 0, false, false, 0);  break;
+                case 'chomper':    drawChomper(ctx, px, py, 0, false, 0, false);       break;
+                case 'repeater':   drawRepeater(ctx, px, py, 0, 0, 0);                break;
+                case 'sunshooter': drawSunShooter(ctx, px, py, 0, 0, false);          break;
                 case 'snowpea':    drawSnowPea(ctx, px, py, 0, 0);                  break;
             }
             ctx.restore();
@@ -673,7 +676,7 @@ class Game {
     // Nhãn màn chơi góc trên phải canvas
     _drawLevelBadge() {
         if (this.state !== 'playing') return;
-        const names = ['First Steps', 'More Lawn', 'Full Garden', 'Cherry Season', 'Potato Field', 'Bucket Brigade'];
+        const names = ['First Steps', 'More Lawn', 'Conehead', 'Cherry Season', 'Potato Field', 'Vaulting Grounds', 'Bucket Brigade', 'Final Assault'];
         ctx.save();
         ctx.fillStyle = 'rgba(0,0,0,0.4)';
         rr(ctx, W - 110, 2, 108, 26, 8); ctx.fill();

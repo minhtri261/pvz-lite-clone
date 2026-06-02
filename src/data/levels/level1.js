@@ -4,7 +4,7 @@
 //  - Chỉ 1 hàng hoạt động (hàng giữa, index 2)
 //  - Chỉ có Peashooter
 //  - Chỉ có Basic Zombie
-//  - 2 đợt (wave)
+//  - 1 đợt (wave)
 //
 //  Cấu trúc mỗi wave:
 //    scouts: zombie lẻ tẻ xuất hiện trước để người chơi làm quen
@@ -27,6 +27,7 @@ const LEVEL_DEF_1 = {
                 { type: 'basic', row: 2, delay: 10000 },  // zombie thứ hai sau 10 giây
                 { type: 'basic', row: 2, delay: 20000 }, // zombie thứ ba sau 20 giây
                 { type: 'basic', row: 2, delay: 30000 }, // zombie thứ tư sau 30 giây
+                { type: 'basic', row: 2, delay: 30500 }, // zombie thứ năm sau 30.5 giây
             ],
             surge: [
                 // 3 zombie cùng lúc (cách nhau 0.5 giây) sau khi cảnh báo "Huge Wave"

@@ -35,7 +35,7 @@ body {
     background: linear-gradient(180deg, #3a6e1a 0%, #2a5010 60%, #1e3a0a 100%);
     border-bottom: 4px solid #1a2e08;
     padding: 8px 12px;
-    height: 88px;
+    height: 94px;   /* tăng để card 80px + padding 7px vừa khít */
     position: relative;
 }
 
@@ -83,7 +83,7 @@ body {
 .pcard {
     position: relative;
     width: 68px;
-    height: 72px;
+    height: 80px;   /* tăng để card art 58px + tên 9px + cd-bar 5px + padding vừa */
     background: linear-gradient(180deg, #2e5e16 0%, #1a3c08 100%);
     border: 3px solid #4a8a20;
     border-radius: 10px;
@@ -146,17 +146,9 @@ body {
     line-height: 1;
 }
 
-.card-cost {
-    font-size: 11px;
-    color: #FFD700;
-    font-weight: 900;
-    background: rgba(0,0,0,0.45);
-    border-radius: 5px;
-    padding: 1px 4px;
-    line-height: 1;
-}
-
-.cost-sun { font-size: 9px; }
+/* Giá đặt cây đã được vẽ trực tiếp lên canvas art (kiểu PvZ gốc) → ẩn div này */
+.card-cost { display: none; }
+.cost-sun  { display: none; }
 
 /* Cooldown bar */
 .cd-bar {

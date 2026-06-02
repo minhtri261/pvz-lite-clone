@@ -13,7 +13,7 @@ const W = canvas.width  = 980;
 const H = canvas.height = 522;
 
 // ── Kích thước lưới (grid) ────────────────────────────────────
-const COLS   = 9;    // số cột
+const COLS   = 10;   // số cột (mở rộng từ 9 lên 10)
 const ROWS   = 5;    // số hàng
 const CELL_W = 80;   // chiều rộng một ô (px)
 const CELL_H = 100;  // chiều cao một ô (px)
@@ -23,9 +23,9 @@ const GX = 158;  // khoảng cách từ trái (chừa chỗ cho nhà + cột tư
 const GY = 10;   // khoảng cách từ trên
 
 // Kích thước & biên lưới tính sẵn để không tính lại nhiều lần
-const GRID_W     = COLS * CELL_W;   // 720 — tổng chiều rộng lưới
+const GRID_W     = COLS * CELL_W;   // 800 — tổng chiều rộng lưới (10 cột)
 const GRID_H     = ROWS * CELL_H;   // 500 — tổng chiều cao lưới
-const GRID_RIGHT = GX + GRID_W;     // 878 — cạnh phải lưới
+const GRID_RIGHT = GX + GRID_W;     // 958 — cạnh phải lưới
 const GRID_BOT   = GY + GRID_H;     // 510 — cạnh dưới lưới
 
 // ── Vị trí quan trọng theo chiều ngang ───────────────────────
@@ -37,7 +37,7 @@ const MOWER_TRIGGER  = GX - 20;   // 138  — zombie vượt qua đây → kích
 const HOUSE_X        = GX - 82;   // 76   — zombie vượt qua đây → game over
 
 // ── Hàm tính tọa độ tâm ô ─────────────────────────────────────
-// cx(col) → tọa độ X tâm cột thứ col (0..8)
+// cx(col) → tọa độ X tâm cột thứ col (0..9)
 function cx(col) { return GX + col * CELL_W + CELL_W / 2; }
 // cy(row) → tọa độ Y tâm hàng thứ row (0..4)
 function cy(row) { return GY + row * CELL_H + CELL_H / 2; }

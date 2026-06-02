@@ -67,50 +67,9 @@ function drawBackground(ctx, activeRows, hoverCol, hoverRow) {
         }
     }
 
-    // Right strip — nền cỏ tối
+    // Dải viền mỏng bên phải (lưới mở rộng chiếm hầu hết không gian)
     ctx.fillStyle = '#3a7a20';
     ctx.fillRect(GRID_RIGHT, GY, W - GRID_RIGHT, GRID_H);
-
-    // Bụi cây trang trí bên phải — thay cho dải trống xấu
-    const BUSH_X = GRID_RIGHT + 51; // tâm dải bên phải
-    for (let row = 0; row < ROWS; row++) {
-        const baseY = GY + row * CELL_H + CELL_H * 0.52;
-        const shift = (row % 2 === 0) ? -6 : 8; // so le hàng chẵn/lẻ
-
-        // Bóng mờ dưới bụi
-        ctx.fillStyle = 'rgba(0,0,0,0.18)';
-        ctx.beginPath();
-        ctx.ellipse(BUSH_X + 2, baseY + shift + 22, 38, 9, 0, 0, Math.PI * 2);
-        ctx.fill();
-
-        // 3 khối bụi chồng nhau
-        const blobs = [
-            { dx: -20, dy: shift + 8,  r: 19, c0: '#3a8a30', c1: '#1d4d14' },
-            { dx:   4, dy: shift - 4,  r: 24, c0: '#4aaa3a', c1: '#246018' },
-            { dx:  24, dy: shift + 10, r: 17, c0: '#3a8a30', c1: '#1d4d14' },
-        ];
-        for (const b of blobs) {
-            const g = ctx.createRadialGradient(
-                BUSH_X + b.dx - b.r * 0.3, baseY + b.dy - b.r * 0.3, b.r * 0.1,
-                BUSH_X + b.dx, baseY + b.dy, b.r
-            );
-            g.addColorStop(0, b.c0);
-            g.addColorStop(1, b.c1);
-            ctx.fillStyle = g;
-            ctx.beginPath();
-            ctx.arc(BUSH_X + b.dx, baseY + b.dy, b.r, 0, Math.PI * 2);
-            ctx.fill();
-        }
-
-        // Điểm sáng highlight trên bụi
-        ctx.fillStyle = 'rgba(130,240,100,0.22)';
-        ctx.beginPath();
-        ctx.ellipse(BUSH_X - 6, baseY + shift - 10, 9, 5, -0.3, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.ellipse(BUSH_X + 18, baseY + shift - 7, 7, 4, 0.4, 0, Math.PI * 2);
-        ctx.fill();
-    }
 
     // Bottom strip
     ctx.fillStyle = '#3a7020'; ctx.fillRect(0, GRID_BOT, W, H - GRID_BOT);

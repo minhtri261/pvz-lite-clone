@@ -32,7 +32,7 @@ document.addEventListener('keydown', e => {
 });
 
 // ── Gắn sự kiện cho thẻ cây trong HUD ─────────────────────────
-['sunflower', 'peashooter', 'wallnut', 'cherrybomb', 'potatomine', 'snowpea'].forEach(type => {
+['sunflower', 'peashooter', 'wallnut', 'cherrybomb', 'potatomine', 'chomper', 'repeater', 'sunshooter', 'snowpea'].forEach(type => {
     document.getElementById(`card-${type}`).addEventListener('click', () => game.selectCard(type));
 });
 

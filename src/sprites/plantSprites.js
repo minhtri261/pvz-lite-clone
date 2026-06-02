@@ -1,6 +1,6 @@
 'use strict';
 // ══════════════════════════════════════════════════════════════
-//  plantSprites.js — Hàm vẽ sprite cho 6 loại cây
+//  plantSprites.js — Hàm vẽ sprite cho 7 loại cây
 //
 //  Tất cả hàm vẽ đều nhận (ctx, x, y, animTime, ...)
 //    x, y: tâm ô trên canvas (tính bằng cx/cy)
@@ -393,6 +393,288 @@ function drawPotatoMine(ctx, x, y, animTime, armed, exploding, explodeT) {
             ctx.beginPath(); ctx.arc(12, bodyY - 12, 3.5, 0, Math.PI * 2); ctx.fill();
         }
     }
+
+    ctx.restore();
+}
+
+// ── Chomper ────────────────────────────────────────────────────
+// chomping=true  → đang há miệng cắn (chompT 0→1)
+// recharging=true→ đang tiêu hoá, miệng khép, mắt lim dim
+function drawChomper(ctx, x, y, animTime, chomping, chompT, recharging) {
+    const bob = chomping ? 0 : Math.sin(animTime * 2.5) * 2;
+    ctx.save(); ctx.translate(Math.round(x), Math.round(y));
+
+    // Bóng
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    ctx.beginPath(); ctx.ellipse(0, 29, 17, 5, 0, 0, Math.PI * 2); ctx.fill();
+
+    // Thân cây — tím
+    ctx.strokeStyle = '#7B1FA2'; ctx.lineWidth = 7; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(0, 27); ctx.quadraticCurveTo(2, 13, 1, 1 + bob); ctx.stroke();
+    ctx.strokeStyle = 'rgba(206,147,216,0.4)'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(-1, 24); ctx.quadraticCurveTo(1, 13, 0, 1 + bob); ctx.stroke();
+
+    // Đầu tròn tím
+    const hy = -10 + bob;
+    const R  = 22;
+    const hg = ctx.createRadialGradient(-R * 0.3, hy - R * 0.3, R * 0.04, 0, hy, R);
+    hg.addColorStop(0,    '#E1BEE7'); // highlight tím nhạt
+    hg.addColorStop(0.3,  '#AB47BC'); // tím trung
+    hg.addColorStop(0.75, '#7B1FA2'); // tím đậm
+    hg.addColorStop(1,    '#4A148C'); // viền
+    ctx.fillStyle = hg; ctx.strokeStyle = '#4A148C'; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.arc(0, hy, R, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+    // ── Miệng ──────────────────────────────────────────────────
+    // mouthGape: 0 = khép, 24 = há tối đa
+    let mouthGape;
+    if (chomping)         mouthGape = Math.sin(chompT * Math.PI) * 24;
+    else if (recharging)  mouthGape = 2 + Math.sin(animTime * 3) * 1;
+    else                  mouthGape = 8 + Math.sin(animTime * 4) * 2;
+
+    const mY = hy + 7; // tâm miệng
+    const mW = 16;     // nửa chiều rộng miệng
+
+    // Môi trên
+    ctx.fillStyle = '#880E4F';
+    ctx.beginPath();
+    ctx.moveTo(-mW, mY);
+    ctx.bezierCurveTo(-mW, mY - 4 - mouthGape * 0.15,
+                      0,   mY - 4 - mouthGape * 0.55,
+                      0,   mY - mouthGape * 0.5);
+    ctx.bezierCurveTo(0,   mY - 4 - mouthGape * 0.55,
+                      mW,  mY - 4 - mouthGape * 0.15,
+                      mW, mY);
+    ctx.closePath(); ctx.fill();
+
+    // Môi dưới
+    ctx.beginPath();
+    ctx.moveTo(-mW, mY);
+    ctx.bezierCurveTo(-mW, mY + 4 + mouthGape * 0.15,
+                      0,   mY + 4 + mouthGape * 0.55,
+                      0,   mY + mouthGape * 0.5);
+    ctx.bezierCurveTo(0,   mY + 4 + mouthGape * 0.55,
+                      mW,  mY + 4 + mouthGape * 0.15,
+                      mW, mY);
+    ctx.closePath(); ctx.fill();
+
+    // Khoang miệng tối
+    if (mouthGape > 2) {
+        ctx.fillStyle = '#12000a';
+        ctx.beginPath();
+        ctx.ellipse(0, mY, mW * 0.82, mouthGape * 0.5 + 1, 0, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    // Răng (hiện khi miệng há đủ)
+    if (mouthGape > 5) {
+        const th = Math.min(8, mouthGape * 0.38);
+        ctx.fillStyle = '#F5F5F5';
+        // Răng trên: 3 chiếc
+        [-9, 0, 9].forEach(tx => {
+            ctx.beginPath();
+            ctx.moveTo(tx - 3.5, mY - 1); ctx.lineTo(tx + 3.5, mY - 1);
+            ctx.lineTo(tx, mY - 1 - th); ctx.closePath(); ctx.fill();
+        });
+        // Răng dưới: 2 chiếc
+        [-4.5, 4.5].forEach(tx => {
+            ctx.beginPath();
+            ctx.moveTo(tx - 3, mY + 1); ctx.lineTo(tx + 3, mY + 1);
+            ctx.lineTo(tx, mY + 1 + th * 0.85); ctx.closePath(); ctx.fill();
+        });
+    }
+
+    // ── Mắt ────────────────────────────────────────────────────
+    const eyeY   = hy - 8;
+    const eyeScY = recharging ? 0.4 : 1; // lim dim khi tiêu hoá
+
+    ctx.fillStyle = 'white';
+    ctx.beginPath(); ctx.ellipse(-8, eyeY, 5.5, 7 * eyeScY, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(8,  eyeY, 5.5, 7 * eyeScY, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#4A148C'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.fillStyle = '#1a0a1a';
+    ctx.beginPath(); ctx.arc(-7.5, eyeY + 1, 3.5, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(8.5,  eyeY + 1, 3.5, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = 'white';
+    ctx.beginPath(); ctx.arc(-6, eyeY - 1, 1.3, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(10, eyeY - 1, 1.3, 0, Math.PI * 2); ctx.fill();
+
+    // Mí mắt lim dim khi tiêu hoá
+    if (recharging) {
+        ctx.fillStyle = '#8E24AA';
+        ctx.beginPath(); ctx.ellipse(-8, eyeY - 3.5, 6.5, 4.5, 0, Math.PI, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(8,  eyeY - 3.5, 6.5, 4.5, 0, Math.PI, Math.PI * 2); ctx.fill();
+    }
+
+    // Dấu "..." nhấp nháy khi đang tiêu hoá
+    if (recharging) {
+        const phase = animTime % 0.9;
+        [0, 0.3, 0.6].forEach((off, i) => {
+            const a = Math.max(0, Math.sin((phase - off) * Math.PI / 0.3));
+            ctx.globalAlpha = a * 0.85;
+            ctx.fillStyle = '#CE93D8';
+            ctx.beginPath(); ctx.arc(-8 + i * 8, hy - R - 9, 3.5, 0, Math.PI * 2); ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+    }
+
+    ctx.restore();
+}
+
+// ── Repeater ───────────────────────────────────────────────────
+// Bắn 2 viên đạn liên tiếp (burst), mỗi burst cách nhau 150ms
+// shootAnim1: giật nòng trên | shootAnim2: giật nòng dưới
+function drawRepeater(ctx, x, y, animTime, shootAnim1, shootAnim2) {
+    const bob    = Math.sin(animTime * 2.5) * 2;
+    const rc1    = Math.sin(shootAnim1 * Math.PI) * -8; // recoil nòng trên
+    const rc2    = Math.sin(shootAnim2 * Math.PI) * -8; // recoil nòng dưới
+    ctx.save(); ctx.translate(Math.round(x), Math.round(y));
+
+    // Bóng
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    ctx.beginPath(); ctx.ellipse(0, 28, 14, 4.5, 0, 0, Math.PI * 2); ctx.fill();
+
+    // Thân cây
+    ctx.strokeStyle = '#2E7D32'; ctx.lineWidth = 7; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(0, 26); ctx.quadraticCurveTo(2, 10, 1, -2 + bob); ctx.stroke();
+    ctx.strokeStyle = 'rgba(185,228,120,0.45)'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(-1, 23); ctx.quadraticCurveTo(1, 10, 0, -2 + bob); ctx.stroke();
+
+    // Lá trái
+    ctx.save(); ctx.translate(-2, 10 + bob * 0.3); ctx.rotate(-0.5);
+    ctx.fillStyle = '#558B2F'; ctx.strokeStyle = '#2E7D32'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.ellipse(-5, 0, 10, 4, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.restore();
+    // Lá phải
+    ctx.save(); ctx.translate(2, 13 + bob * 0.3); ctx.rotate(0.55);
+    ctx.fillStyle = '#558B2F'; ctx.strokeStyle = '#2E7D32'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.ellipse(5, 0, 8, 3.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.restore();
+
+    // Đầu tròn — xanh đậm hơn Peashooter (nòng kép)
+    const hy = -12 + bob;
+    const R  = 20;
+    const hg = ctx.createRadialGradient(-R * 0.32, hy - R * 0.32, R * 0.05, 0, hy, R);
+    hg.addColorStop(0, '#AED581'); hg.addColorStop(0.3, '#7CB342');
+    hg.addColorStop(0.75, '#4CAF50'); hg.addColorStop(1, '#1B5E20');
+    ctx.fillStyle = hg; ctx.strokeStyle = '#1B5E20'; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.arc(0, hy, R, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+    // Nòng trên
+    const bxBase = Math.round(R * 0.76);
+    const barGrad = ctx.createLinearGradient(bxBase, hy - 11, bxBase, hy);
+    barGrad.addColorStop(0, '#66BB6A'); barGrad.addColorStop(0.5, '#43A047'); barGrad.addColorStop(1, '#2E7D32');
+    ctx.fillStyle = barGrad; ctx.strokeStyle = '#1B5E20'; ctx.lineWidth = 2;
+    rr(ctx, bxBase + rc1, hy - 11, 24, 9, 3); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#33691E'; ctx.strokeStyle = '#1B5E20'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(bxBase + rc1 + 24, hy - 6.5, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#0d2600'; ctx.beginPath(); ctx.arc(bxBase + rc1 + 24, hy - 6.5, 3.5, 0, Math.PI * 2); ctx.fill();
+
+    // Nòng dưới
+    const barGrad2 = ctx.createLinearGradient(bxBase, hy + 1, bxBase, hy + 10);
+    barGrad2.addColorStop(0, '#558B2F'); barGrad2.addColorStop(0.5, '#388E3C'); barGrad2.addColorStop(1, '#2E7D32');
+    ctx.fillStyle = barGrad2; ctx.strokeStyle = '#1B5E20'; ctx.lineWidth = 2;
+    rr(ctx, bxBase + rc2, hy + 1, 24, 9, 3); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#2E7D32'; ctx.strokeStyle = '#1B5E20'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(bxBase + rc2 + 24, hy + 5.5, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#0d2600'; ctx.beginPath(); ctx.arc(bxBase + rc2 + 24, hy + 5.5, 3.5, 0, Math.PI * 2); ctx.fill();
+
+    // Mắt trái
+    ctx.fillStyle = 'white';
+    ctx.beginPath(); ctx.ellipse(-7, hy - 8, 6.5, 7.5, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#1B5E20'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(-6.5, hy - 7, 4.5, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(-5, hy - 9.5, 1.8, 0, Math.PI * 2); ctx.fill();
+    // Miệng
+    ctx.strokeStyle = '#1B5E20'; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.arc(2, hy + 9, 6, 0.4, Math.PI - 0.4); ctx.stroke();
+
+    ctx.restore();
+}
+
+// ── Sun-Shooter ────────────────────────────────────────────────
+// Cây lai: đầu trái = sunflower nhỏ (tạo sun), đầu phải = đầu vàng bắn đạn vàng
+// producePulse: > 0 khi vừa tạo sun → animation phồng
+// shootT: giật nòng khi bắn
+function drawSunShooter(ctx, x, y, animTime, shootT, producePulse) {
+    const bob    = Math.sin(animTime * 2.2) * 2;
+    const recoil = Math.sin(shootT * Math.PI) * -7;
+    const scl    = producePulse > 0 ? 1 + Math.sin(animTime * 8) * 0.07 : 1;
+    ctx.save(); ctx.translate(Math.round(x), Math.round(y));
+
+    // Bóng
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    ctx.beginPath(); ctx.ellipse(0, 28, 20, 5, 0, 0, Math.PI * 2); ctx.fill();
+
+    // Thân chính (giữa)
+    ctx.strokeStyle = '#388E3C'; ctx.lineWidth = 7; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(0, 26); ctx.quadraticCurveTo(0, 8, 0, -1 + bob); ctx.stroke();
+
+    // Nhánh trái → đầu sunflower
+    ctx.strokeStyle = '#2E7D32'; ctx.lineWidth = 4; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(0, 2 + bob); ctx.lineTo(-18, -8 + bob); ctx.stroke();
+    // Nhánh phải → đầu shooter
+    ctx.beginPath(); ctx.moveTo(0, 2 + bob); ctx.lineTo(10, -8 + bob); ctx.stroke();
+
+    // ── ĐẦU TRÁI: mini Sunflower ──────────────────────────────
+    const sfx = -18, sfy = -14 + bob;
+    ctx.save(); ctx.translate(sfx, sfy); ctx.scale(scl, scl);
+    // Cánh hoa
+    for (let i = 0; i < 8; i++) {
+        const a = (i / 8) * Math.PI * 2 + animTime * 0.3;
+        ctx.save(); ctx.rotate(a);
+        const pg = ctx.createLinearGradient(0, -16, 0, -10);
+        pg.addColorStop(0, '#FFF176'); pg.addColorStop(1, '#FDD835');
+        ctx.fillStyle = pg; ctx.strokeStyle = '#F57F17'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.ellipse(0, -13, 4, 7, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.restore();
+    }
+    // Đĩa trung tâm nâu
+    const cg = ctx.createRadialGradient(-3, -4, 1, 0, 0, 10);
+    cg.addColorStop(0, '#A1887F'); cg.addColorStop(0.6, '#6D4C41'); cg.addColorStop(1, '#3E2723');
+    ctx.fillStyle = cg; ctx.strokeStyle = '#3E2723'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.arc(0, 0, 10, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    // Mắt sunflower
+    ctx.fillStyle = 'white';
+    ctx.beginPath(); ctx.ellipse(-3, -2, 2.5, 3.2, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(3, -2, 2.5, 3.2, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#1A237E';
+    ctx.beginPath(); ctx.arc(-3, -1.5, 1.8, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(3, -1.5, 1.8, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+
+    // ── ĐẦU PHẢI: đầu tròn vàng (shooter) ────────────────────
+    const phx = 10, phy = -14 + bob;
+    const hg = ctx.createRadialGradient(phx - 6, phy - 6, 1, phx, phy, 16);
+    hg.addColorStop(0, '#FFF9C4'); hg.addColorStop(0.35, '#FFD600');
+    hg.addColorStop(0.75, '#FFA000'); hg.addColorStop(1, '#E65100');
+    ctx.fillStyle = hg; ctx.strokeStyle = '#E65100'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(phx, phy, 16, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+    // Nòng vàng
+    const bx = phx + Math.round(16 * 0.75) + recoil;
+    const bg = ctx.createLinearGradient(bx, phy - 5, bx, phy + 5);
+    bg.addColorStop(0, '#FFD54F'); bg.addColorStop(0.5, '#FFA000'); bg.addColorStop(1, '#E65100');
+    ctx.fillStyle = bg; ctx.strokeStyle = '#E65100'; ctx.lineWidth = 2;
+    rr(ctx, bx, phy - 5, 22, 10, 3); ctx.fill(); ctx.stroke();
+    // Highlight nòng
+    ctx.fillStyle = 'rgba(255,255,200,0.3)';
+    rr(ctx, bx + 2, phy - 4, 18, 4, 2); ctx.fill();
+    // Đầu nòng
+    ctx.fillStyle = '#BF360C'; ctx.strokeStyle = '#E65100'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(bx + 22, phy, 6.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#4a1000';
+    ctx.beginPath(); ctx.arc(bx + 22, phy, 3.5, 0, Math.PI * 2); ctx.fill();
+
+    // Mắt đầu phải
+    ctx.fillStyle = 'white';
+    ctx.beginPath(); ctx.ellipse(phx - 6, phy - 6, 5.5, 6.5, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#E65100'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(phx - 5.5, phy - 5.5, 3.5, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(phx - 4, phy - 8, 1.4, 0, Math.PI * 2); ctx.fill();
+    // Nụ cười
+    ctx.strokeStyle = '#E65100'; ctx.lineWidth = 2; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.arc(phx + 2, phy + 7, 5, 0.4, Math.PI - 0.4); ctx.stroke();
 
     ctx.restore();
 }

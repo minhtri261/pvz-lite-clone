@@ -12,6 +12,9 @@ function createPlant(type, col, row) {
         case 'wallnut':    return new WallNut(col, row);
         case 'cherrybomb': return new CherryBomb(col, row);
         case 'potatomine': return new PotatoMine(col, row);
+        case 'chomper':    return new Chomper(col, row);
+        case 'repeater':   return new Repeater(col, row);
+        case 'sunshooter': return new SunShooter(col, row);
         case 'snowpea':    return new SnowPea(col, row);
     }
 }

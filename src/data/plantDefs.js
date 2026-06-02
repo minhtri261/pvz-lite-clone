@@ -43,9 +43,36 @@ const PLANT_DEFS = {
         armMs: 14000,      // 14 giây để kích hoạt (từ trạng thái ngủ → sẵn sàng nổ)
         blastDmg: 1800,   // tiêu diệt tức thời zombie bước lên
     },
+    chomper: {
+        name: 'Chomper',
+        cost: 150,         // ăn 1 zombie tức thì, nhưng cần thời gian tiêu hoá
+        hp: 400,           // HP cao hơn Peashooter để sống sót lâu hơn khi ăn zombie
+        cooldownMs: 7000,
+        rechargeMs: 38000, // 38s tiêu hoá trước khi cắn được lại
+        chompRange: 60,    // khoảng cách kích hoạt cắn (pixel, rộng hơn eating range)
+    },
+    repeater: {
+        name: 'Repeater',
+        cost: 175,      
+        hp: 300,
+        cooldownMs: 7000,
+        fireRate: 1500,    // bắn burst 2 viên mỗi 1.5s
+        peaDamage: 20,     // mỗi viên 20 dmg → burst 40 dmg/lần
+        burstDelay: 150,   // khoảng cách giữa 2 viên trong cùng 1 burst (ms)
+    },
+    sunshooter: {
+        name: 'Sun-Shooter',
+        cost: 125,         // kết hợp Sunflower + Peashooter
+        hp: 300,
+        cooldownMs: 7000,
+        sunInterval: 23000,
+        sunAmount: 25,
+        fireRate: 1500,  
+        peaDamage: 15,     // bắn đạn yếu hơn Peashooter, nhưng có thể sản xuất sun
+    },
     snowpea: {
         name: 'Snow Pea',
-        cost: 175,
+        cost: 150,
         hp: 300,
         cooldownMs: 7000,
         fireRate: 1500,

@@ -2,9 +2,10 @@
 // ══════════════════════════════════════════════════════════════
 //  miscSprites.js — Sprite cho đạn, mặt trời, máy cắt cỏ, xẻng
 //
-//  drawPea(ctx, x, y, animTime, isIce):
-//    isIce=false → đạn xanh lá (Peashooter)
-//    isIce=true  → đạn xanh băng với tia tinh thể (SnowPea)
+//  drawPea(ctx, x, y, animTime, isIce, isYellow):
+//    isIce=false, isYellow=false → đạn xanh lá (Peashooter, Repeater)
+//    isIce=true   → đạn xanh băng với tia tinh thể (SnowPea)
+//    isYellow=true → đạn vàng cam (Sun-Shooter)
 //
 //  drawSun(ctx, x, y, animTime, alpha):
 //    alpha: 0–1, dùng để mờ dần khi timeout hoặc hiện dần khi rơi
@@ -17,11 +18,11 @@
 //    Xẻng góc nghiêng -22° với nắm tay, thân gỗ, lưỡi kim loại bóng
 // ══════════════════════════════════════════════════════════════
 
-function drawPea(ctx, x, y, animTime, isIce) {
-    const c1 = isIce ? '#B2EBF2' : '#CCFF80';
-    const c2 = isIce ? '#00BCD4' : '#66CC00';
-    const c3 = isIce ? '#006064' : '#336600';
-    const gl = isIce ? 'rgba(0,188,212,0.28)' : 'rgba(120,255,80,0.25)';
+function drawPea(ctx, x, y, animTime, isIce, isYellow = false) {
+    const c1 = isIce ? '#B2EBF2' : isYellow ? '#FFF9C4' : '#CCFF80';
+    const c2 = isIce ? '#00BCD4' : isYellow ? '#FFD600' : '#66CC00';
+    const c3 = isIce ? '#006064' : isYellow ? '#E65100' : '#336600';
+    const gl = isIce ? 'rgba(0,188,212,0.28)' : isYellow ? 'rgba(255,200,0,0.25)' : 'rgba(120,255,80,0.25)';
     ctx.save(); ctx.translate(Math.round(x), Math.round(y));
     ctx.fillStyle = gl; ctx.beginPath(); ctx.arc(0, 0, 12, 0, Math.PI * 2); ctx.fill();
     const pg = ctx.createRadialGradient(-3, -3, 1, 0, 0, 9);

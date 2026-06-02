@@ -29,4 +29,11 @@ const ZOMBIE_DEFS = {
         attackRate: 1000,
         bucketHp: 900,    // xô hấp thụ 900 điểm sát thương trước khi rơi
     },
+    polevaulting: {
+        maxHp: 400,        // bền hơn basic nhưng kém conehead
+        speed: 0.5,       // nhanh hơn basic (đang chạy để nhảy)
+        damage: 100,
+        attackRate: 1000,
+        // Đặc biệt: nhảy qua 1 cây đầu tiên gặp, sau đó đi bộ bình thường
+    },
 };

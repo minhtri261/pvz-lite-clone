@@ -52,10 +52,27 @@
                 <div class="cd-bar"><div class="cd-fill" id="cd-potatomine"></div></div>
             </div>
 
+            <div class="pcard" id="card-chomper" data-type="chomper">
+                <canvas class="card-art" id="art-chomper" width="58" height="58"></canvas>
+                <div class="card-name">Chomper</div>
+                <div class="cd-bar"><div class="cd-fill" id="cd-chomper"></div></div>
+            </div>
+
+            <div class="pcard" id="card-repeater" data-type="repeater">
+                <canvas class="card-art" id="art-repeater" width="58" height="58"></canvas>
+                <div class="card-name">Repeater</div>
+                <div class="cd-bar"><div class="cd-fill" id="cd-repeater"></div></div>
+            </div>
+
+            <div class="pcard" id="card-sunshooter" data-type="sunshooter">
+                <canvas class="card-art" id="art-sunshooter" width="58" height="58"></canvas>
+                <div class="card-name">Sun-Shooter</div>
+                <div class="cd-bar"><div class="cd-fill" id="cd-sunshooter"></div></div>
+            </div>
+
             <div class="pcard" id="card-snowpea" data-type="snowpea">
                 <canvas class="card-art" id="art-snowpea" width="58" height="58"></canvas>
                 <div class="card-name">Snow Pea</div>
-                <div class="card-cost"><span class="cost-sun">☀</span>175</div>
                 <div class="cd-bar"><div class="cd-fill" id="cd-snowpea"></div></div>
             </div>
 
@@ -100,7 +117,7 @@
                 <div class="lvl-btn-wrap" id="lvlwrap-3">
                     <button class="lvl-btn locked" id="lvl-btn-3" onclick="game.startLevel(3)">
                         <span class="lvl-num">3</span>
-                        <span class="lvl-name">Full Garden</span>
+                        <span class="lvl-name">Conehead</span>
                     </button>
                 </div>
                 <div class="lvl-btn-wrap" id="lvlwrap-4">
@@ -118,7 +135,19 @@
                 <div class="lvl-btn-wrap" id="lvlwrap-6">
                     <button class="lvl-btn locked" id="lvl-btn-6" onclick="game.startLevel(6)">
                         <span class="lvl-num">6</span>
+                        <span class="lvl-name">Vaulting Grounds</span>
+                    </button>
+                </div>
+                <div class="lvl-btn-wrap" id="lvlwrap-7">
+                    <button class="lvl-btn locked" id="lvl-btn-7" onclick="game.startLevel(7)">
+                        <span class="lvl-num">7</span>
                         <span class="lvl-name">Bucket Brigade</span>
+                    </button>
+                </div>
+                <div class="lvl-btn-wrap" id="lvlwrap-8">
+                    <button class="lvl-btn locked" id="lvl-btn-8" onclick="game.startLevel(8)">
+                        <span class="lvl-num">8</span>
+                        <span class="lvl-name">Final Assault</span>
                     </button>
                 </div>
             </div>
@@ -183,6 +212,8 @@
 <script src="src/data/levels/level4.js"></script>
 <script src="src/data/levels/level5.js"></script>
 <script src="src/data/levels/level6.js"></script>
+<script src="src/data/levels/level7.js"></script>
+<script src="src/data/levels/level8.js"></script>
 <script src="src/data/levels/levelDefs.js"></script>
 
 <!-- §4 Sprites (pure draw functions, no classes) -->
@@ -202,6 +233,9 @@
 <script src="src/plants/WallNut.js"></script>
 <script src="src/plants/CherryBomb.js"></script>
 <script src="src/plants/PotatoMine.js"></script>
+<script src="src/plants/Chomper.js"></script>
+<script src="src/plants/Repeater.js"></script>
+<script src="src/plants/SunShooter.js"></script>
 <script src="src/plants/SnowPea.js"></script>
 <script src="src/plants/createPlant.js"></script>
 
@@ -211,6 +245,7 @@
 <script src="src/zombies/FlagZombie.js"></script>
 <script src="src/zombies/ConeheadZombie.js"></script>
 <script src="src/zombies/BucketZombie.js"></script>
+<script src="src/zombies/PoleVaultingZombie.js"></script>
 <script src="src/zombies/createZombie.js"></script>
 
 <!-- §8 Other game entities -->
