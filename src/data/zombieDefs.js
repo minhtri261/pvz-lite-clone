@@ -30,10 +30,16 @@ const ZOMBIE_DEFS = {
         bucketHp: 900,    // xô hấp thụ 900 điểm sát thương trước khi rơi
     },
     polevaulting: {
-        maxHp: 400,        // bền hơn basic nhưng kém conehead
-        speed: 0.5,       // nhanh hơn basic (đang chạy để nhảy)
+        maxHp: 300,
+        speed: 0.5,
         damage: 100,
         attackRate: 1000,
-        // Đặc biệt: nhảy qua 1 cây đầu tiên gặp, sau đó đi bộ bình thường
+    },
+    brickhead: {
+        maxHp: 1800,      
+        speed: 0.2,     
+        damage: 100,
+        attackRate: 1000,
+        brickHp: 1600,    // cục gạch hấp thụ 1600 sát thương trước khi vỡ
     },
 };

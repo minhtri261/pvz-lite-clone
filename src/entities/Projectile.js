@@ -2,15 +2,16 @@
 // ══════════════════════════════════════════════════════════════
 //  Projectile.js — Viên đạn do các cây bắn ra
 //  Các loại đạn:
-//    isIce=true  → đạn băng xanh (SnowPea) — làm chậm zombie
-//    isYellow=true → đạn vàng (Sun-Shooter) — không có hiệu ứng đặc biệt
-//    cả hai false → đạn xanh lá (Peashooter, Repeater)
+//    isIce=true    → đạn băng xanh (SnowPea) — làm chậm zombie
+//    isYellow=true → đạn vàng cam (Sun-Shooter)
+//    isBrown=true  → đạn nâu đất (Peanut)
+//    tất cả false  → đạn xanh lá (Peashooter, Repeater)
 // ══════════════════════════════════════════════════════════════
 
 class Projectile {
-    constructor(x, y, row, isIce = false, isYellow = false) {
+    constructor(x, y, row, isIce = false, isYellow = false, isBrown = false) {
         Object.assign(this, {
-            x, y, row, isIce, isYellow,
+            x, y, row, isIce, isYellow, isBrown,
             speed: 8,
             dead: false,
             animTime: Math.random() * Math.PI * 2,
@@ -25,6 +26,6 @@ class Projectile {
     }
 
     draw(ctx) {
-        drawPea(ctx, this.x, this.y, this.animTime, this.isIce, this.isYellow);
+        drawPea(ctx, this.x, this.y, this.animTime, this.isIce, this.isYellow, this.isBrown);
     }
 }

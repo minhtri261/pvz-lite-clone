@@ -2,21 +2,21 @@
 // ══════════════════════════════════════════════════════════════
 //  level7.js — Màn 7: Bucket Zombie và Repeater
 //  - 5 hàng đầy đủ
-//  - Mở khóa Repeater (bắn 2 đậu mỗi lần, giá 200☀)
+//  - Mở khóa Peanut (bắn đậu nâu, giá 150☀)
 //  - Bucket Zombie (1100 HP tổng): khó nhất game
 //  - 4 đợt (wave)
 //  Chiến thuật:
-//    - Repeater giúp tăng gấp đôi sát thương, rất hiệu quả để xử lý Bucket Zombie.
+//    - Peanut vừa bắn vừa chặn, rất hữu ích để đối phó Bucket Zombie.
 //    - Cần ưu tiên tiêu diệt Pole Vaulter và Conehead trước, sau đó mới đến Bucket.
 // ══════════════════════════════════════════════════════════════
 const LEVEL_DEF_7 = {
     id: 7,
     title:    'Level 7 Complete!',
     subtitle: 'Watch out for Bucket Zombies! The final level awaits!',
-    newPlant:  'Repeater',
+    newPlant:  'Peanut',
     newZombie: 'Bucket Zombie',
     activeRows:      [0, 1, 2, 3, 4],
-    availablePlants: ['sunflower', 'peashooter', 'wallnut', 'cherrybomb', 'potatomine', 'sunshooter', 'repeater'],
+    availablePlants: ['sunflower', 'peashooter', 'wallnut', 'cherrybomb', 'potatomine', 'sunshooter', 'peanut'],
     startingSun: 150,
     waves: [
         {

@@ -19,18 +19,23 @@ class Game {
         this.currentLevelId = 1;
         this._initEntities();
         this._initWaveSystem();
-        this.selectedType = null;
-        this.shovelMode   = false;
-        this.cooldowns = { sunflower: 0, peashooter: 0, wallnut: 0, cherrybomb: 0, potatomine: 0, chomper: 0, repeater: 0, sunshooter: 0, snowpea: 0 };
-        this.hoverCol = -1; this.hoverRow = -1; // ô đang hover (-1 = ngoài lưới)
+        this.selectedType    = null;
+        this.shovelMode      = false;
+        this._overridePlants = null;      // danh sách cây người chơi chọn (màn 7+)
+        this._pickSelected   = new Set(); // Set của plant types đang được chọn trên pick screen
+        this.cooldowns = { sunflower: 0, peashooter: 0, wallnut: 0, cherrybomb: 0, potatomine: 0,
+                           chomper: 0, repeater: 0, sunshooter: 0, twinsun: 0, peanut: 0, snowpea: 0 };
+        this.hoverCol = -1; this.hoverRow = -1;
         this.mouseX = 0;    this.mouseY = 0;
         this.skySunTimer = 4000;    // ms cho đến khi sun tiếp theo rơi từ trời
         this._updateLevelSelectUI();
     }
 
     // Truy cập nhanh định nghĩa màn hiện tại và các hàng đang hoạt động
-    get levelDef()   { return LEVEL_DEFS[this.currentLevelId - 1]; }
-    get activeRows() { return this.levelDef.activeRows; }
+    get levelDef()        { return LEVEL_DEFS[this.currentLevelId - 1]; }
+    get activeRows()      { return this.levelDef.activeRows; }
+    // availablePlants: bị ghi đè bởi lựa chọn của người chơi ở màn 7+
+    get availablePlants() { return this._overridePlants || this.levelDef.availablePlants; }
 
     // ── Khởi tạo ──────────────────────────────────────────────
     // Reset tất cả đối tượng game (gọi khi bắt đầu màn mới hoặc thử lại)
@@ -69,29 +74,145 @@ class Game {
 
     // ── Vòng đời màn chơi ─────────────────────────────────────
     startLevel(id) {
-        if (id > highestUnlocked) return; // không cho vào màn chưa mở khóa
+        if (id > highestUnlocked) return;
         this.currentLevelId = id;
+        // Màn 7+ có hơn 6 cây → hiện màn chọn cây
+        if (id >= 7 && this.levelDef.availablePlants.length > 6) {
+            this._showPlantPick();
+            return;
+        }
+        this._overridePlants = null;
+        this._doStartLevel();
+    }
+
+    // Tách riêng để có thể gọi từ cả startLevel lẫn confirmPlantPick
+    _doStartLevel() {
         this._initEntities();
         this._initWaveSystem();
         this._rebuildMowers();
         this.selectedType = null;
         this.shovelMode   = false;
         document.getElementById('shovel-btn').classList.remove('selected');
-        this.cooldowns = { sunflower: 0, peashooter: 0, wallnut: 0, cherrybomb: 0, potatomine: 0, chomper: 0, repeater: 0, sunshooter: 0, snowpea: 0 };
+        this.cooldowns = { sunflower: 0, peashooter: 0, wallnut: 0, cherrybomb: 0, potatomine: 0,
+                           chomper: 0, repeater: 0, sunshooter: 0, twinsun: 0, peanut: 0, snowpea: 0 };
         this.skySunTimer = 4000;
         this.sun = this.levelDef.startingSun;
         this.state = 'playing';
         this._hideAllScreens();
         this._updateUI();
+        audioManager.play(); // bắt đầu nhạc nền
     }
 
-    restart()  { this.startLevel(this.currentLevelId); } // thử lại màn hiện tại
+    // ── Pause / Resume ────────────────────────────────────────
+    togglePause() {
+        if (this.state === 'playing') {
+            this.state = 'paused';
+            const names = ['First Steps','More Lawn','Conehead','Cherry Season','Potato Field',
+                           'Vaulting Grounds','Bucket Brigade','Final Assault','Peanut Gallery','Brick by Brick'];
+            document.getElementById('pause-level-info').textContent =
+                `Level ${this.currentLevelId} — ${names[this.currentLevelId - 1] || ''}`;
+            document.getElementById('screen-pause').classList.remove('hidden');
+            audioManager.pause();
+        } else if (this.state === 'paused') {
+            this.state = 'playing';
+            document.getElementById('screen-pause').classList.add('hidden');
+            audioManager.resume();
+        }
+    }
+
+    restart() {
+        // Màn 7+ → hiện lại màn chọn cây
+        if (this.currentLevelId >= 7 && this.levelDef.availablePlants.length > 6) {
+            this._showPlantPick();
+        } else {
+            this._overridePlants = null;
+            this._doStartLevel();
+        }
+    }
+
+    // ── Hệ thống chọn cây (màn 7+) ───────────────────────────
+    _showPlantPick() {
+        const pool = this.levelDef.availablePlants;
+        // Chọn sẵn 6 cây đầu tiên, hoặc tất cả nếu ít hơn 6
+        this._pickSelected = new Set(pool.slice(0, Math.min(6, pool.length)));
+
+        document.getElementById('plantpick-sub').textContent =
+            `Màn ${this.currentLevelId} — Chọn tối đa 6 cây (${pool.length} cây có thể dùng)`;
+
+        this._buildPlantPickCards(pool);
+        this._updatePickCounter();
+        this._hideAllScreens();
+        document.getElementById('screen-plantpick').classList.remove('hidden');
+    }
+
+    _buildPlantPickCards(pool) {
+        const grid = document.getElementById('plantpick-grid');
+        grid.innerHTML = '';
+        const maxed = this._pickSelected.size >= 6;
+
+        for (const type of pool) {
+            const div = document.createElement('div');
+            div.className = 'ppcard';
+            if (this._pickSelected.has(type)) div.classList.add('pp-selected');
+            else if (maxed)                   div.classList.add('disabled');
+            div.dataset.plant = type;
+
+            // Copy thumbnail từ art canvas đã vẽ sẵn
+            const thumb = document.createElement('canvas');
+            thumb.width = thumb.height = 58;
+            thumb.className = 'card-art';
+            const src = document.getElementById(`art-${type}`);
+            if (src) thumb.getContext('2d').drawImage(src, 0, 0);
+
+            const name = document.createElement('div');
+            name.className = 'card-name';
+            name.textContent = PLANT_DEFS[type]?.name || type;
+
+            div.appendChild(thumb);
+            div.appendChild(name);
+            div.addEventListener('click', () => this._togglePlantPick(type, div));
+            grid.appendChild(div);
+        }
+    }
+
+    _togglePlantPick(type, cardEl) {
+        if (this._pickSelected.has(type)) {
+            // Bỏ chọn
+            this._pickSelected.delete(type);
+            cardEl.classList.remove('pp-selected');
+        } else if (this._pickSelected.size < 6) {
+            // Thêm chọn (còn chỗ)
+            this._pickSelected.add(type);
+            cardEl.classList.add('pp-selected');
+        }
+        // Cập nhật trạng thái disabled cho các card chưa chọn
+        const maxed = this._pickSelected.size >= 6;
+        document.querySelectorAll('.ppcard').forEach(c => {
+            const selected = this._pickSelected.has(c.dataset.plant);
+            c.classList.toggle('disabled', maxed && !selected);
+        });
+        this._updatePickCounter();
+    }
+
+    _updatePickCounter() {
+        const n = this._pickSelected.size;
+        document.getElementById('plantpick-counter').textContent = `${n} / 6 cây đã chọn`;
+        document.getElementById('btn-startlevel').disabled = (n === 0);
+    }
+
+    // Gọi khi người chơi bấm "Bắt Đầu!" trên màn pick
+    confirmPlantPick() {
+        if (this._pickSelected.size === 0) return;
+        this._overridePlants = [...this._pickSelected]; // lưu lựa chọn
+        this._doStartLevel();
+    }
 
     showMenu() {
         this._hideAllScreens();
         document.getElementById('screen-start').classList.remove('hidden');
         this.state = 'start';
         this._updateLevelSelectUI();
+        audioManager.pause(); // dừng nhạc khi về menu
     }
 
     // ── Cập nhật mỗi frame ─────────────────────────────────────
@@ -300,10 +421,10 @@ class Game {
         // Chờ 2 giây rồi mới hiện màn hình thắng (cho zombie chết hết animation)
         setTimeout(() => {
             if (this.state !== 'playing') return;
-            if (this.currentLevelId === 8) {
+            if (this.currentLevelId === 10) {
                 // Màn cuối → màn hình chiến thắng tổng
                 this.state = 'win';
-                highestUnlocked = 8;
+                highestUnlocked = 10;
                 document.getElementById('screen-win').classList.remove('hidden');
             } else {
                 // Còn màn tiếp → màn hình hoàn thành màn + mở khóa màn kế
@@ -325,7 +446,7 @@ class Game {
 
     // Ẩn tất cả màn hình overlay
     _hideAllScreens() {
-        ['screen-start', 'screen-gameover', 'screen-win', 'screen-levelcomplete']
+        ['screen-start', 'screen-gameover', 'screen-win', 'screen-levelcomplete', 'screen-plantpick', 'screen-pause']
             .forEach(id => document.getElementById(id).classList.add('hidden'));
         document.getElementById('wave-banner').classList.add('hidden');
         this._winPending = false;
@@ -387,7 +508,7 @@ class Game {
     // Chọn thẻ cây từ HUD — kiểm tra đủ sun và không cooldown
     selectCard(type) {
         if (this.state !== 'playing') return;
-        if (!this.levelDef.availablePlants.includes(type)) return; // chưa mở khóa
+        if (!this.availablePlants.includes(type)) return; // chưa mở khóa
         const d = PLANT_DEFS[type];
         if (this.sun < d.cost || this.cooldowns[type] > 0) return; // không đủ điều kiện
         // Nếu đang dùng xẻng → tắt xẻng trước
@@ -440,8 +561,9 @@ class Game {
     // ── Cập nhật giao diện DOM ─────────────────────────────────
     _updateUI() {
         document.getElementById('sun-count').textContent = this.sun;
-        const available = this.levelDef.availablePlants;
-        const all = ['sunflower', 'peashooter', 'wallnut', 'cherrybomb', 'potatomine', 'chomper', 'repeater', 'sunshooter', 'snowpea'];
+        const available = this.availablePlants;
+        const all = ['sunflower', 'peashooter', 'wallnut', 'cherrybomb', 'potatomine',
+                     'chomper', 'repeater', 'sunshooter', 'twinsun', 'peanut', 'snowpea'];
         for (const type of all) {
             const card    = document.getElementById(`card-${type}`);
             const cdFill  = document.getElementById(`cd-${type}`);
@@ -459,14 +581,15 @@ class Game {
 
     // Cập nhật viền vàng "selected" trên các thẻ cây
     _updateCardSelection() {
-        ['sunflower', 'peashooter', 'wallnut', 'cherrybomb', 'potatomine', 'chomper', 'repeater', 'sunshooter', 'snowpea'].forEach(t => {
+        ['sunflower', 'peashooter', 'wallnut', 'cherrybomb', 'potatomine',
+         'chomper', 'repeater', 'sunshooter', 'twinsun', 'peanut', 'snowpea'].forEach(t => {
             document.getElementById(`card-${t}`).classList.toggle('selected', this.selectedType === t);
         });
     }
 
     // Cập nhật giao diện chọn màn: nút unlocked = xanh, locked = xám
     _updateLevelSelectUI() {
-        for (let i = 1; i <= 8; i++) {
+        for (let i = 1; i <= 10; i++) {
             const btn = document.getElementById(`lvl-btn-${i}`);
             if (i <= highestUnlocked) { btn.classList.add('unlocked'); btn.classList.remove('locked'); }
             else                      { btn.classList.add('locked');   btn.classList.remove('unlocked'); }
@@ -513,8 +636,10 @@ class Game {
                 case 'potatomine': drawPotatoMine(ctx, px, py, 0, false, false, 0);  break;
                 case 'chomper':    drawChomper(ctx, px, py, 0, false, 0, false);       break;
                 case 'repeater':   drawRepeater(ctx, px, py, 0, 0, 0);                break;
-                case 'sunshooter': drawSunShooter(ctx, px, py, 0, 0, false);          break;
-                case 'snowpea':    drawSnowPea(ctx, px, py, 0, 0);                  break;
+                case 'sunshooter': drawSunShooter(ctx, px, py, 0, 0, false); break;
+                case 'twinsun':    drawTwinSun(ctx, px, py, 0, false);     break;
+                case 'peanut':     drawPeanut(ctx, px, py, 0, 1, 0);       break;
+                case 'snowpea':    drawSnowPea(ctx, px, py, 0, 0);         break;
             }
             ctx.restore();
         }
@@ -676,7 +801,8 @@ class Game {
     // Nhãn màn chơi góc trên phải canvas
     _drawLevelBadge() {
         if (this.state !== 'playing') return;
-        const names = ['First Steps', 'More Lawn', 'Conehead', 'Cherry Season', 'Potato Field', 'Vaulting Grounds', 'Bucket Brigade', 'Final Assault'];
+        const names = ['First Steps', 'More Lawn', 'Conehead', 'Cherry Season', 'Potato Field',
+                       'Vaulting Grounds', 'Bucket Brigade', 'Final Assault', 'Peanut Gallery', 'Brick by Brick'];
         ctx.save();
         ctx.fillStyle = 'rgba(0,0,0,0.4)';
         rr(ctx, W - 110, 2, 108, 26, 8); ctx.fill();

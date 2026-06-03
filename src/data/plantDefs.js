@@ -45,11 +45,13 @@ const PLANT_DEFS = {
     },
     chomper: {
         name: 'Chomper',
-        cost: 150,         // ăn 1 zombie tức thì, nhưng cần thời gian tiêu hoá
-        hp: 400,           // HP cao hơn Peashooter để sống sót lâu hơn khi ăn zombie
+        cost: 150,
+        hp: 400,
         cooldownMs: 7000,
-        rechargeMs: 38000, // 38s tiêu hoá trước khi cắn được lại
-        chompRange: 60,    // khoảng cách kích hoạt cắn (pixel, rộng hơn eating range)
+        rechargeMs: 35000,  // 35s tiêu hoá sau khi zombie chết
+        chompRange: 120,    // tầm cắn 120px — gấp đôi, vươn xa để bắt zombie trước
+        chompDmg:   900,    
+        biteInterval: 1500, // ms giữa 2 nhát cắn khi zombie chưa chết
     },
     repeater: {
         name: 'Repeater',
@@ -69,6 +71,22 @@ const PLANT_DEFS = {
         sunAmount: 25,
         fireRate: 1500,  
         peaDamage: 15,     // bắn đạn yếu hơn Peashooter, nhưng có thể sản xuất sun
+    },
+    twinsun: {
+        name: 'Twin Sunflower',
+        cost: 125,          // PvZ2: 125 sun
+        hp: 300,
+        cooldownMs: 15000,  // cooldown dài hơn Sunflower vì hiệu quả hơn
+        sunInterval: 23000, // sản xuất 2 sun mỗi 25s (= 50 sun) vs Sunflower 25sun/23s
+        sunAmount: 25,      // mỗi lần drop 25, nhưng drop 2 cùng lúc → 50 sun/chu kỳ
+    },
+    peanut: {
+        name: 'Peanut',
+        cost: 150,          // PvZ Fusion: kết hợp Wall-nut + Peashooter
+        hp: 4000,           // máu bằng Wall-nut — vừa bắn vừa chặn
+        cooldownMs: 30000,  // cooldown bằng Wall-nut
+        fireRate: 2000,     // chậm hơn Peashooter (nó là cây chặn mà)
+        peaDamage: 20,      // sát thương bằng Peashooter, đạn màu nâu
     },
     snowpea: {
         name: 'Snow Pea',

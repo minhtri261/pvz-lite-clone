@@ -16,6 +16,8 @@ function drawCardThumbnails() {
         ['art-chomper',    c => { c.save(); c.translate(29, 36); c.scale(0.72, 0.72); drawChomper(c, 0, 0, 0.5, false, 0, false); c.restore(); }],
         ['art-repeater',   c => { c.save(); c.translate(18, 36); c.scale(0.55, 0.55); drawRepeater(c, 0, 0, 0.5, 0, 0); c.restore(); }],
         ['art-sunshooter', c => { c.save(); c.translate(29, 36); c.scale(0.58, 0.58); drawSunShooter(c, 0, 0, 0.5, 0, false); c.restore(); }],
+        ['art-twinsun',    c => { c.save(); c.translate(29, 38); c.scale(0.62, 0.62); drawTwinSun(c, 0, 0, 0.5, false); c.restore(); }],
+        ['art-peanut',     c => { c.save(); c.translate(20, 32); c.scale(0.65, 0.65); drawPeanut(c, 0, 0, 0.5, 1, 0); c.restore(); }],
         ['art-snowpea',    c => { c.save(); c.translate(20, 36); c.scale(0.56, 0.56); drawSnowPea(c, 0, 0, 0.5, 0); c.restore(); }],
     ];
 
@@ -32,6 +34,8 @@ function drawCardThumbnails() {
                     : id === 'art-chomper'    ? '#2a0a3a'
                     : id === 'art-repeater'  ? '#1a4a0a'
                     : id === 'art-sunshooter'? '#3a2a00'
+                    : id === 'art-twinsun'   ? '#3a3000'
+                    : id === 'art-peanut'    ? '#4a2a00'
                     :                           '#2a6a14';
         rr(c, 0, 0, 58, 58, 5); c.fill();
 

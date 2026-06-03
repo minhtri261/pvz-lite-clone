@@ -18,11 +18,11 @@
 //    Xẻng góc nghiêng -22° với nắm tay, thân gỗ, lưỡi kim loại bóng
 // ══════════════════════════════════════════════════════════════
 
-function drawPea(ctx, x, y, animTime, isIce, isYellow = false) {
-    const c1 = isIce ? '#B2EBF2' : isYellow ? '#FFF9C4' : '#CCFF80';
-    const c2 = isIce ? '#00BCD4' : isYellow ? '#FFD600' : '#66CC00';
-    const c3 = isIce ? '#006064' : isYellow ? '#E65100' : '#336600';
-    const gl = isIce ? 'rgba(0,188,212,0.28)' : isYellow ? 'rgba(255,200,0,0.25)' : 'rgba(120,255,80,0.25)';
+function drawPea(ctx, x, y, animTime, isIce, isYellow = false, isBrown = false) {
+    const c1 = isIce ? '#B2EBF2' : isYellow ? '#FFF9C4' : isBrown ? '#D2A060' : '#CCFF80';
+    const c2 = isIce ? '#00BCD4' : isYellow ? '#FFD600' : isBrown ? '#A0522D' : '#66CC00';
+    const c3 = isIce ? '#006064' : isYellow ? '#E65100' : isBrown ? '#5C2A08' : '#336600';
+    const gl = isIce ? 'rgba(0,188,212,0.28)' : isYellow ? 'rgba(255,200,0,0.25)' : isBrown ? 'rgba(160,82,45,0.22)' : 'rgba(120,255,80,0.25)';
     ctx.save(); ctx.translate(Math.round(x), Math.round(y));
     ctx.fillStyle = gl; ctx.beginPath(); ctx.arc(0, 0, 12, 0, Math.PI * 2); ctx.fill();
     const pg = ctx.createRadialGradient(-3, -3, 1, 0, 0, 9);

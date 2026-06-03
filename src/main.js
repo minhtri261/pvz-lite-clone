@@ -27,12 +27,32 @@ canvas.addEventListener('contextmenu', e => {
 
 // ── Phím tắt ──────────────────────────────────────────────────
 document.addEventListener('keydown', e => {
-    if (e.key === 'Escape')             game._deselect();     // ESC: hủy chọn
-    if (e.key === 's' || e.key === 'S') game.selectShovel();  // S: bật/tắt xẻng
+    if (e.key === 'Escape') {
+        if (game.state === 'paused') {
+            game.togglePause();               // ESC khi đang pause → tiếp tục
+        } else if (game.state === 'playing') {
+            if (game.selectedType || game.shovelMode) {
+                game._deselect();             // ESC khi đang chọn cây/xẻng → hủy chọn
+            } else {
+                game.togglePause();           // ESC khi đang chơi bình thường → pause
+            }
+        }
+    }
+    if (e.key === 's' || e.key === 'S') game.selectShovel();
+    if (e.key === 'm' || e.key === 'M') {
+        const muted = audioManager.toggleMute();
+        const btn   = document.getElementById('btn-mute');
+        btn.textContent = muted ? '🔇' : '🔊';
+        btn.classList.toggle('muted', muted);
+    }
+    if (e.key === 'p' || e.key === 'P') {
+        if (game.state === 'playing' || game.state === 'paused') game.togglePause();
+    }
 });
 
 // ── Gắn sự kiện cho thẻ cây trong HUD ─────────────────────────
-['sunflower', 'peashooter', 'wallnut', 'cherrybomb', 'potatomine', 'chomper', 'repeater', 'sunshooter', 'snowpea'].forEach(type => {
+['sunflower', 'peashooter', 'wallnut', 'cherrybomb', 'potatomine',
+ 'chomper', 'repeater', 'sunshooter', 'twinsun', 'peanut', 'snowpea'].forEach(type => {
     document.getElementById(`card-${type}`).addEventListener('click', () => game.selectCard(type));
 });
 
@@ -41,11 +61,30 @@ document.getElementById('shovel-btn').addEventListener('click', () => game.selec
 
 // ── Gắn sự kiện cho các nút màn hình overlay ──────────────────
 document.getElementById('btn-nextlevel').addEventListener('click', () => {
-    game.startLevel(game.currentLevelId + 1); // vào màn tiếp theo
+    game.startLevel(game.currentLevelId + 1);
 });
 document.getElementById('btn-retry').addEventListener('click',   () => game.restart());
 document.getElementById('btn-menu').addEventListener('click',    () => game.showMenu());
-document.getElementById('btn-winplay').addEventListener('click', () => game.showMenu()); // chơi lại từ đầu
+document.getElementById('btn-winplay').addEventListener('click', () => game.showMenu());
+
+// Màn chọn cây
+document.getElementById('btn-startlevel').addEventListener('click',     () => game.confirmPlantPick());
+document.getElementById('btn-plantpick-back').addEventListener('click', () => game.showMenu());
+
+// Pause menu
+document.getElementById('btn-resume').addEventListener('click',       () => game.togglePause());
+document.getElementById('btn-retry-pause').addEventListener('click',  () => { game.togglePause(); game.restart(); });
+document.getElementById('btn-menu-pause').addEventListener('click',   () => game.showMenu());
+
+// HUD buttons
+document.getElementById('btn-pause-hud').addEventListener('click', () => {
+    if (game.state === 'playing' || game.state === 'paused') game.togglePause();
+});
+document.getElementById('btn-mute').addEventListener('click', () => {
+    const muted = audioManager.toggleMute();
+    document.getElementById('btn-mute').textContent = muted ? '🔇' : '🔊';
+    document.getElementById('btn-mute').classList.toggle('muted', muted);
+});
 
 // ══════════════════════════════════════════════════════════════
 //  Vòng lặp game chính — chạy ở 60 FPS với requestAnimationFrame
@@ -68,8 +107,11 @@ function loop(timestamp) {
 }
 
 // ── Khởi tạo ──────────────────────────────────────────────────
-const game = new Game();       // tạo đối tượng game (hiện màn chọn màn)
-drawCardThumbnails();           // vẽ hình cây/xẻng vào các thẻ card
+const game = new Game();
+drawCardThumbnails();
+
+// Khởi tạo audio sau lần click đầu tiên (yêu cầu của browser)
+document.addEventListener('click', () => audioManager.init(), { once: true });
 
 // Frame đầu tiên: ghi timestamp để dt không bị âm/sai ở frame 2
 requestAnimationFrame(ts => {

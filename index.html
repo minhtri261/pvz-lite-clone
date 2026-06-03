@@ -70,6 +70,18 @@
                 <div class="cd-bar"><div class="cd-fill" id="cd-sunshooter"></div></div>
             </div>
 
+            <div class="pcard" id="card-twinsun" data-type="twinsun">
+                <canvas class="card-art" id="art-twinsun" width="58" height="58"></canvas>
+                <div class="card-name">Twin Sun</div>
+                <div class="cd-bar"><div class="cd-fill" id="cd-twinsun"></div></div>
+            </div>
+
+            <div class="pcard" id="card-peanut" data-type="peanut">
+                <canvas class="card-art" id="art-peanut" width="58" height="58"></canvas>
+                <div class="card-name">Peanut</div>
+                <div class="cd-bar"><div class="cd-fill" id="cd-peanut"></div></div>
+            </div>
+
             <div class="pcard" id="card-snowpea" data-type="snowpea">
                 <canvas class="card-art" id="art-snowpea" width="58" height="58"></canvas>
                 <div class="card-name">Snow Pea</div>
@@ -84,12 +96,33 @@
         </div>
 
         <div id="wave-label">Wave <span id="wave-num">—</span></div>
+        <button id="btn-mute"      class="hud-icon-btn" title="Tắt/Bật nhạc (M)">🔊</button>
+        <button id="btn-pause-hud" class="hud-icon-btn" title="Tạm dừng (ESC)">⏸</button>
     </div>
 
     <!-- ══ MAIN CANVAS ══════════════════════════════════════════ -->
     <canvas id="gameCanvas"></canvas>
 
     <!-- ══ OVERLAYS ═════════════════════════════════════════════ -->
+
+    <!-- ══ PAUSE MENU ══════════════════════════════════════════ -->
+    <div id="screen-pause" class="fullscreen-overlay hidden">
+        <div class="screen-box">
+            <h1 class="pause-title">⏸ Tạm Dừng</h1>
+            <p id="pause-level-info" style="font-size:14px;color:#c8ffb0;margin-bottom:4px;"></p>
+            <button class="big-btn green-btn" id="btn-resume" style="margin-top:6px;">
+                ▶ Tiếp Tục
+            </button>
+            <button class="big-btn" id="btn-retry-pause"
+                style="margin-top:8px;background:linear-gradient(180deg,#d85c1a,#8a2800);border-color:#5a1200;color:#ffe8d8;">
+                ↺ Chơi Lại Màn
+            </button>
+            <button class="big-btn" id="btn-menu-pause"
+                style="margin-top:8px;background:linear-gradient(180deg,#5060b0,#2a3070);border-color:#181e50;color:#d8dcff;">
+                ⌂ Trang Chủ
+            </button>
+        </div>
+    </div>
 
     <!-- Start Screen / Level Select -->
     <div id="screen-start" class="fullscreen-overlay">
@@ -150,6 +183,18 @@
                         <span class="lvl-name">Final Assault</span>
                     </button>
                 </div>
+                <div class="lvl-btn-wrap" id="lvlwrap-9">
+                    <button class="lvl-btn locked" id="lvl-btn-9" onclick="game.startLevel(9)">
+                        <span class="lvl-num">9</span>
+                        <span class="lvl-name">Peanut Gallery</span>
+                    </button>
+                </div>
+                <div class="lvl-btn-wrap" id="lvlwrap-10">
+                    <button class="lvl-btn locked" id="lvl-btn-10" onclick="game.startLevel(10)">
+                        <span class="lvl-num">10</span>
+                        <span class="lvl-name">Brick by Brick</span>
+                    </button>
+                </div>
             </div>
 
             <div class="tips-box">
@@ -165,6 +210,21 @@
     <!-- Wave Banner -->
     <div id="wave-banner" class="hidden">
         <span id="wave-banner-text">Wave 1!</span>
+    </div>
+
+    <!-- Plant Selection Screen (level 7+) -->
+    <div id="screen-plantpick" class="fullscreen-overlay hidden">
+        <div class="screen-box">
+            <h2 class="plantpick-title">Chọn Cây Trồng</h2>
+            <p id="plantpick-sub" class="plantpick-sub"></p>
+            <div id="plantpick-grid"></div>
+            <div id="plantpick-counter" class="plantpick-counter">0 / 6</div>
+            <button class="big-btn green-btn" id="btn-startlevel">Bắt Đầu!</button>
+            <button class="big-btn" id="btn-plantpick-back"
+                style="margin-top:6px;background:linear-gradient(180deg,#555,#2a2a2a);border-color:#666;color:#ccc;font-size:18px;">
+                Quay Lại
+            </button>
+        </div>
     </div>
 
     <!-- Level Complete -->
@@ -198,6 +258,9 @@
 
 </div><!-- end #game-wrap -->
 
+<!-- §0 Audio (before everything — uses no game globals) -->
+<script src="src/audio/AudioManager.js"></script>
+
 <!-- §1 Constants + utils (must be first) -->
 <script src="src/constants.js"></script>
 
@@ -214,6 +277,8 @@
 <script src="src/data/levels/level6.js"></script>
 <script src="src/data/levels/level7.js"></script>
 <script src="src/data/levels/level8.js"></script>
+<script src="src/data/levels/level9.js"></script>
+<script src="src/data/levels/level10.js"></script>
 <script src="src/data/levels/levelDefs.js"></script>
 
 <!-- §4 Sprites (pure draw functions, no classes) -->
@@ -236,6 +301,8 @@
 <script src="src/plants/Chomper.js"></script>
 <script src="src/plants/Repeater.js"></script>
 <script src="src/plants/SunShooter.js"></script>
+<script src="src/plants/TwinSun.js"></script>
+<script src="src/plants/Peanut.js"></script>
 <script src="src/plants/SnowPea.js"></script>
 <script src="src/plants/createPlant.js"></script>
 
@@ -246,6 +313,7 @@
 <script src="src/zombies/ConeheadZombie.js"></script>
 <script src="src/zombies/BucketZombie.js"></script>
 <script src="src/zombies/PoleVaultingZombie.js"></script>
+<script src="src/zombies/BrickheadZombie.js"></script>
 <script src="src/zombies/createZombie.js"></script>
 
 <!-- §8 Other game entities -->
