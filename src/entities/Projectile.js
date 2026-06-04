@@ -1,21 +1,21 @@
 'use strict';
 // ══════════════════════════════════════════════════════════════
 //  Projectile.js — Viên đạn do các cây bắn ra
-//  Các loại đạn:
-//    isIce=true    → đạn băng xanh (SnowPea) — làm chậm zombie
-//    isYellow=true → đạn vàng cam (Sun-Shooter)
-//    isBrown=true  → đạn nâu đất (Peanut)
-//    tất cả false  → đạn xanh lá (Peashooter, Repeater)
+//  isIce=true    → băng xanh (SnowPea) — làm chậm zombie
+//  isYellow=true → vàng cam (Sun-Shooter)
+//  isBrown=true  → nâu đất (Peanut)
+//  isSpore=true  → tím bào tử (Puff-shroom)
+//  tất cả false  → xanh lá (Peashooter, Repeater)
 // ══════════════════════════════════════════════════════════════
 
 class Projectile {
-    constructor(x, y, row, isIce = false, isYellow = false, isBrown = false) {
+    constructor(x, y, row, isIce = false, isYellow = false, isBrown = false, isSpore = false) {
         Object.assign(this, {
-            x, y, row, isIce, isYellow, isBrown,
-            speed: 8,
-            dead: false,
+            x, y, row, isIce, isYellow, isBrown, isSpore,
+            speed:    8,
+            dead:     false,
             animTime: Math.random() * Math.PI * 2,
-            damage: PLANT_DEFS.peashooter.peaDamage,
+            damage:   PLANT_DEFS.peashooter.peaDamage,
         });
     }
 
@@ -26,6 +26,7 @@ class Projectile {
     }
 
     draw(ctx) {
-        drawPea(ctx, this.x, this.y, this.animTime, this.isIce, this.isYellow, this.isBrown);
+        drawPea(ctx, this.x, this.y, this.animTime,
+                this.isIce, this.isYellow, this.isBrown, this.isSpore);
     }
 }

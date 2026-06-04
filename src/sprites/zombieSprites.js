@@ -178,28 +178,46 @@ function drawBucketZombie(ctx, x, y, animTime, state, hpPct, hasBucket, deathT) 
     const hy = -36 + eatBob;
     const bTop = hy - 46, bBase = hy - 14;
 
-    const bucketG = ctx.createLinearGradient(-18, bTop, 18, bBase);
-    bucketG.addColorStop(0, '#BDBDBD'); bucketG.addColorStop(0.3, '#E0E0E0');
-    bucketG.addColorStop(0.6, '#9E9E9E'); bucketG.addColorStop(1, '#757575');
-    ctx.fillStyle = bucketG; ctx.strokeStyle = '#424242'; ctx.lineWidth = 2.5;
+    // Xô úp ngược (đang đội trên đầu):
+    //   bBase (y = hy-14, gần đầu)  = miệng xô → RỘNG hơn
+    //   bTop  (y = hy-46, trên cao) = đáy xô   → HẸP hơn
+    const bucketG = ctx.createLinearGradient(0, bTop, 0, bBase);
+    bucketG.addColorStop(0,   '#6a6a6a'); // đáy xô (trên) tối
+    bucketG.addColorStop(0.35,'#9a9a9a');
+    bucketG.addColorStop(0.7, '#CECECE'); // miệng xô (dưới) sáng
+    bucketG.addColorStop(1,   '#E8E8E8');
+    ctx.fillStyle = bucketG; ctx.strokeStyle = '#3a3a3a'; ctx.lineWidth = 2.5;
     ctx.beginPath();
-    ctx.moveTo(-15, bBase); ctx.lineTo(-19, bTop); ctx.lineTo(19, bTop); ctx.lineTo(15, bBase);
+    ctx.moveTo(-19, bBase); // miệng xô (dưới), rộng
+    ctx.lineTo(-12, bTop);  // đáy xô (trên), hẹp
+    ctx.lineTo(12, bTop);   // đáy xô (trên), hẹp
+    ctx.lineTo(19, bBase);  // miệng xô (dưới), rộng
     ctx.closePath(); ctx.fill(); ctx.stroke();
 
-    ctx.fillStyle = '#9E9E9E'; ctx.strokeStyle = '#424242'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.ellipse(0, bTop, 19, 6, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    // Đáy xô (phẳng, ở TRÊN cao) — hẹp
+    ctx.fillStyle = '#7a7a7a'; ctx.strokeStyle = '#3a3a3a'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.ellipse(0, bTop, 12, 4, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
 
-    ctx.strokeStyle = 'rgba(66,66,66,0.55)'; ctx.lineWidth = 1.5;
-    [0.35, 0.65].forEach(t => {
-        const by = lerp(bTop, bBase, t), bw = lerp(19, 15, t);
+    // Vành miệng xô (ở DƯỚI, gần đầu zombie) — rộng
+    ctx.fillStyle = '#BEBEBE'; ctx.strokeStyle = '#3a3a3a'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.ellipse(0, bBase, 19, 6.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+    // Đai ngang — hẹp dần từ dưới lên trên
+    ctx.strokeStyle = 'rgba(50,50,50,0.55)'; ctx.lineWidth = 1.5;
+    [0.32, 0.66].forEach(t => {
+        const by = lerp(bBase, bTop, t); // từ miệng lên đáy
+        const bw = lerp(19, 12, t);      // hẹp dần
         ctx.beginPath(); ctx.moveTo(-bw, by); ctx.lineTo(bw, by); ctx.stroke();
     });
 
-    ctx.strokeStyle = '#9E9E9E'; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
-    ctx.beginPath(); ctx.arc(0, bTop, 12, Math.PI + 0.3, -0.3); ctx.stroke();
+    // Quai xô — ở đáy (phía trên)
+    ctx.strokeStyle = '#8a8a8a'; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.arc(0, bTop, 10, Math.PI + 0.3, -0.3); ctx.stroke();
 
-    ctx.strokeStyle = 'rgba(255,255,255,0.4)'; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.moveTo(-13, bTop + 5); ctx.lineTo(-11, bBase - 2); ctx.stroke();
+    // Highlight phản sáng
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(-16, bBase - 3); ctx.lineTo(-11, bTop + 5); ctx.stroke();
+
     ctx.restore();
 }
 
@@ -263,16 +281,17 @@ function drawBrickheadZombie(ctx, x, y, animTime, state, hpPct, hasBrick, brickP
     // Cục gạch lớn trên đầu
     const bL = -22, bT = hy - 46, bW = 44, bH = 38;
 
-    // Thân gạch — gradient xám
+    // Thân gạch — ĐỎ GẠCH (brick red, giống gạch thật)
     const bg = ctx.createLinearGradient(bL, bT, bL, bT + bH);
-    bg.addColorStop(0,   '#AEAEAE');
-    bg.addColorStop(0.4, '#888888');
-    bg.addColorStop(1,   '#5a5a5a');
-    ctx.fillStyle = bg; ctx.strokeStyle = '#3a3a3a'; ctx.lineWidth = 2.5;
+    bg.addColorStop(0,    '#CC3822'); // đỏ gạch sáng (highlight trên)
+    bg.addColorStop(0.35, '#A82C18'); // đỏ gạch trung
+    bg.addColorStop(0.72, '#8A1E0E'); // đỏ gạch tối
+    bg.addColorStop(1,    '#6a1408'); // rất tối (cạnh dưới)
+    ctx.fillStyle = bg; ctx.strokeStyle = '#4a0e06'; ctx.lineWidth = 2.5;
     rr(ctx, bL, bT, bW, bH, 3); ctx.fill(); ctx.stroke();
 
-    // Đường vữa ngang (mortar lines)
-    ctx.strokeStyle = 'rgba(30,30,30,0.55)'; ctx.lineWidth = 1.5;
+    // Đường vữa ngang (mortar màu xám nhạt — tương phản với gạch đỏ)
+    ctx.strokeStyle = 'rgba(200,150,120,0.45)'; ctx.lineWidth = 1.5;
     const m1y = bT + bH * 0.33, m2y = bT + bH * 0.66;
     ctx.beginPath(); ctx.moveTo(bL, m1y); ctx.lineTo(bL + bW, m1y); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(bL, m2y); ctx.lineTo(bL + bW, m2y); ctx.stroke();
@@ -282,19 +301,22 @@ function drawBrickheadZombie(ctx, x, y, animTime, state, hpPct, hasBrick, brickP
     ctx.beginPath(); ctx.moveTo(bL + bW * 0.75, m1y); ctx.lineTo(bL + bW * 0.75, m2y); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(bL + bW * 0.5, m2y);  ctx.lineTo(bL + bW * 0.5, bT + bH); ctx.stroke();
 
-    // Highlight phía trên
-    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+    // Highlight ấm trên gạch đỏ
+    ctx.fillStyle = 'rgba(255,180,130,0.14)';
     ctx.fillRect(bL + 2, bT + 2, bW - 4, bH * 0.28);
 
-    // Vết nứt khi HP gạch thấp
+    // Vết nứt khi HP gạch thấp (màu tối hơn để nổi bật trên nền đỏ)
     if (brickPct < 0.65) {
-        ctx.strokeStyle = 'rgba(0,0,0,0.65)'; ctx.lineWidth = 1.5;
+        ctx.strokeStyle = 'rgba(30,5,0,0.75)'; ctx.lineWidth = 1.5;
         ctx.beginPath(); ctx.moveTo(bL + 8, bT + 4); ctx.lineTo(bL + 14, bT + 16); ctx.lineTo(bL + 10, bT + 28); ctx.stroke();
     }
     if (brickPct < 0.3) {
-        ctx.strokeStyle = 'rgba(0,0,0,0.75)'; ctx.lineWidth = 2;
+        ctx.strokeStyle = 'rgba(20,2,0,0.82)'; ctx.lineWidth = 2;
         ctx.beginPath(); ctx.moveTo(bL + 26, bT + 3); ctx.lineTo(bL + 22, bT + 15); ctx.lineTo(bL + 32, bT + 24); ctx.stroke();
         ctx.beginPath(); ctx.moveTo(bL + 34, bT + 30); ctx.lineTo(bL + 40, bT + 36); ctx.stroke();
+        // Bụi gạch vỡ màu đỏ nhạt
+        ctx.fillStyle = 'rgba(180,60,30,0.25)';
+        ctx.beginPath(); ctx.arc(bL + 28, bT + 35, 5, 0, Math.PI * 2); ctx.fill();
     }
 
     ctx.restore();

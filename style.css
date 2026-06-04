@@ -281,6 +281,14 @@ body {
     color: #555;
     cursor: not-allowed;
 }
+/* Nút màn đêm (11-12) — giao diện tối với viền trăng */
+.lvl-btn.night-btn.unlocked {
+    background: linear-gradient(180deg, #1a1a4a, #0a0a28);
+    border-color: #a0a8d8;
+    color: #c8d0f0;
+}
+.lvl-btn.night-btn.unlocked:hover { border-color: #d0d8ff; transform: translateY(-4px); }
+.lvl-btn.night-btn.locked { background: linear-gradient(180deg, #1a1a2a, #0a0a18); border-color: #333; }
 .lvl-btn.locked:hover { transform: none; }
 
 .lvl-num {

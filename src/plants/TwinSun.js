@@ -23,7 +23,8 @@ class TwinSun extends Plant {
         this.sunTimer    += dt;
         this.producePulse = Math.max(0, this.producePulse - dt / 1000);
 
-        if (this.sunTimer >= PLANT_DEFS.twinsun.sunInterval) {
+        const interval = PLANT_DEFS.twinsun.sunInterval * (game.levelDef?.isNight ? 2 : 1);
+        if (this.sunTimer >= interval) {
             this.sunTimer    = 0;
             this.producePulse = 0.5;
             // Hai đầu hoa → hai sun xuất hiện ở hai vị trí khác nhau

@@ -17,10 +17,11 @@ class Sunflower extends Plant {
         this.sunTimer    += dt;
         this.producePulse = Math.max(0, this.producePulse - dt / 1000);
 
-        if (this.sunTimer >= PLANT_DEFS.sunflower.sunInterval) {
+        // Ban đêm: sản xuất sun chậm hơn 25% → nhân thời gian tạo sun với 1.25
+        const interval = PLANT_DEFS.sunflower.sunInterval * (game.levelDef?.isNight ? 1.25 : 1);
+        if (this.sunTimer >= interval) {
             this.sunTimer    = 0;
-            this.producePulse = 0.5; // kích hoạt animation 0.5 giây
-            // Thêm sun vào danh sách — xuất hiện ngẫu nhiên quanh cây (không từ trời)
+            this.producePulse = 0.5;
             game.suns.push(new Sun(this.cx + randFloat(-30, 30), this.cy - 50, false));
         }
     }

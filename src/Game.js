@@ -24,7 +24,7 @@ class Game {
         this._overridePlants = null;      // danh sách cây người chơi chọn (màn 7+)
         this._pickSelected   = new Set(); // Set của plant types đang được chọn trên pick screen
         this.cooldowns = { sunflower: 0, peashooter: 0, wallnut: 0, cherrybomb: 0, potatomine: 0,
-                           chomper: 0, repeater: 0, sunshooter: 0, twinsun: 0, peanut: 0, snowpea: 0 };
+                           chomper: 0, repeater: 0, sunshooter: 0, twinsun: 0, peanut: 0, puffshroom: 0, snowpea: 0 };
         this.hoverCol = -1; this.hoverRow = -1;
         this.mouseX = 0;    this.mouseY = 0;
         this.skySunTimer = 4000;    // ms cho đến khi sun tiếp theo rơi từ trời
@@ -34,6 +34,8 @@ class Game {
     // Truy cập nhanh định nghĩa màn hiện tại và các hàng đang hoạt động
     get levelDef()        { return LEVEL_DEFS[this.currentLevelId - 1]; }
     get activeRows()      { return this.levelDef.activeRows; }
+    // isNight: true cho màn 11-12 → không có sun trời, sun plants chậm hơn 50%
+    get isNight()         { return this.levelDef?.isNight === true; }
     // availablePlants: bị ghi đè bởi lựa chọn của người chơi ở màn 7+
     get availablePlants() { return this._overridePlants || this.levelDef.availablePlants; }
 
@@ -47,8 +49,9 @@ class Game {
         this.suns        = []; // ánh nắng chưa thu
         this.particles   = []; // hạt hiệu ứng
         this.grid        = new Grid(); // lưới 5×9 quản lý vị trí cây
-        this.lawnMowers  = [];
-        this.zombiesKilled = 0;
+        this.lawnMowers      = [];
+        this.zombiesKilled   = 0;
+        this._mowerCooldowns = {}; // { row: remainingMs } — hàng vừa có mower chạy
     }
 
     // Reset hệ thống wave về trạng thái ban đầu
@@ -94,13 +97,14 @@ class Game {
         this.shovelMode   = false;
         document.getElementById('shovel-btn').classList.remove('selected');
         this.cooldowns = { sunflower: 0, peashooter: 0, wallnut: 0, cherrybomb: 0, potatomine: 0,
-                           chomper: 0, repeater: 0, sunshooter: 0, twinsun: 0, peanut: 0, snowpea: 0 };
+                           chomper: 0, repeater: 0, sunshooter: 0, twinsun: 0, peanut: 0, puffshroom: 0, snowpea: 0 };
         this.skySunTimer = 4000;
         this.sun = this.levelDef.startingSun;
         this.state = 'playing';
         this._hideAllScreens();
+        this._lastNight = null; // buộc refresh card puffshroom
         this._updateUI();
-        audioManager.play(); // bắt đầu nhạc nền
+        audioManager.play(!this.isNight);
     }
 
     // ── Pause / Resume ────────────────────────────────────────
@@ -108,7 +112,8 @@ class Game {
         if (this.state === 'playing') {
             this.state = 'paused';
             const names = ['First Steps','More Lawn','Conehead','Cherry Season','Potato Field',
-                           'Vaulting Grounds','Bucket Brigade','Final Assault','Peanut Gallery','Brick by Brick'];
+                           'Vaulting Grounds','Bucket Brigade','Final Assault','Peanut Gallery','Brick by Brick',
+                           '🌙 First Night','🌙 Final Night'];
             document.getElementById('pause-level-info').textContent =
                 `Level ${this.currentLevelId} — ${names[this.currentLevelId - 1] || ''}`;
             document.getElementById('screen-pause').classList.remove('hidden');
@@ -223,11 +228,13 @@ class Game {
         for (const t in this.cooldowns)
             if (this.cooldowns[t] > 0) this.cooldowns[t] = Math.max(0, this.cooldowns[t] - dt);
 
-        // Rơi sun từ trời ngẫu nhiên mỗi 8–12 giây
-        this.skySunTimer -= dt;
-        if (this.skySunTimer <= 0) {
-            this.skySunTimer = randFloat(8000, 12000);
-            this.suns.push(new Sun(randFloat(GX + 40, GRID_RIGHT - 40), 0, true));
+        // Rơi sun từ trời — CHỈ ở màn Ngày (ban đêm không có sun trời)
+        if (!this.isNight) {
+            this.skySunTimer -= dt;
+            if (this.skySunTimer <= 0) {
+                this.skySunTimer = randFloat(8000, 12000);
+                this.suns.push(new Sun(randFloat(GX + 40, GRID_RIGHT - 40), 0, true));
+            }
         }
 
         // Cập nhật tất cả cây, sau đó dọn cây đã chết
@@ -235,7 +242,13 @@ class Game {
         this.plants = this.plants.filter(p => !p.isDead);
         this.grid.cleanup(); // đồng bộ grid với mảng plants
 
-        this._updateWaves(dt); // tiến hành wave hệ thống
+        this._updateWaves(dt);
+
+        // Giảm cooldown hàng sau khi mower chạy
+        for (const row in this._mowerCooldowns) {
+            this._mowerCooldowns[row] -= dt;
+            if (this._mowerCooldowns[row] <= 0) delete this._mowerCooldowns[row];
+        }
 
         // Kiểm tra kích hoạt máy cắt cỏ
         for (const mower of this.lawnMowers) {
@@ -243,7 +256,10 @@ class Game {
             for (const z of this.zombies) {
                 // Zombie đến gần đủ → kích hoạt mower hàng đó
                 if (!z.dying && z.row === mower.row && z.x <= MOWER_TRIGGER) {
-                    mower.activate(); break;
+                    mower.activate();
+                    // Đặt cooldown 10s — hàng này tạm thời không spawn zombie
+                    this._mowerCooldowns[mower.row] = 10000;
+                    break;
                 }
             }
         }
@@ -319,8 +335,8 @@ class Game {
             // Spawn các scout theo đúng thời điểm delay
             while (this.scoutQueue.length > 0 && this.scoutQueue[0].delay <= this.waveTimer) {
                 const e   = this.scoutQueue.shift();
-                // row: null → chọn ngẫu nhiên trong activeRows
-                const row = e.row ?? this.activeRows[randInt(0, this.activeRows.length - 1)];
+                // row: null → ưu tiên hàng ít zombie + tránh hàng vừa có mower chạy
+                const row = e.row ?? this._pickSpawnRow(this.activeRows);
                 this.zombies.push(createZombie(e.type, row));
             }
             if (this.scoutQueue.length === 0) {
@@ -347,7 +363,7 @@ class Game {
             this.surgeTimer += dt;
             while (this.surgeQueue.length > 0 && this.surgeQueue[0].delay <= this.surgeTimer) {
                 const e   = this.surgeQueue.shift();
-                const row = e.row ?? this.activeRows[randInt(0, this.activeRows.length - 1)];
+                const row = e.row ?? this._pickSpawnRow(this.activeRows);
                 this.zombies.push(createZombie(e.type, row));
             }
             if (this.surgeQueue.length === 0) {
@@ -387,6 +403,39 @@ class Game {
         this.wavePhase  = 'surge';
     }
 
+    // Chọn hàng spawn tối ưu khi row = null:
+    //   1. Loại trừ hàng đang trong mower cooldown (10s sau khi mower chạy)
+    //   2. Trong các hàng còn lại, ưu tiên hàng ít zombie hơn (weighted random)
+    //      → tránh pile-up 5 zombie cùng 1 hàng
+    _pickSpawnRow(activeRows) {
+        if (activeRows.length === 1) return activeRows[0];
+
+        // Loại trừ hàng có mower cooldown (nếu còn hàng khả dụng)
+        const eligible = activeRows.filter(r => !this._mowerCooldowns[r]);
+        const pool     = eligible.length > 0 ? eligible : activeRows;
+
+        if (pool.length === 1) return pool[0];
+
+        // Đếm zombie sống (không dying) trên mỗi hàng
+        const counts = {};
+        for (const r of pool) counts[r] = 0;
+        for (const z of this.zombies) {
+            if (!z.isDead && !z.dying && counts[z.row] !== undefined) counts[z.row]++;
+        }
+
+        // Trọng số nghịch đảo: hàng ít zombie → trọng số cao hơn
+        const maxCount = Math.max(...Object.values(counts), 0);
+        const weights  = pool.map(r => maxCount - counts[r] + 1); // min weight = 1
+        const total    = weights.reduce((s, w) => s + w, 0);
+
+        let roll = Math.random() * total;
+        for (let i = 0; i < pool.length; i++) {
+            roll -= weights[i];
+            if (roll <= 0) return pool[i];
+        }
+        return pool[pool.length - 1];
+    }
+
     // Hiện banner wave ở giữa màn hình
     // isHuge = true → chữ đỏ lớn "A Huge Wave..." | false → chữ vàng "Wave 1"
     _showWaveBanner(text, isHuge = false) {
@@ -421,10 +470,10 @@ class Game {
         // Chờ 2 giây rồi mới hiện màn hình thắng (cho zombie chết hết animation)
         setTimeout(() => {
             if (this.state !== 'playing') return;
-            if (this.currentLevelId === 10) {
+            if (this.currentLevelId === 12) {
                 // Màn cuối → màn hình chiến thắng tổng
                 this.state = 'win';
-                highestUnlocked = 10;
+                highestUnlocked = 12;
                 document.getElementById('screen-win').classList.remove('hidden');
             } else {
                 // Còn màn tiếp → màn hình hoàn thành màn + mở khóa màn kế
@@ -506,11 +555,18 @@ class Game {
     }
 
     // Chọn thẻ cây từ HUD — kiểm tra đủ sun và không cooldown
+    // Trả về giá sun thực tế — puffshroom miễn phí ban đêm
+    _getEffectiveCost(type) {
+        const def = PLANT_DEFS[type];
+        if (def.nightCost !== undefined && this.isNight) return def.nightCost;
+        return def.cost;
+    }
+
     selectCard(type) {
         if (this.state !== 'playing') return;
-        if (!this.availablePlants.includes(type)) return; // chưa mở khóa
-        const d = PLANT_DEFS[type];
-        if (this.sun < d.cost || this.cooldowns[type] > 0) return; // không đủ điều kiện
+        if (!this.availablePlants.includes(type)) return;
+        const cost = this._getEffectiveCost(type);
+        if (this.sun < cost || this.cooldowns[type] > 0) return;
         // Nếu đang dùng xẻng → tắt xẻng trước
         if (this.shovelMode) {
             this.shovelMode = false;
@@ -547,13 +603,14 @@ class Game {
 
     // Thử đặt cây — kiểm tra sun, cooldown, ô trống
     _tryPlace(type, col, row) {
-        const d = PLANT_DEFS[type];
-        if (this.sun < d.cost || this.cooldowns[type] > 0 || this.grid.isOccupied(col, row)) return;
+        const cost = this._getEffectiveCost(type);
+        const d    = PLANT_DEFS[type];
+        if (this.sun < cost || this.cooldowns[type] > 0 || this.grid.isOccupied(col, row)) return;
         const p = createPlant(type, col, row);
         this.plants.push(p);
         this.grid.place(p, col, row);
-        this.sun -= d.cost;           // trừ sun
-        this.cooldowns[type] = d.cooldownMs; // bắt đầu cooldown
+        this.sun -= cost;                    // trừ sun theo giá thực tế
+        this.cooldowns[type] = d.cooldownMs;
         this._deselect();
         this._updateUI();
     }
@@ -563,33 +620,62 @@ class Game {
         document.getElementById('sun-count').textContent = this.sun;
         const available = this.availablePlants;
         const all = ['sunflower', 'peashooter', 'wallnut', 'cherrybomb', 'potatomine',
-                     'chomper', 'repeater', 'sunshooter', 'twinsun', 'peanut', 'snowpea'];
+                     'chomper', 'repeater', 'sunshooter', 'twinsun', 'peanut', 'puffshroom', 'snowpea'];
         for (const type of all) {
             const card    = document.getElementById(`card-${type}`);
             const cdFill  = document.getElementById(`cd-${type}`);
             const isAvail = available.includes(type);
-            // Ẩn thẻ nếu cây chưa mở khóa trong màn này
             card.classList.toggle('card-hidden', !isAvail);
             if (!isAvail) continue;
-            const d = PLANT_DEFS[type], cd = this.cooldowns[type];
-            // Làm mờ thẻ nếu không đủ sun hoặc đang cooldown
-            card.classList.toggle('disabled', this.sun < d.cost || cd > 0);
-            // Thanh cooldown: 0% = vừa dùng xong, 100% = sẵn sàng
+            const d    = PLANT_DEFS[type];
+            const cd   = this.cooldowns[type];
+            const cost = this._getEffectiveCost(type); // giá thực tế (puffshroom = 0 đêm)
+            card.classList.toggle('disabled', this.sun < cost || cd > 0);
             cdFill.style.width = cd > 0 ? `${(1 - cd / d.cooldownMs) * 100}%` : '100%';
         }
+        // Cập nhật hiển thị giá Puff-shroom (FREE ban đêm / 75 ban ngày)
+        if (available.includes('puffshroom') && this._lastNight !== this.isNight) {
+            this._lastNight = this.isNight;
+            this._refreshPuffShroomCard();
+        }
+    }
+
+    // Cập nhật hiển thị giá Puff-shroom trên card art canvas
+    _refreshPuffShroomCard() {
+        const el = document.getElementById('art-puffshroom');
+        if (!el) return;
+        const c = el.getContext('2d');
+        // Xóa phần dải giá cũ rồi vẽ lại
+        c.fillStyle = 'rgba(0,0,0,0.60)';
+        c.fillRect(0, 45, 58, 13);
+        if (this.isNight) {
+            // Ban đêm: "FREE" màu xanh lá
+            c.fillStyle = '#40FF60';
+            c.font = 'bold 10px Arial';
+            c.textAlign = 'left';
+            c.fillText('🌙 FREE', 6, 56);
+        } else {
+            // Ban ngày: sun icon + "75"
+            const sg = c.createRadialGradient(11, 51.5, 0.5, 11, 51.5, 5);
+            sg.addColorStop(0, '#FFFDE7'); sg.addColorStop(0.45, '#FFD700'); sg.addColorStop(1, '#FFA000');
+            c.fillStyle = sg; c.beginPath(); c.arc(11, 51.5, 5, 0, Math.PI * 2); c.fill();
+            c.fillStyle = '#FFE040'; c.font = 'bold 11px Arial'; c.textAlign = 'left';
+            c.fillText(PLANT_DEFS.puffshroom.cost, 20, 56);
+        }
+        c.textAlign = 'left';
     }
 
     // Cập nhật viền vàng "selected" trên các thẻ cây
     _updateCardSelection() {
         ['sunflower', 'peashooter', 'wallnut', 'cherrybomb', 'potatomine',
-         'chomper', 'repeater', 'sunshooter', 'twinsun', 'peanut', 'snowpea'].forEach(t => {
+         'chomper', 'repeater', 'sunshooter', 'twinsun', 'peanut', 'puffshroom', 'snowpea'].forEach(t => {
             document.getElementById(`card-${t}`).classList.toggle('selected', this.selectedType === t);
         });
     }
 
     // Cập nhật giao diện chọn màn: nút unlocked = xanh, locked = xám
     _updateLevelSelectUI() {
-        for (let i = 1; i <= 10; i++) {
+        for (let i = 1; i <= 12; i++) {
             const btn = document.getElementById(`lvl-btn-${i}`);
             if (i <= highestUnlocked) { btn.classList.add('unlocked'); btn.classList.remove('locked'); }
             else                      { btn.classList.add('locked');   btn.classList.remove('unlocked'); }
@@ -603,7 +689,8 @@ class Game {
         // Vẽ nền — highlight vàng chỉ hiện khi đặt cây (không phải xẻng)
         drawBackground(ctx, this.activeRows,
             (this.selectedType && !this.shovelMode) ? this.hoverCol : -1,
-            (this.selectedType && !this.shovelMode) ? this.hoverRow : -1);
+            (this.selectedType && !this.shovelMode) ? this.hoverRow : -1,
+            this.isNight); // truyền trạng thái ngày/đêm
 
         // Highlight đỏ khi xẻng hover trên ô
         if (this.shovelMode && this.hoverCol >= 0 && this.hoverRow >= 0 && this.activeRows.includes(this.hoverRow)) {
@@ -639,6 +726,7 @@ class Game {
                 case 'sunshooter': drawSunShooter(ctx, px, py, 0, 0, false); break;
                 case 'twinsun':    drawTwinSun(ctx, px, py, 0, false);     break;
                 case 'peanut':     drawPeanut(ctx, px, py, 0, 1, 0);       break;
+                case 'puffshroom': drawPuffShroom(ctx, px, py, 0, 0);      break;
                 case 'snowpea':    drawSnowPea(ctx, px, py, 0, 0);         break;
             }
             ctx.restore();
@@ -802,7 +890,8 @@ class Game {
     _drawLevelBadge() {
         if (this.state !== 'playing') return;
         const names = ['First Steps', 'More Lawn', 'Conehead', 'Cherry Season', 'Potato Field',
-                       'Vaulting Grounds', 'Bucket Brigade', 'Final Assault', 'Peanut Gallery', 'Brick by Brick'];
+                       'Vaulting Grounds', 'Bucket Brigade', 'Final Assault', 'Peanut Gallery', 'Brick by Brick',
+                       '🌙 First Night', '🌙 Final Night'];
         ctx.save();
         ctx.fillStyle = 'rgba(0,0,0,0.4)';
         rr(ctx, W - 110, 2, 108, 26, 8); ctx.fill();

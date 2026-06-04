@@ -82,6 +82,12 @@
                 <div class="cd-bar"><div class="cd-fill" id="cd-peanut"></div></div>
             </div>
 
+            <div class="pcard" id="card-puffshroom" data-type="puffshroom">
+                <canvas class="card-art" id="art-puffshroom" width="58" height="58"></canvas>
+                <div class="card-name">Puff-shroom</div>
+                <div class="cd-bar"><div class="cd-fill" id="cd-puffshroom"></div></div>
+            </div>
+
             <div class="pcard" id="card-snowpea" data-type="snowpea">
                 <canvas class="card-art" id="art-snowpea" width="58" height="58"></canvas>
                 <div class="card-name">Snow Pea</div>
@@ -195,6 +201,18 @@
                         <span class="lvl-name">Brick by Brick</span>
                     </button>
                 </div>
+                <div class="lvl-btn-wrap" id="lvlwrap-11">
+                    <button class="lvl-btn locked night-btn" id="lvl-btn-11" onclick="game.startLevel(11)">
+                        <span class="lvl-num">🌙11</span>
+                        <span class="lvl-name">First Night</span>
+                    </button>
+                </div>
+                <div class="lvl-btn-wrap" id="lvlwrap-12">
+                    <button class="lvl-btn locked night-btn" id="lvl-btn-12" onclick="game.startLevel(12)">
+                        <span class="lvl-num">🌙12</span>
+                        <span class="lvl-name">Final Night</span>
+                    </button>
+                </div>
             </div>
 
             <div class="tips-box">
@@ -279,6 +297,8 @@
 <script src="src/data/levels/level8.js"></script>
 <script src="src/data/levels/level9.js"></script>
 <script src="src/data/levels/level10.js"></script>
+<script src="src/data/levels/level11.js"></script>
+<script src="src/data/levels/level12.js"></script>
 <script src="src/data/levels/levelDefs.js"></script>
 
 <!-- §4 Sprites (pure draw functions, no classes) -->
@@ -303,6 +323,7 @@
 <script src="src/plants/SunShooter.js"></script>
 <script src="src/plants/TwinSun.js"></script>
 <script src="src/plants/Peanut.js"></script>
+<script src="src/plants/PuffShroom.js"></script>
 <script src="src/plants/SnowPea.js"></script>
 <script src="src/plants/createPlant.js"></script>
 

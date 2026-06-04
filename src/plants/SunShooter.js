@@ -28,7 +28,8 @@ class SunShooter extends Plant {
         // ── Sản xuất sun (đầu trái) ─────────────────────────
         this.sunTimer    += dt;
         this.producePulse = Math.max(0, this.producePulse - dt / 1000);
-        if (this.sunTimer >= PLANT_DEFS.sunshooter.sunInterval) {
+        const sunInterval = PLANT_DEFS.sunshooter.sunInterval * (game.levelDef?.isNight ? 2 : 1);
+        if (this.sunTimer >= sunInterval) {
             this.sunTimer    = 0;
             this.producePulse = 0.5;
             game.suns.push(new Sun(this.cx + randFloat(-30, 30), this.cy - 50, false));

@@ -88,6 +88,16 @@ const PLANT_DEFS = {
         fireRate: 2000,     // chậm hơn Peashooter (nó là cây chặn mà)
         peaDamage: 20,      // sát thương bằng Peashooter, đạn màu nâu
     },
+    puffshroom: {
+        name: 'Puff-shroom',
+        cost:      75,   // ban ngày: 75 sun
+        nightCost: 0,    // ban đêm: MIỄN PHÍ (0 sun)
+        hp:        200,  // yếu hơn Peashooter — nấm dễ bị phá
+        cooldownMs: 7500,
+        fireRate:  1500, // tốc độ bắn bằng Peashooter
+        peaDamage: 20,   // sát thương bằng Peashooter
+        range:     240,  // chỉ bắn trong 3 ô (3 × 80px = 240px) — giới hạn tầm
+    },
     snowpea: {
         name: 'Snow Pea',
         cost: 150,

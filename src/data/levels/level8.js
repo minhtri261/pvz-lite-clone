@@ -49,12 +49,13 @@ const LEVEL_DEF_8 = {
                 { type: 'bucket', row: null, delay: 20000 },
 
                 { type: 'conehead', row: null, delay: 30000 },
-                { type: 'conehead', row: null, delay: 30500 },
+                { type: 'basic', row: null, delay: 30500 },
                 { type: 'basic', row: null, delay: 31000 },
+                { type: 'basic', row: null, delay: 31500 },
+                { type: 'basic', row: null, delay: 32000 },
 
                 { type: 'bucket', row: null, delay: 40000 },
                 { type: 'basic', row: null, delay: 40500 },
-                { type: 'basic', row: null, delay: 41000 },
 
                 { type: 'basic', row: null, delay: 50000 },
                 { type: 'conehead', row: null, delay: 50500 },

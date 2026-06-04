@@ -23,21 +23,22 @@ const LEVEL_DEF_4 = {
                 { type: 'basic', row: null, delay: 0 },
                 { type: 'basic', row: null, delay: 15000 },
                 { type: 'basic', row: null, delay: 30000 },
-
                 { type: 'basic', row: null, delay: 45000 },
-                { type: 'basic', row: null, delay: 45500 },
 
                 { type: 'conehead', row: null, delay: 60000 },
 
-                { type: 'basic', row: null, delay: 75000 },
-                { type: 'basic', row: null, delay: 75500 },
-                { type: 'basic', row: null, delay: 76000 },
+                { type: 'conehead', row: null, delay: 75000 },
+
+                { type: 'basic', row: null, delay: 90000 },
+                { type: 'basic', row: null, delay: 90500 },
+                { type: 'basic', row: null, delay: 91000 },
             ],
             surge: [
                 { type: 'flag',  row: null, delay: 0 },    // flag zombie đi trước
                 { type: 'basic', row: null, delay: 1000 },
                 { type: 'basic', row: null, delay: 1500 },
                 { type: 'conehead', row: null, delay: 2000 },
+                { type: 'basic', row: null, delay: 2500 },
             ],
         },
         {

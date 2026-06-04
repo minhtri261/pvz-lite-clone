@@ -67,8 +67,11 @@ const LEVEL_DEF_7 = {
                 { type: 'basic', row: null, delay: 50000 },
                 { type: 'basic', row: null, delay: 50500 },
                 { type: 'basic', row: null, delay: 51000 },
-                { type: 'basic', row: null, delay: 60000 },
-                { type: 'basic', row: null, delay: 60500 },
+                { type: 'basic', row: null, delay: 51500 },
+                { type: 'basic', row: null, delay: 52000 },
+
+                { type: 'bucket', row: null, delay: 60000 },
+                { type: 'bucket', row: null, delay: 60500 },
             ],
             surge: [
                 { type: 'flag',  row: null, delay: 0 },

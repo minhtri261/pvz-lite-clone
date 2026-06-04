@@ -17,6 +17,7 @@ function createPlant(type, col, row) {
         case 'sunshooter': return new SunShooter(col, row);
         case 'twinsun':    return new TwinSun(col, row);
         case 'peanut':     return new Peanut(col, row);
+        case 'puffshroom': return new PuffShroom(col, row);
         case 'snowpea':    return new SnowPea(col, row);
     }
 }
