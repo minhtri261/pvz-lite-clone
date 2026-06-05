@@ -243,6 +243,61 @@ body {
     padding: 20px;
 }
 
+/* ── Era / Thời Kỳ system ────────────────────────────────── */
+.era-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 480px;
+    width: 100%;
+}
+.era-card {
+    border: 2px solid #4a8a20;
+    border-radius: 12px;
+    padding: 10px 12px 8px;
+    background: rgba(0,0,0,0.28);
+}
+.era-locked-card {
+    border-color: #2a2a2a;
+    background: rgba(0,0,0,0.18);
+    opacity: 0.7;
+}
+.era-card-header {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 8px;
+}
+.era-icon       { font-size: 20px; }
+.era-lock-icon  { font-size: 18px; opacity: 0.6; }
+.era-title-text {
+    font-size: 14px; font-weight: 900;
+    color: #e0ff90;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
+}
+.era-locked-text { color: #555; }
+.era-meta        { font-size: 10px; color: #80a860; }
+.era-coming      { color: #555; font-style: italic; }
+
+.era-section     { margin-bottom: 6px; }
+
+.era-period-title {
+    font-size: 10px; font-weight: 900;
+    text-transform: uppercase; letter-spacing: 1.5px;
+    margin-bottom: 4px;
+}
+.era-day   { color: #FFE060; }
+.era-night { color: #90b8ff; }
+
+.era-levels-row {
+    display: flex; gap: 5px; flex-wrap: wrap;
+}
+/* Era level buttons are narrower than default */
+.era-levels-row .lvl-btn {
+    width: 68px; height: 58px;
+    font-family: inherit;
+}
+.era-levels-row .lvl-num { font-size: 20px; }
+.era-levels-row .lvl-name { font-size: 7.5px; }
+
 /* Logo */
 .pvz-logo { font-size: 48px; font-weight: 900; line-height: 1; letter-spacing: -1px; }
 .logo-p  { color: #60e820; text-shadow: 3px 3px 0 #1a6000; }

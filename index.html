@@ -140,87 +140,67 @@
             </div>
             <p class="logo-sub">Fan Clone</p>
 
-            <div id="level-select-grid">
-                <div class="lvl-btn-wrap" id="lvlwrap-1">
-                    <button class="lvl-btn unlocked" id="lvl-btn-1" onclick="game.startLevel(1)">
-                        <span class="lvl-num">1</span>
-                        <span class="lvl-name">First Steps</span>
-                    </button>
+            <!-- ══ ERA SELECT (Hệ thống Thời Kỳ) ════════════════ -->
+            <div class="era-container">
+
+                <!-- Thời Kỳ 1: Hiện Tại (Present) -->
+                <div class="era-card">
+                    <div class="era-card-header">
+                        <span class="era-icon">🌍</span>
+                        <div>
+                            <div class="era-title-text">Thời Kỳ Hiện Tại</div>
+                            <div class="era-meta">Present · 10 màn</div>
+                        </div>
+                    </div>
+
+                    <!-- Buổi Sáng (màn 1-5) -->
+                    <div class="era-section">
+                        <div class="era-period-title era-day">☀ Buổi Sáng</div>
+                        <div class="era-levels-row">
+                            <div class="lvl-btn-wrap" id="lvlwrap-1"><button class="lvl-btn unlocked" id="lvl-btn-1" onclick="game.startLevel(1)"><span class="lvl-num">1</span><span class="lvl-name">First Steps</span></button></div>
+                            <div class="lvl-btn-wrap" id="lvlwrap-2"><button class="lvl-btn locked" id="lvl-btn-2" onclick="game.startLevel(2)"><span class="lvl-num">2</span><span class="lvl-name">More Lawn</span></button></div>
+                            <div class="lvl-btn-wrap" id="lvlwrap-3"><button class="lvl-btn locked" id="lvl-btn-3" onclick="game.startLevel(3)"><span class="lvl-num">3</span><span class="lvl-name">Conehead</span></button></div>
+                            <div class="lvl-btn-wrap" id="lvlwrap-4"><button class="lvl-btn locked" id="lvl-btn-4" onclick="game.startLevel(4)"><span class="lvl-num">4</span><span class="lvl-name">Cherry Season</span></button></div>
+                            <div class="lvl-btn-wrap" id="lvlwrap-5"><button class="lvl-btn locked" id="lvl-btn-5" onclick="game.startLevel(5)"><span class="lvl-num">5</span><span class="lvl-name">Potato Field</span></button></div>
+                        </div>
+                    </div>
+
+                    <!-- Buổi Tối (màn 6-10) -->
+                    <div class="era-section">
+                        <div class="era-period-title era-night">🌙 Buổi Tối</div>
+                        <div class="era-levels-row">
+                            <div class="lvl-btn-wrap" id="lvlwrap-6"><button class="lvl-btn locked" id="lvl-btn-6" onclick="game.startLevel(6)"><span class="lvl-num">6</span><span class="lvl-name">Vaulting</span></button></div>
+                            <div class="lvl-btn-wrap" id="lvlwrap-7"><button class="lvl-btn locked" id="lvl-btn-7" onclick="game.startLevel(7)"><span class="lvl-num">7</span><span class="lvl-name">Buckets</span></button></div>
+                            <div class="lvl-btn-wrap" id="lvlwrap-8"><button class="lvl-btn locked" id="lvl-btn-8" onclick="game.startLevel(8)"><span class="lvl-num">8</span><span class="lvl-name">Assault</span></button></div>
+                            <div class="lvl-btn-wrap" id="lvlwrap-9"><button class="lvl-btn locked" id="lvl-btn-9" onclick="game.startLevel(9)"><span class="lvl-num">9</span><span class="lvl-name">Peanuts</span></button></div>
+                            <div class="lvl-btn-wrap" id="lvlwrap-10"><button class="lvl-btn locked" id="lvl-btn-10" onclick="game.startLevel(10)"><span class="lvl-num">10</span><span class="lvl-name">Brick</span></button></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="lvl-btn-wrap" id="lvlwrap-2">
-                    <button class="lvl-btn locked" id="lvl-btn-2" onclick="game.startLevel(2)">
-                        <span class="lvl-num">2</span>
-                        <span class="lvl-name">More Lawn</span>
-                    </button>
+
+                <!-- Thời Kỳ Tiếp Theo (Coming Soon) -->
+                <div class="era-card era-locked-card">
+                    <div class="era-card-header">
+                        <span class="era-icon era-lock-icon">🔒</span>
+                        <div>
+                            <div class="era-title-text era-locked-text">Thời Kỳ Tiếp Theo</div>
+                            <div class="era-meta era-coming">Sắp Ra Mắt...</div>
+                        </div>
+                    </div>
+                    <!-- Giữ buttons ẩn trong DOM cho _updateLevelSelectUI -->
+                    <div style="display:none">
+                        <div class="lvl-btn-wrap" id="lvlwrap-11"><button class="lvl-btn locked" id="lvl-btn-11" onclick="game.startLevel(11)"><span class="lvl-num">11</span><span class="lvl-name">First Night</span></button></div>
+                        <div class="lvl-btn-wrap" id="lvlwrap-12"><button class="lvl-btn locked" id="lvl-btn-12" onclick="game.startLevel(12)"><span class="lvl-num">12</span><span class="lvl-name">Final Night</span></button></div>
+                    </div>
                 </div>
-                <div class="lvl-btn-wrap" id="lvlwrap-3">
-                    <button class="lvl-btn locked" id="lvl-btn-3" onclick="game.startLevel(3)">
-                        <span class="lvl-num">3</span>
-                        <span class="lvl-name">Conehead</span>
-                    </button>
-                </div>
-                <div class="lvl-btn-wrap" id="lvlwrap-4">
-                    <button class="lvl-btn locked" id="lvl-btn-4" onclick="game.startLevel(4)">
-                        <span class="lvl-num">4</span>
-                        <span class="lvl-name">Cherry Season</span>
-                    </button>
-                </div>
-                <div class="lvl-btn-wrap" id="lvlwrap-5">
-                    <button class="lvl-btn locked" id="lvl-btn-5" onclick="game.startLevel(5)">
-                        <span class="lvl-num">5</span>
-                        <span class="lvl-name">Potato Field</span>
-                    </button>
-                </div>
-                <div class="lvl-btn-wrap" id="lvlwrap-6">
-                    <button class="lvl-btn locked" id="lvl-btn-6" onclick="game.startLevel(6)">
-                        <span class="lvl-num">6</span>
-                        <span class="lvl-name">Vaulting Grounds</span>
-                    </button>
-                </div>
-                <div class="lvl-btn-wrap" id="lvlwrap-7">
-                    <button class="lvl-btn locked" id="lvl-btn-7" onclick="game.startLevel(7)">
-                        <span class="lvl-num">7</span>
-                        <span class="lvl-name">Bucket Brigade</span>
-                    </button>
-                </div>
-                <div class="lvl-btn-wrap" id="lvlwrap-8">
-                    <button class="lvl-btn locked" id="lvl-btn-8" onclick="game.startLevel(8)">
-                        <span class="lvl-num">8</span>
-                        <span class="lvl-name">Final Assault</span>
-                    </button>
-                </div>
-                <div class="lvl-btn-wrap" id="lvlwrap-9">
-                    <button class="lvl-btn locked" id="lvl-btn-9" onclick="game.startLevel(9)">
-                        <span class="lvl-num">9</span>
-                        <span class="lvl-name">Peanut Gallery</span>
-                    </button>
-                </div>
-                <div class="lvl-btn-wrap" id="lvlwrap-10">
-                    <button class="lvl-btn locked" id="lvl-btn-10" onclick="game.startLevel(10)">
-                        <span class="lvl-num">10</span>
-                        <span class="lvl-name">Brick by Brick</span>
-                    </button>
-                </div>
-                <div class="lvl-btn-wrap" id="lvlwrap-11">
-                    <button class="lvl-btn locked night-btn" id="lvl-btn-11" onclick="game.startLevel(11)">
-                        <span class="lvl-num">🌙11</span>
-                        <span class="lvl-name">First Night</span>
-                    </button>
-                </div>
-                <div class="lvl-btn-wrap" id="lvlwrap-12">
-                    <button class="lvl-btn locked night-btn" id="lvl-btn-12" onclick="game.startLevel(12)">
-                        <span class="lvl-num">🌙12</span>
-                        <span class="lvl-name">Final Night</span>
-                    </button>
-                </div>
-            </div>
+
+            </div><!-- end era-container -->
 
             <div class="tips-box">
-                <p>☀ Click falling/produced sun to collect</p>
-                <p>🌻 Sunflower generates more sun</p>
-                <p>🫛 Peashooter fires peas at zombies</p>
-                <p>🪨 Wall-nut blocks zombies · 🍒 Cherry Bomb = area nuke</p>
-                <p>❄ Snow Pea slows · Right-click to dig up plants</p>
+                <p>☀ Click sun to collect · S = Shovel · ESC = Pause</p>
+                <p>⚗ <strong style="color:#FFE040">Fusion:</strong> Đậu+Đậu=Repeater · Đậu+☀=SunShooter · Đậu+🪨=Peanut</p>
+                <p style="font-size:11px;color:#b0e0b0;">☀+☀=TwinSun · 🪨+🪨=Hồi HP · 🪨+☀=SunNut · ☀+💣=SunMine · Đậu+💣=PotatoShooter</p>
+                <p style="font-size:11px;color:#c8c8ff;">Trồng 2 cây lên cùng 1 ô để kết hợp!</p>
             </div>
         </div>
     </div>
@@ -303,8 +283,36 @@
 
 <!-- §4 Sprites (pure draw functions, no classes) -->
 <script src="src/sprites/background.js"></script>
-<script src="src/sprites/plantSprites.js"></script>
-<script src="src/sprites/zombieSprites.js"></script>
+
+<!-- §4a Plant sprites — mỗi plant 1 file riêng, dễ mở rộng -->
+<script src="src/sprites/plants/drawPeashooter.js"></script>
+<script src="src/sprites/plants/drawSunflower.js"></script>
+<script src="src/sprites/plants/drawWallNut.js"></script>
+<script src="src/sprites/plants/drawCherryBomb.js"></script>
+<script src="src/sprites/plants/drawSnowPea.js"></script>
+<script src="src/sprites/plants/drawPotatoMine.js"></script>
+<script src="src/sprites/plants/drawChomper.js"></script>
+<script src="src/sprites/plants/drawRepeater.js"></script>
+<script src="src/sprites/plants/drawSunShooter.js"></script>
+<script src="src/sprites/plants/drawTwinSun.js"></script>
+<script src="src/sprites/plants/drawPeanut.js"></script>
+<script src="src/sprites/plants/drawPuffShroom.js"></script>
+
+<!-- §4b Zombie sprites — drawBasicZombie phải load trước vì các zombie khác gọi nó -->
+<script src="src/sprites/zombies/drawBasicZombie.js"></script>
+<script src="src/sprites/zombies/drawConeheadZombie.js"></script>
+<script src="src/sprites/zombies/drawFlagZombie.js"></script>
+<script src="src/sprites/zombies/drawBucketZombie.js"></script>
+<script src="src/sprites/zombies/drawPoleVaultingZombie.js"></script>
+<script src="src/sprites/zombies/drawBrickheadZombie.js"></script>
+<script src="src/sprites/zombies/drawNewspaperZombie.js"></script>
+
+<script src="src/sprites/plants/drawSunNut.js"></script>
+<script src="src/sprites/plants/drawSunMine.js"></script>
+<script src="src/sprites/plants/drawPotatoShooter.js"></script>
+<script src="src/sprites/plants/drawMineNut.js"></script>
+<script src="src/sprites/plants/drawSunShroom.js"></script>
+
 <script src="src/sprites/miscSprites.js"></script>
 <script src="src/sprites/cardThumbnails.js"></script>
 
@@ -324,6 +332,11 @@
 <script src="src/plants/TwinSun.js"></script>
 <script src="src/plants/Peanut.js"></script>
 <script src="src/plants/PuffShroom.js"></script>
+<script src="src/plants/SunNut.js"></script>
+<script src="src/plants/SunMine.js"></script>
+<script src="src/plants/PotatoShooter.js"></script>
+<script src="src/plants/MineNut.js"></script>
+<script src="src/plants/SunShroom.js"></script>
 <script src="src/plants/SnowPea.js"></script>
 <script src="src/plants/createPlant.js"></script>
 
@@ -335,6 +348,7 @@
 <script src="src/zombies/BucketZombie.js"></script>
 <script src="src/zombies/PoleVaultingZombie.js"></script>
 <script src="src/zombies/BrickheadZombie.js"></script>
+<script src="src/zombies/NewspaperZombie.js"></script>
 <script src="src/zombies/createZombie.js"></script>
 
 <!-- §8 Other game entities -->

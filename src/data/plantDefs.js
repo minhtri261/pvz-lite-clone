@@ -53,6 +53,52 @@ const PLANT_DEFS = {
         chompDmg:   900,    
         biteInterval: 1500, // ms giữa 2 nhát cắn khi zombie chưa chết
     },
+    // ── Fusion-only plants (không đặt trực tiếp) ────────────────
+    minenut: {
+        name: 'Mine Nut',
+        cost: 0,           // fusion-only: wallnut + potatomine
+        hp: 4000,          // WallNut HP — nhưng khi chết sẽ phát nổ!
+        cooldownMs: 30000,
+        blastDmg: 1800,    // nổ bằng PotatoMine khi hết máu
+        blastRange: 160,   // 2 ô = 2 × CELL_W
+    },
+    sunshroom: {
+        name: 'Sun-shroom',
+        cost: 0,             // fusion-only: puffshroom + sunflower
+        hp: 200,             // yếu — giống PuffShroom
+        cooldownMs: 7500,
+        sunAmount: 25,
+        sunIntervalDay:   25000, // ban ngày: 25s/sun
+        sunIntervalNight: 20000, // ban đêm: 20s/sun (nấm thích bóng tối!)
+    },
+    sunnut: {
+        name: 'Sun-nut',
+        cost: 0,           // fusion-only: wallnut(50) + sunflower(50)
+        hp: 4000,          // WallNut HP — vẫn chặn được zombie
+        cooldownMs: 30000, // WallNut cooldown
+        sunInterval: 28000,// hơi chậm hơn Sunflower (23s)
+        sunAmount: 25,
+    },
+    sunmine: {
+        name: 'Sun Mine',
+        cost: 0,           // fusion-only: sunflower(50) + potatomine(25)
+        hp: 300,
+        cooldownMs: 20000,
+        armMs: 14000,
+        blastDmg: 1800,
+        sunInterval: 23000, // sản xuất sun như Sunflower
+        sunAmount: 25,
+    },
+    potatoshooter: {
+        name: 'Potato Shooter',
+        cost: 0,           // fusion-only: peashooter(100) + potatomine(25)
+        hp: 400,
+        cooldownMs: 20000,
+        armMs: 14000,
+        blastDmg: 1800,
+        fireRate: 1500,    // bắn mỗi 1.5s
+        peaDamage: 20,     // đạn nâu, sát thương 20
+    },
     repeater: {
         name: 'Repeater',
         cost: 175,      

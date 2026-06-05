@@ -13,5 +13,6 @@ function createZombie(type, row) {
         case 'bucket':       return new BucketZombie(row);
         case 'polevaulting': return new PoleVaultingZombie(row);
         case 'brickhead':    return new BrickheadZombie(row);
+        case 'newspaper':    return new NewspaperZombie(row);
     }
 }

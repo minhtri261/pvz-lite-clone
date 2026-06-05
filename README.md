@@ -16,6 +16,7 @@ Mở file `index.html` là chơi được ngay.
 - **Thanh tiến trình wave** hiển thị cờ và giai đoạn hiện tại
 - **Xẻng** để đào cây lên (hotkey `S`)
 - **Thu ánh nắng** ngay trong lúc đang rơi, vùng click rộng
+- Đặc biệt là tính năng kết hợp cây trồng lấy cảm hứng từ Fusion
 - Đồ họa Canvas 2D toàn bộ vẽ tay, 60 FPS với `requestAnimationFrame`
 - Hệ thống hạt (particles) cho hiệu ứng trúng đạn, chết, nổ, thu sun
 

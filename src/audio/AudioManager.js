@@ -61,6 +61,17 @@ class AudioManager {
         this._currentSrc = null;
     }
 
+    // Phát âm thanh hiệu ứng (one-shot, không loop)
+    // name: tên file trong assets/sounds/ (không cần .mp3)
+    // Đặt file vào: assets/sounds/hit.mp3, assets/sounds/plant.mp3, v.v.
+    playSFX(name) {
+        if (this.muted) return;
+        const src = `assets/sounds/${name}.mp3`;
+        const sfx = new Audio(src);
+        sfx.volume = 0.45;
+        sfx.play().catch(() => {}); // bỏ qua nếu file chưa có
+    }
+
     // Thử phát lại sau user gesture (giải quyết autoplay policy)
     retryPlay() {
         if (this.audio && this.audio.paused && this._currentSrc) {

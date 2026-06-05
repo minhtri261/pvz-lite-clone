@@ -11,13 +11,13 @@
 // ══════════════════════════════════════════════════════════════
 const LEVEL_DEF_9 = {
     id: 9,
+    isNight:   true,
     title:    'Level 9 Complete!',
     subtitle: 'Almost there — the final level awaits!',
-    newPlant:  'Chomper',
+    newPlant:  null,
     newZombie: null,
     activeRows:      [0, 1, 2, 3, 4],
-    availablePlants: ['sunflower', 'peashooter', 'wallnut', 'cherrybomb', 'potatomine',
-                      'sunshooter', 'repeater', 'chomper', 'peanut'],
+    availablePlants: ['sunflower', 'peashooter', 'wallnut', 'potatomine', 'puffshroom'],
     startingSun: 150,
     waves: [
         {
@@ -104,19 +104,19 @@ const LEVEL_DEF_9 = {
                 { type: 'conehead', row: null, delay: 2500 },
                 { type: 'basic', row: null, delay: 3000 },
 
-                { type: 'bucket', row: null, delay: 10000 },
+                { type: 'brickhead', row: null, delay: 10000 },
                 { type: 'basic', row: null, delay: 10500 },
 
-                { type: 'bucket', row: null, delay: 20000 },
+                { type: 'brickhead', row: null, delay: 20000 },
                 { type: 'basic', row: null, delay: 20500 },
                 { type: 'basic', row: null, delay: 21000 },
                 { type: 'basic', row: null, delay: 21500 },
 
-                { type: 'bucket', row: null, delay: 30000 },
+                { type: 'brickhead', row: null, delay: 30000 },
                 { type: 'basic', row: null, delay: 30500 },
                 { type: 'conehead', row: null, delay: 31000 },
 
-                { type: 'bucket', row: null, delay: 40000 },
+                { type: 'brickhead', row: null, delay: 40000 },
                 { type: 'basic', row: null, delay: 40500 },
                 { type: 'conehead', row: null, delay: 41000 },
                 { type: 'basic', row: null, delay: 41500 },
@@ -136,14 +136,14 @@ const LEVEL_DEF_9 = {
             surge: [
                 { type: 'flag',     row: null, delay: 0 },
                 { type: 'basic',     row: null, delay: 1000 },
-                { type: 'bucket',   row: null, delay: 1500 },
+                { type: 'brickhead',   row: null, delay: 1500 },
                 { type: 'conehead',   row: null, delay: 2000 },
                 { type: 'conehead', row: null, delay: 2500 },
                 { type: 'conehead',   row: null, delay: 3000 },
                 { type: 'polevaulting', row: null, delay: 3500 },
                 { type: 'basic',     row: null, delay: 4000 },
                 { type: 'basic',     row: null, delay: 4500 },
-                { type: 'bucket',     row: null, delay: 5000 },
+                { type: 'brickhead',     row: null, delay: 5000 },
                 { type: 'polevaulting',     row: null, delay: 5500 },
                 { type: 'basic',     row: null, delay: 6000 },
                 { type: 'conehead',     row: null, delay: 6500 },

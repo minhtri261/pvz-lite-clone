@@ -13,6 +13,32 @@
 // Biến session: màn cao nhất đã mở khóa (mất khi tải lại trang)
 let highestUnlocked = 1;
 
+// ── Hệ thống kết hợp cây (Plant Fusion) ──────────────────────
+// Đặt 2 cây cùng 1 ô → tự động kết hợp (thứ tự a/b không quan trọng)
+const FUSION_RECIPES = [
+    { a: 'peashooter', b: 'peashooter', result: 'repeater'       },
+    { a: 'peashooter', b: 'sunflower',  result: 'sunshooter'      },
+    { a: 'peashooter', b: 'wallnut',    result: 'peanut'          },
+    { a: 'sunflower',  b: 'sunflower',  result: 'twinsun'         },
+    { a: 'wallnut',    b: 'wallnut',    result: 'wallnut_heal'     }, // đặc biệt: hồi HP
+    { a: 'wallnut',    b: 'sunflower',  result: 'sunnut'          },
+    { a: 'sunflower',  b: 'potatomine', result: 'sunmine'         },
+    { a: 'peashooter', b: 'potatomine', result: 'potatoshooter'   },
+    { a: 'wallnut',    b: 'potatomine', result: 'minenut'         },
+    { a: 'puffshroom', b: 'sunflower',  result: 'sunshroom'       },
+];
+
+// Label hiển thị cho fusion result đặc biệt (không phải tên plant)
+const FUSION_RESULT_LABELS = {
+    'wallnut_heal': '🔋 Hồi HP Wall-nut!',
+};
+
+// Cây chỉ có thể có qua kết hợp — KHÔNG đặt trực tiếp từ thanh card
+const FUSION_ONLY = new Set([
+    'repeater', 'sunshooter', 'peanut', 'twinsun', 'snowpea',
+    'sunnut', 'sunmine', 'potatoshooter', 'minenut', 'sunshroom',
+]);
+
 class Game {
     constructor() {
         this.state = 'start';        // 'start' | 'playing' | 'gameover' | 'win' | 'levelcomplete'
@@ -78,6 +104,7 @@ class Game {
     // ── Vòng đời màn chơi ─────────────────────────────────────
     startLevel(id) {
         if (id > highestUnlocked) return;
+        if (id > 10) return; // màn 11-12 tạm khoá
         this.currentLevelId = id;
         // Màn 7+ có hơn 6 cây → hiện màn chọn cây
         if (id >= 7 && this.levelDef.availablePlants.length > 6) {
@@ -279,7 +306,8 @@ class Game {
                     if (proj.isIce) { z.slowed = true; z.slowTimer = PLANT_DEFS.snowpea.slowMs; }
                     proj.dead = true;
                     spawnHitParticles(proj.x, proj.y, this.particles);
-                    if (!was && z.dying) this.zombiesKilled++; // tính số zombie đã diệt
+                    audioManager.playSFX('hit'); // âm thanh trúng đạn (file: assets/sounds/hit.mp3)
+                    if (!was && z.dying) this.zombiesKilled++;
                     break; // 1 viên đạn chỉ trúng 1 zombie
                 }
             }
@@ -470,10 +498,10 @@ class Game {
         // Chờ 2 giây rồi mới hiện màn hình thắng (cho zombie chết hết animation)
         setTimeout(() => {
             if (this.state !== 'playing') return;
-            if (this.currentLevelId === 12) {
-                // Màn cuối → màn hình chiến thắng tổng
+            // Màn 10 = màn cuối hiện tại (màn 11-12 tạm khoá)
+            if (this.currentLevelId === 10) {
                 this.state = 'win';
-                highestUnlocked = 12;
+                highestUnlocked = 10;
                 document.getElementById('screen-win').classList.remove('hidden');
             } else {
                 // Còn màn tiếp → màn hình hoàn thành màn + mở khóa màn kế
@@ -601,16 +629,78 @@ class Game {
         document.getElementById('shovel-btn').classList.remove('selected');
     }
 
-    // Thử đặt cây — kiểm tra sun, cooldown, ô trống
+    // Thử đặt cây — hỗ trợ cả đặt bình thường lẫn fusion
     _tryPlace(type, col, row) {
         const cost = this._getEffectiveCost(type);
         const d    = PLANT_DEFS[type];
-        if (this.sun < cost || this.cooldowns[type] > 0 || this.grid.isOccupied(col, row)) return;
+        if (this.sun < cost || this.cooldowns[type] > 0) return;
+
+        if (this.grid.isOccupied(col, row)) {
+            // Ô đã có cây → kiểm tra công thức kết hợp
+            const existing = this.grid.getPlant(col, row);
+            if (existing && !existing.dying && !existing.isDead) {
+                const result = this._checkFusion(existing.type, type);
+                if (result) {
+                    this._doFusion(result, existing, col, row, cost, d.cooldownMs);
+                }
+            }
+            return; // ô bận và không có công thức → bỏ qua
+        }
+
+        // Đặt bình thường vào ô trống
         const p = createPlant(type, col, row);
         this.plants.push(p);
         this.grid.place(p, col, row);
-        this.sun -= cost;                    // trừ sun theo giá thực tế
+        this.sun -= cost;
         this.cooldowns[type] = d.cooldownMs;
+        this._deselect();
+        this._updateUI();
+    }
+
+    // Kiểm tra 2 loại cây có công thức kết hợp không (thứ tự không quan trọng)
+    _checkFusion(typeA, typeB) {
+        for (const recipe of FUSION_RECIPES) {
+            if ((recipe.a === typeA && recipe.b === typeB) ||
+                (recipe.a === typeB && recipe.b === typeA)) {
+                return recipe.result;
+            }
+        }
+        return null;
+    }
+
+    // Thực hiện kết hợp: xóa cây gốc → đặt cây kết hợp + hiệu ứng
+    _doFusion(resultType, existingPlant, col, row, secondCost, secondCooldown) {
+        const secondType = this.selectedType;
+
+        // ── Trường hợp đặc biệt: WallNut + WallNut = Hồi HP đầy ──
+        if (resultType === 'wallnut_heal') {
+            existingPlant.hp = existingPlant.maxHp; // hồi full HP
+            this.sun -= secondCost;
+            this.cooldowns[secondType] = secondCooldown;
+            spawnFusionParticles(existingPlant.cx, existingPlant.cy - 10, this.particles);
+            this._deselect();
+            this._updateUI();
+            return;
+        }
+
+        // Xóa cây gốc ngay lập tức
+        existingPlant.dead = true;
+        this.grid.remove(col, row);
+        this.plants = this.plants.filter(p => !p.isDead);
+        this.grid.cleanup();
+
+        // Đặt cây kết hợp
+        const fused = createPlant(resultType, col, row);
+        this.plants.push(fused);
+        this.grid.place(fused, col, row);
+
+        // Trừ sun và cooldown nguyên liệu thứ 2
+        this.sun -= secondCost;
+        this.cooldowns[secondType] = secondCooldown;
+
+        // Hiệu ứng hạt vàng lấp lánh
+        spawnFusionParticles(fused.cx, fused.cy - 10, this.particles);
+
         this._deselect();
         this._updateUI();
     }
@@ -622,14 +712,21 @@ class Game {
         const all = ['sunflower', 'peashooter', 'wallnut', 'cherrybomb', 'potatomine',
                      'chomper', 'repeater', 'sunshooter', 'twinsun', 'peanut', 'puffshroom', 'snowpea'];
         for (const type of all) {
-            const card    = document.getElementById(`card-${type}`);
-            const cdFill  = document.getElementById(`cd-${type}`);
+            const card   = document.getElementById(`card-${type}`);
+            const cdFill = document.getElementById(`cd-${type}`);
+
+            // Cây fusion-only: LUÔN ẩn khỏi thanh card — chỉ có được qua kết hợp
+            if (FUSION_ONLY.has(type)) {
+                card.classList.add('card-hidden');
+                continue;
+            }
+
             const isAvail = available.includes(type);
             card.classList.toggle('card-hidden', !isAvail);
             if (!isAvail) continue;
             const d    = PLANT_DEFS[type];
             const cd   = this.cooldowns[type];
-            const cost = this._getEffectiveCost(type); // giá thực tế (puffshroom = 0 đêm)
+            const cost = this._getEffectiveCost(type);
             card.classList.toggle('disabled', this.sun < cost || cd > 0);
             cdFill.style.width = cd > 0 ? `${(1 - cd / d.cooldownMs) * 100}%` : '100%';
         }
@@ -667,8 +764,9 @@ class Game {
 
     // Cập nhật viền vàng "selected" trên các thẻ cây
     _updateCardSelection() {
+        // Fusion-only plants không có card → bỏ qua khi cập nhật selected state
         ['sunflower', 'peashooter', 'wallnut', 'cherrybomb', 'potatomine',
-         'chomper', 'repeater', 'sunshooter', 'twinsun', 'peanut', 'puffshroom', 'snowpea'].forEach(t => {
+         'chomper', 'puffshroom'].forEach(t => {
             document.getElementById(`card-${t}`).classList.toggle('selected', this.selectedType === t);
         });
     }
@@ -677,8 +775,19 @@ class Game {
     _updateLevelSelectUI() {
         for (let i = 1; i <= 12; i++) {
             const btn = document.getElementById(`lvl-btn-${i}`);
-            if (i <= highestUnlocked) { btn.classList.add('unlocked'); btn.classList.remove('locked'); }
-            else                      { btn.classList.add('locked');   btn.classList.remove('unlocked'); }
+            // Màn 11-12 tạm khoá — chưa ra mắt
+            const permanentlyLocked = i > 10;
+            const unlocked = !permanentlyLocked && i <= highestUnlocked;
+            if (unlocked) { btn.classList.add('unlocked'); btn.classList.remove('locked'); }
+            else           { btn.classList.add('locked');   btn.classList.remove('unlocked'); }
+            // Thêm label "Sắp Ra Mắt" cho màn 11-12
+            if (permanentlyLocked) {
+                const nameEl = btn.querySelector('.lvl-name');
+                if (nameEl && !nameEl.dataset.locked) {
+                    nameEl.dataset.locked = '1';
+                    nameEl.textContent = 'Sắp Ra Mắt';
+                }
+            }
         }
     }
 
@@ -709,30 +818,76 @@ class Game {
         for (const s of this.suns)        s.draw(ctx);
         for (const p of this.particles)   p.draw(ctx);
 
-        this._drawHouseWarning(); // hiệu ứng đỏ bên trái khi zombie sắp vào nhà
+        this._drawHouseWarning();
 
-        // Bóng ma cây khi đang đặt: vẽ sprite mờ tại ô hover
+        // ── Hover preview (plant ghost hoặc fusion) ───────────────
         if (this.selectedType && !this.shovelMode && this.hoverCol >= 0 && this.activeRows.includes(this.hoverRow)) {
-            ctx.save(); ctx.globalAlpha = 0.65;
-            const px = cx(this.hoverCol), py = cy(this.hoverRow);
-            switch (this.selectedType) {
-                case 'sunflower':  drawSunflower(ctx, px, py, 0, false);        break;
-                case 'peashooter': drawPeashooter(ctx, px, py, 0, 0);           break;
-                case 'wallnut':    drawWallNut(ctx, px, py, 0, 1);              break;
-                case 'cherrybomb': drawCherryBomb(ctx, px, py, 0, 0, false, 0);       break;
-                case 'potatomine': drawPotatoMine(ctx, px, py, 0, false, false, 0);  break;
-                case 'chomper':    drawChomper(ctx, px, py, 0, false, 0, false);       break;
-                case 'repeater':   drawRepeater(ctx, px, py, 0, 0, 0);                break;
-                case 'sunshooter': drawSunShooter(ctx, px, py, 0, 0, false); break;
-                case 'twinsun':    drawTwinSun(ctx, px, py, 0, false);     break;
-                case 'peanut':     drawPeanut(ctx, px, py, 0, 1, 0);       break;
-                case 'puffshroom': drawPuffShroom(ctx, px, py, 0, 0);      break;
-                case 'snowpea':    drawSnowPea(ctx, px, py, 0, 0);         break;
+            const px       = cx(this.hoverCol), py = cy(this.hoverRow);
+            const existing = this.grid.getPlant(this.hoverCol, this.hoverRow);
+
+            if (existing && !existing.dying) {
+                // Ô đã có cây → kiểm tra fusion
+                const fusionResult = this._checkFusion(existing.type, this.selectedType);
+                if (fusionResult) {
+                    // Viền vàng rực (thay viền hover vàng nhạt)
+                    ctx.fillStyle   = 'rgba(255,210,0,0.22)';
+                    ctx.strokeStyle = 'rgba(255,185,0,0.95)';
+                    ctx.lineWidth   = 3;
+                    rr(ctx, GX + this.hoverCol * CELL_W + 1, GY + this.hoverRow * CELL_H + 1,
+                       CELL_W - 2, CELL_H - 2, 6);
+                    ctx.fill(); ctx.stroke();
+
+                    // Ghost của cây kết hợp (hoặc glow đặc biệt cho heal)
+                    ctx.save(); ctx.globalAlpha = 0.72;
+                    switch (fusionResult) {
+                        case 'repeater':      drawRepeater(ctx, px, py, 0, 0, 0);             break;
+                        case 'sunshooter':    drawSunShooter(ctx, px, py, 0, 0, false);       break;
+                        case 'peanut':        drawPeanut(ctx, px, py, 0, 1, 0);               break;
+                        case 'twinsun':       drawTwinSun(ctx, px, py, 0, false);             break;
+                        case 'sunnut':        drawSunNut(ctx, px, py, 0, 1, false);           break;
+                        case 'sunmine':       drawSunMine(ctx, px, py, 0, false, false, 0, false); break;
+                        case 'potatoshooter': drawPotatoShooter(ctx, px, py, 0, false, false, 0, 0); break;
+                        case 'minenut':       drawMineNut(ctx, px, py, 0, 1, false, 0);             break;
+                        case 'sunshroom':     drawSunShroom(ctx, px, py, 0, false);                 break;
+                        case 'wallnut_heal':
+                            // Hiện glow xanh lá (heal indicator)
+                            ctx.globalAlpha = 0.5;
+                            ctx.fillStyle = '#40FF80';
+                            ctx.beginPath(); ctx.arc(px, py, 34, 0, Math.PI * 2); ctx.fill();
+                            break;
+                    }
+                    ctx.restore();
+
+                    // Tên cây kết hợp phía trên ô
+                    const fuseName = FUSION_RESULT_LABELS[fusionResult]
+                                  || PLANT_DEFS[fusionResult]?.name
+                                  || fusionResult;
+                    const labelX   = GX + this.hoverCol * CELL_W + CELL_W / 2;
+                    const labelY   = GY + this.hoverRow * CELL_H - 8;
+                    ctx.font = 'bold 11px Arial'; ctx.textAlign = 'center';
+                    ctx.strokeStyle = 'rgba(0,0,0,0.85)'; ctx.lineWidth = 3;
+                    ctx.strokeText(`⚗ ${fuseName}`, labelX, labelY);
+                    ctx.fillStyle = fusionResult === 'wallnut_heal' ? '#80FF80' : '#FFD700';
+                    ctx.fillText(`⚗ ${fuseName}`, labelX, labelY);
+                    ctx.textAlign = 'left';
+                }
+            } else if (!existing) {
+                // Ô trống → ghost bình thường
+                ctx.save(); ctx.globalAlpha = 0.65;
+                switch (this.selectedType) {
+                    case 'sunflower':  drawSunflower(ctx, px, py, 0, false);          break;
+                    case 'peashooter': drawPeashooter(ctx, px, py, 0, 0);             break;
+                    case 'wallnut':    drawWallNut(ctx, px, py, 0, 1);                break;
+                    case 'cherrybomb': drawCherryBomb(ctx, px, py, 0, 0, false, 0);   break;
+                    case 'potatomine': drawPotatoMine(ctx, px, py, 0, false, false, 0); break;
+                    case 'chomper':    drawChomper(ctx, px, py, 0, false, 0, false);   break;
+                    case 'puffshroom': drawPuffShroom(ctx, px, py, 0, 0);             break;
+                }
+                ctx.restore();
             }
-            ctx.restore();
         }
 
-        // Hiện icon xẻng nổi trên cây khi hover (chỉ khi ô có cây)
+        // Xẻng hover
         if (this.shovelMode && this.hoverCol >= 0 && this.hoverRow >= 0 && this.activeRows.includes(this.hoverRow)) {
             const p = this.grid.getPlant(this.hoverCol, this.hoverRow);
             if (p) {
@@ -742,8 +897,40 @@ class Game {
             }
         }
 
-        this._drawLevelBadge(); // nhãn "Level 1 — First Steps" góc trên phải
-        this._drawWaveBar();    // thanh tiến trình wave ở đáy canvas
+        this._drawLevelBadge();
+        this._drawWaveBar();
+        this._drawFusionHints(); // công thức kết hợp khi đang cầm cây
+    }
+
+    // Hiển thị công thức kết hợp khi người chơi đang cầm một cây
+    _drawFusionHints() {
+        if (this.state !== 'playing' || !this.selectedType) return;
+        // Tìm tất cả công thức liên quan đến cây đang cầm
+        const hints = FUSION_RECIPES
+            .filter(r => r.a === this.selectedType || r.b === this.selectedType)
+            .map(r => {
+                const other  = r.a === this.selectedType ? r.b : r.a;
+                const result = r.result;
+                const resultLabel = FUSION_RESULT_LABELS[result]
+                                 || PLANT_DEFS[result]?.name
+                                 || result;
+                return `+ ${PLANT_DEFS[other]?.name || other} = ${resultLabel}`;
+            });
+        if (hints.length === 0) return;
+
+        const text  = `⚗  ${hints.join('   |   ')}`;
+        const textY = H - 37; // ngay trên thanh wave bar
+        ctx.save();
+        ctx.font = 'bold 11px Arial'; ctx.textAlign = 'center';
+        const tw = ctx.measureText(text).width + 22;
+        ctx.fillStyle = 'rgba(0,0,0,0.58)';
+        rr(ctx, W / 2 - tw / 2, textY - 13, tw, 17, 6); ctx.fill();
+        ctx.strokeStyle = 'rgba(255,185,0,0.55)'; ctx.lineWidth = 1.5;
+        rr(ctx, W / 2 - tw / 2, textY - 13, tw, 17, 6); ctx.stroke();
+        ctx.fillStyle = '#FFE040';
+        ctx.fillText(text, W / 2, textY);
+        ctx.textAlign = 'left';
+        ctx.restore();
     }
 
     // ── Thanh tiến trình wave (giống PvZ gốc) ─────────────────

@@ -43,6 +43,18 @@ function drawCardThumbnails() {
 
         fn(c); // vẽ sprite
 
+        // ── Huy hiệu ⚗ nhỏ ở góc trên-phải cho cây có thể kết hợp ──
+        const fusionSources = new Set(['art-peashooter', 'art-sunflower', 'art-wallnut']);
+        if (fusionSources.has(id)) {
+            c.fillStyle = 'rgba(0,0,0,0.5)';
+            c.beginPath(); c.arc(48, 10, 9, 0, Math.PI * 2); c.fill();
+            c.fillStyle = '#FFE040';
+            c.font = 'bold 11px Arial';
+            c.textAlign = 'center';
+            c.fillText('⚗', 48, 14);
+            c.textAlign = 'left';
+        }
+
         // ── Dải giá ánh nắng ở đáy card (giống PvZ gốc) ────────
         const plantType = id.replace('art-', '');
         const cost = PLANT_DEFS[plantType]?.cost;

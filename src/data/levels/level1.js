@@ -1,39 +1,46 @@
 'use strict';
 // ══════════════════════════════════════════════════════════════
 //  level1.js — Màn 1: Khởi đầu đơn giản
-//  - Chỉ 1 hàng hoạt động (hàng giữa, index 2)
-//  - Chỉ có Peashooter
+//  - Full 5 hàng (hỗ trợ Fusion ngay từ đầu)
+//  - Peashooter + Sunflower
 //  - Chỉ có Basic Zombie
 //  - 1 đợt (wave)
 //
-//  Cấu trúc mỗi wave:
-//    scouts: zombie lẻ tẻ xuất hiện trước để người chơi làm quen
-//    surge:  làn sóng lớn ập vào ngay sau cảnh báo "Huge Wave"
+//  row: null → hệ thống tự chọn hàng ít zombie nhất (_pickSpawnRow)
 // ══════════════════════════════════════════════════════════════
 const LEVEL_DEF_1 = {
     id: 1,
     title:    'Level 1 Complete!',
-    subtitle: 'Great start — more rows await!',
-    newPlant:  'Peashooter',
-    newZombie: null,
-    activeRows:      [2],           // chỉ hàng giữa có thể đặt cây và zombie vào
-    availablePlants: ['peashooter'],
-    startingSun: 150,               // ánh nắng ban đầu
+    subtitle: 'Great start — combine plants for more power!',
+    newPlant:  'Peashooter, Sunflower', 
+    newZombie: 'Basic Zombie, Flag Zombie',
+    activeRows:      [0, 1, 2, 3, 4],
+    availablePlants: ['peashooter', 'sunflower'],
+    startingSun: 150,
     waves: [
         {
-            // Màn 1 chỉ có 1 wave, nhẹ nhàng để người chơi làm quen
+            // Wave 1 — nhẹ nhàng, zombie phân tán đều 5 hàng
             scouts: [
-                { type: 'basic', row: 2, delay: 0 },      // zombie đầu tiên ngay lúc bắt đầu
-                { type: 'basic', row: 2, delay: 10000 },  // zombie thứ hai sau 10 giây
-                { type: 'basic', row: 2, delay: 20000 }, // zombie thứ ba sau 20 giây
-                { type: 'basic', row: 2, delay: 30000 }, // zombie thứ tư sau 30 giây
-                { type: 'basic', row: 2, delay: 30500 }, // zombie thứ năm sau 30.5 giây
+                { type: 'basic', row: null, delay: 0 },
+                { type: 'basic', row: null, delay: 20000 },
+                { type: 'basic', row: null, delay: 40000 },
+
+                { type: 'basic', row: null, delay: 60000 },
+                { type: 'basic', row: null, delay: 60500 },
+
+                { type: 'basic', row: null, delay: 75000 },
+                { type: 'basic', row: null, delay: 75500 },
+
+                { type: 'basic', row: null, delay: 90000 },
+                { type: 'basic', row: null, delay: 90500 },
+                { type: 'basic', row: null, delay: 91000 },
             ],
             surge: [
-                // 3 zombie cùng lúc (cách nhau 0.5 giây) sau khi cảnh báo "Huge Wave"
-                { type: 'basic', row: 2, delay: 0 },
-                { type: 'basic', row: 2, delay: 500 },
-                { type: 'basic', row: 2, delay: 1000 },
+                { type: 'flag',  row: null, delay: 0 },    // flag zombie đi trước
+                { type: 'basic', row: null, delay: 1000 },
+                { type: 'basic', row: null, delay: 1500 },
+                { type: 'basic', row: null, delay: 2000 },
+                { type: 'basic', row: null, delay: 2500 },
             ],
         },
     ],

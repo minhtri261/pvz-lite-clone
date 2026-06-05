@@ -24,7 +24,7 @@ const ZOMBIE_DEFS = {
     },
     bucket: {
         maxHp: 1100,      // 900 (xô) + 200 (cơ thể) = 1100 tổng
-        speed: 0.28,
+        speed: 0.24,
         damage: 100,
         attackRate: 1000,
         bucketHp: 900,    // xô hấp thụ 900 điểm sát thương trước khi rơi
@@ -34,6 +34,15 @@ const ZOMBIE_DEFS = {
         speed: 0.5,
         damage: 100,
         attackRate: 1000,
+    },
+    newspaper: {
+        maxHp: 200,          // bằng basic zombie
+        speed: 0.28,         // tốc độ ban đầu (bằng basic)
+        damage: 100,
+        attackRate: 1000,    // nhịp tấn công ban đầu (bằng basic)
+        paperHp: 100,        // HP báo — hết thì báo rách → zombie điên
+        ragespeed: 0.5,      // tốc độ sau khi mất báo (nhanh gấp đôi!)
+        rageAttackRate: 2000,// nhịp tấn công sau khi mất báo
     },
     brickhead: {
         maxHp: 1800,      

@@ -13,13 +13,13 @@
 // ══════════════════════════════════════════════════════════════
 const LEVEL_DEF_10 = {
     id: 10,
+    isNight:   true,
     title:    'PvZ Custom — All Levels Cleared!',
     subtitle: 'You are the ultimate Plant Master! All 10 levels defeated!',
     newPlant:  'twinsun',
     newZombie: 'Brickhead Zombie',
     activeRows:      [0, 1, 2, 3, 4],
-    availablePlants: ['sunflower', 'peashooter', 'wallnut', 'cherrybomb', 'potatomine',
-                      'sunshooter', 'repeater', 'chomper', 'twinsun', 'peanut'],
+    availablePlants: ['sunflower', 'peashooter', 'wallnut', 'potatomine', 'puffshroom'],
     startingSun: 150,
     waves: [
         {

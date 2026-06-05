@@ -96,3 +96,31 @@ function spawnSunCollectParticles(x, y, particles) {
         ));
     }
 }
+
+// Hiệu ứng kết hợp plant (Fusion) — tia vàng + điểm sáng trắng
+function spawnFusionParticles(x, y, particles) {
+    // Vòng tia vàng/xanh lá bùng ra
+    for (let i = 0; i < 24; i++) {
+        const a = (i / 24) * Math.PI * 2;
+        const s = randFloat(4, 10);
+        particles.push(new Particle(
+            x, y,
+            Math.cos(a) * s, Math.sin(a) * s - 2,
+            `hsl(${randInt(45, 75)}, 100%, ${randInt(60, 88)}%)`, // vàng-xanh lá
+            randFloat(4, 8),
+            randFloat(550, 1000)
+        ));
+    }
+    // Điểm sáng trắng lấp lánh
+    for (let i = 0; i < 10; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const s = randFloat(6, 13);
+        particles.push(new Particle(
+            x, y,
+            Math.cos(a) * s, Math.sin(a) * s - 5,
+            '#FFFFFF',
+            randFloat(2, 4),
+            randFloat(350, 650)
+        ));
+    }
+}
