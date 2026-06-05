@@ -33,7 +33,7 @@ const LEVEL_DEF_10 = {
 
                 { type: 'conehead', row: null, delay: 60000 },
 
-                { type: 'basic', row: null, delay: 75000 },
+                { type: 'newspaper', row: null, delay: 75000 },
                 { type: 'basic', row: null, delay: 75500 },
                 { type: 'basic', row: null, delay: 76000 },
 
@@ -45,7 +45,7 @@ const LEVEL_DEF_10 = {
                 { type: 'basic', row: null, delay: 1000 },
                 { type: 'conehead', row: null, delay: 1500 },
                 { type: 'basic', row: null, delay: 2000 },
-                { type: 'basic', row: null, delay: 2500 },
+                { type: 'newspaper', row: null, delay: 2500 },
                 { type: 'basic', row: null, delay: 3000 },
                 { type: 'basic', row: null, delay: 3500 },
             ],
@@ -56,7 +56,7 @@ const LEVEL_DEF_10 = {
                 { type: 'conehead',    row: null, delay: 0 },    
                 { type: 'polevaulting', row: null, delay: 12000 },
                 { type: 'basic',       row: null, delay: 20000 },
-                { type: 'basic',    row: null, delay: 28000 },
+                { type: 'newspaper',    row: null, delay: 28000 },
                 { type: 'polevaulting',     row: null, delay: 33000 },
             ],
             surge: [
@@ -66,7 +66,7 @@ const LEVEL_DEF_10 = {
                 { type: 'basic',       row: null, delay: 2100 },
                 { type: 'polevaulting',    row: null, delay: 2800 },
                 { type: 'conehead',     row: null, delay: 3500 },
-                { type: 'conehead', row: null, delay: 4200 },
+                { type: 'newspaper', row: null, delay: 4200 },
             ],
         },
         {
@@ -110,6 +110,8 @@ const LEVEL_DEF_10 = {
                 { type: 'polevaulting', row: null, delay: 3700 },
                 { type: 'bucket',       row: null, delay: 4200 },
                 { type: 'brickhead',    row: null, delay: 4700 },
+                { type: 'newspaper',    row: null, delay: 5200 },
+                { type: 'newspaper',    row: null, delay: 5700 },
             ],
         },
     ],

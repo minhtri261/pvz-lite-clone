@@ -22,6 +22,7 @@ body {
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 0 60px rgba(0,0,0,0.9), 0 0 20px rgba(80,200,80,0.3);
+    zoom: 1.28; /* phóng to 28% — toàn bộ game + overlay đều scale theo */
 }
 
 /* ── Canvas ────────────────────────────────────── */

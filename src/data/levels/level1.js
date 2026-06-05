@@ -21,7 +21,7 @@ const LEVEL_DEF_1 = {
         {
             // Wave 1 — nhẹ nhàng, zombie phân tán đều 5 hàng
             scouts: [
-                { type: 'basic', row: null, delay: 0 },
+                { type: 'polevaulting', row: null, delay: 0 },
                 { type: 'basic', row: null, delay: 20000 },
                 { type: 'basic', row: null, delay: 40000 },
 

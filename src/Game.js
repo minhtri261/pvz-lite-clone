@@ -26,6 +26,8 @@ const FUSION_RECIPES = [
     { a: 'peashooter', b: 'potatomine', result: 'potatoshooter'   },
     { a: 'wallnut',    b: 'potatomine', result: 'minenut'         },
     { a: 'puffshroom', b: 'sunflower',  result: 'sunshroom'       },
+    { a: 'puffshroom', b: 'peashooter', result: 'peashroom'       },
+    { a: 'puffshroom', b: 'wallnut',    result: 'nutshroom'       },
 ];
 
 // Label hiển thị cho fusion result đặc biệt (không phải tên plant)
@@ -37,7 +39,11 @@ const FUSION_RESULT_LABELS = {
 const FUSION_ONLY = new Set([
     'repeater', 'sunshooter', 'peanut', 'twinsun', 'snowpea',
     'sunnut', 'sunmine', 'potatoshooter', 'minenut', 'sunshroom',
+    'peashroom', 'nutshroom',
 ]);
+
+// Các loại Shroom — có thể xếp chồng 2 con cùng loại trong 1 ô
+const SHROOM_TYPES = new Set(['puffshroom', 'sunshroom', 'peashroom', 'nutshroom']);
 
 class Game {
     constructor() {
@@ -636,9 +642,24 @@ class Game {
         if (this.sun < cost || this.cooldowns[type] > 0) return;
 
         if (this.grid.isOccupied(col, row)) {
-            // Ô đã có cây → kiểm tra công thức kết hợp
             const existing = this.grid.getPlant(col, row);
             if (existing && !existing.dying && !existing.isDead) {
+                // Shroom cùng loại → xếp chồng (tối đa 2)
+                if (SHROOM_TYPES.has(type) && existing.type === type && existing.stackCount < 2) {
+                    existing.stackCount = 2;
+                    existing._rightHp   = existing.maxHp; // con phải bắt đầu với full HP
+                    this.sun -= cost;
+                    this.cooldowns[type] = d.cooldownMs;
+                    spawnFusionParticles(existing.cx, existing.cy - 10, this.particles);
+                    this._deselect();
+                    this._updateUI();
+                    return;
+                }
+                // Shroom khác loại → chặn (không cho trộn)
+                if (SHROOM_TYPES.has(type) && SHROOM_TYPES.has(existing.type) && existing.type !== type) {
+                    return;
+                }
+                // Kiểm tra công thức kết hợp bình thường
                 const result = this._checkFusion(existing.type, type);
                 if (result) {
                     this._doFusion(result, existing, col, row, cost, d.cooldownMs);
@@ -691,6 +712,11 @@ class Game {
 
         // Đặt cây kết hợp
         const fused = createPlant(resultType, col, row);
+        // Nếu cây gốc là Shroom đã xếp chồng 2 → kết quả cũng ×2
+        if (SHROOM_TYPES.has(resultType) && existingPlant.stackCount === 2) {
+            fused.stackCount = 2;
+            fused._rightHp   = fused.maxHp;
+        }
         this.plants.push(fused);
         this.grid.place(fused, col, row);
 
@@ -826,50 +852,84 @@ class Game {
             const existing = this.grid.getPlant(this.hoverCol, this.hoverRow);
 
             if (existing && !existing.dying) {
-                // Ô đã có cây → kiểm tra fusion
-                const fusionResult = this._checkFusion(existing.type, this.selectedType);
-                if (fusionResult) {
-                    // Viền vàng rực (thay viền hover vàng nhạt)
-                    ctx.fillStyle   = 'rgba(255,210,0,0.22)';
-                    ctx.strokeStyle = 'rgba(255,185,0,0.95)';
+                const sel = this.selectedType;
+                const labelX = GX + this.hoverCol * CELL_W + CELL_W / 2;
+                const labelY = GY + this.hoverRow * CELL_H - 8;
+
+                if (SHROOM_TYPES.has(sel) && existing.type === sel && existing.stackCount < 2) {
+                    // ── Shroom xếp chồng: viền xanh lá ──
+                    ctx.fillStyle   = 'rgba(0,220,120,0.20)';
+                    ctx.strokeStyle = 'rgba(0,220,120,0.90)';
                     ctx.lineWidth   = 3;
                     rr(ctx, GX + this.hoverCol * CELL_W + 1, GY + this.hoverRow * CELL_H + 1,
                        CELL_W - 2, CELL_H - 2, 6);
                     ctx.fill(); ctx.stroke();
-
-                    // Ghost của cây kết hợp (hoặc glow đặc biệt cho heal)
                     ctx.save(); ctx.globalAlpha = 0.72;
-                    switch (fusionResult) {
-                        case 'repeater':      drawRepeater(ctx, px, py, 0, 0, 0);             break;
-                        case 'sunshooter':    drawSunShooter(ctx, px, py, 0, 0, false);       break;
-                        case 'peanut':        drawPeanut(ctx, px, py, 0, 1, 0);               break;
-                        case 'twinsun':       drawTwinSun(ctx, px, py, 0, false);             break;
-                        case 'sunnut':        drawSunNut(ctx, px, py, 0, 1, false);           break;
-                        case 'sunmine':       drawSunMine(ctx, px, py, 0, false, false, 0, false); break;
-                        case 'potatoshooter': drawPotatoShooter(ctx, px, py, 0, false, false, 0, 0); break;
-                        case 'minenut':       drawMineNut(ctx, px, py, 0, 1, false, 0);             break;
-                        case 'sunshroom':     drawSunShroom(ctx, px, py, 0, false);                 break;
-                        case 'wallnut_heal':
-                            // Hiện glow xanh lá (heal indicator)
-                            ctx.globalAlpha = 0.5;
-                            ctx.fillStyle = '#40FF80';
-                            ctx.beginPath(); ctx.arc(px, py, 34, 0, Math.PI * 2); ctx.fill();
-                            break;
-                    }
+                    if (sel === 'puffshroom') drawPuffShroom(ctx, px, py, 0, 0, 2);
+                    else if (sel === 'sunshroom') drawSunShroom(ctx, px, py, 0, 0, 2);
                     ctx.restore();
-
-                    // Tên cây kết hợp phía trên ô
-                    const fuseName = FUSION_RESULT_LABELS[fusionResult]
-                                  || PLANT_DEFS[fusionResult]?.name
-                                  || fusionResult;
-                    const labelX   = GX + this.hoverCol * CELL_W + CELL_W / 2;
-                    const labelY   = GY + this.hoverRow * CELL_H - 8;
                     ctx.font = 'bold 11px Arial'; ctx.textAlign = 'center';
                     ctx.strokeStyle = 'rgba(0,0,0,0.85)'; ctx.lineWidth = 3;
-                    ctx.strokeText(`⚗ ${fuseName}`, labelX, labelY);
-                    ctx.fillStyle = fusionResult === 'wallnut_heal' ? '#80FF80' : '#FFD700';
-                    ctx.fillText(`⚗ ${fuseName}`, labelX, labelY);
+                    ctx.strokeText(`⊕ ×2 ${PLANT_DEFS[sel]?.name || sel}`, labelX, labelY);
+                    ctx.fillStyle = '#00EE88';
+                    ctx.fillText(`⊕ ×2 ${PLANT_DEFS[sel]?.name || sel}`, labelX, labelY);
                     ctx.textAlign = 'left';
+
+                } else if (SHROOM_TYPES.has(sel) && SHROOM_TYPES.has(existing.type) && existing.type !== sel) {
+                    // ── Shroom khác loại: không thể đặt ──
+                    ctx.fillStyle   = 'rgba(200,50,50,0.15)';
+                    ctx.strokeStyle = 'rgba(200,50,50,0.60)';
+                    ctx.lineWidth   = 2;
+                    rr(ctx, GX + this.hoverCol * CELL_W + 1, GY + this.hoverRow * CELL_H + 1,
+                       CELL_W - 2, CELL_H - 2, 6);
+                    ctx.fill(); ctx.stroke();
+
+                } else {
+                    // ── Fusion bình thường ──
+                    const fusionResult = this._checkFusion(existing.type, sel);
+                    if (fusionResult) {
+                        ctx.fillStyle   = 'rgba(255,210,0,0.22)';
+                        ctx.strokeStyle = 'rgba(255,185,0,0.95)';
+                        ctx.lineWidth   = 3;
+                        rr(ctx, GX + this.hoverCol * CELL_W + 1, GY + this.hoverRow * CELL_H + 1,
+                           CELL_W - 2, CELL_H - 2, 6);
+                        ctx.fill(); ctx.stroke();
+
+                        // Ghost cây kết hợp
+                        const ghostStack = (SHROOM_TYPES.has(fusionResult) && existing.stackCount === 2) ? 2 : 1;
+                        ctx.save(); ctx.globalAlpha = 0.72;
+                        switch (fusionResult) {
+                            case 'repeater':      drawRepeater(ctx, px, py, 0, 0, 0);             break;
+                            case 'sunshooter':    drawSunShooter(ctx, px, py, 0, 0, false);       break;
+                            case 'peanut':        drawPeanut(ctx, px, py, 0, 1, 0);               break;
+                            case 'twinsun':       drawTwinSun(ctx, px, py, 0, false);             break;
+                            case 'sunnut':        drawSunNut(ctx, px, py, 0, 1, false);           break;
+                            case 'sunmine':       drawSunMine(ctx, px, py, 0, false, false, 0, false); break;
+                            case 'potatoshooter': drawPotatoShooter(ctx, px, py, 0, false, false, 0, 0); break;
+                            case 'minenut':       drawMineNut(ctx, px, py, 0, 1, false, 0);             break;
+                            case 'sunshroom':     drawSunShroom(ctx, px, py, 0, false, ghostStack);                  break;
+                            case 'peashroom':     drawPeaShroom(ctx, px, py, 0, 0, ghostStack);                    break;
+                            case 'nutshroom':     drawNutShroom(ctx, px, py, 0, 1, ghostStack, 1);                 break;
+                            case 'wallnut_heal':
+                                ctx.globalAlpha = 0.5;
+                                ctx.fillStyle = '#40FF80';
+                                ctx.beginPath(); ctx.arc(px, py, 34, 0, Math.PI * 2); ctx.fill();
+                                break;
+                        }
+                        ctx.restore();
+
+                        // Label
+                        const fuseName  = FUSION_RESULT_LABELS[fusionResult]
+                                        || PLANT_DEFS[fusionResult]?.name
+                                        || fusionResult;
+                        const stackSuffix = ghostStack === 2 ? ' ×2' : '';
+                        ctx.font = 'bold 11px Arial'; ctx.textAlign = 'center';
+                        ctx.strokeStyle = 'rgba(0,0,0,0.85)'; ctx.lineWidth = 3;
+                        ctx.strokeText(`⚗ ${fuseName}${stackSuffix}`, labelX, labelY);
+                        ctx.fillStyle = fusionResult === 'wallnut_heal' ? '#80FF80' : '#FFD700';
+                        ctx.fillText(`⚗ ${fuseName}${stackSuffix}`, labelX, labelY);
+                        ctx.textAlign = 'left';
+                    }
                 }
             } else if (!existing) {
                 // Ô trống → ghost bình thường

@@ -1,11 +1,9 @@
 'use strict';
 // Sun-shroom: PuffShroom + SunFlower fusion
 // Nấm nhỏ màu nâu-vàng kiểu PvZ1, sản xuất sun nhanh hơn ban đêm
-// producePulse: > 0 khi vừa tạo sun → hào quang nhỏ
-function drawSunShroom(ctx, x, y, animTime, producePulse) {
+function _drawSunShroomBody(ctx, animTime, producePulse) {
     const bob = Math.sin(animTime * 2.5) * 2;
     const sc  = producePulse > 0 ? 1 + Math.sin(animTime * 8) * 0.06 : 1;
-    ctx.save(); ctx.translate(Math.round(x), Math.round(y));
 
     // Bóng
     ctx.fillStyle = 'rgba(0,0,0,0.18)';
@@ -30,17 +28,17 @@ function drawSunShroom(ctx, x, y, animTime, producePulse) {
     const hy = -3 + bob;
     ctx.save(); ctx.scale(sc, sc);
     const cG = ctx.createRadialGradient(-8, hy - 10, 2, 0, hy, 20);
-    cG.addColorStop(0,    '#F0C050'); // vàng sáng highlight
-    cG.addColorStop(0.38, '#C88520'); // cam-nâu
-    cG.addColorStop(0.78, '#8B5010'); // nâu đậm
-    cG.addColorStop(1,    '#5a2e06'); // viền tối
+    cG.addColorStop(0,    '#F0C050');
+    cG.addColorStop(0.38, '#C88520');
+    cG.addColorStop(0.78, '#8B5010');
+    cG.addColorStop(1,    '#5a2e06');
     ctx.fillStyle = cG; ctx.strokeStyle = '#4a2604'; ctx.lineWidth = 2.5;
     ctx.beginPath(); ctx.ellipse(0, hy, 20, 17, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
 
     // Chấm trắng (toadstool spots)
     ctx.fillStyle = 'rgba(255,255,255,0.60)';
     ctx.beginPath(); ctx.arc(-8, hy - 5, 3.8, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc( 6, hy - 10, 3, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc( 6, hy - 10, 3,   0, Math.PI * 2); ctx.fill();
     ctx.beginPath(); ctx.arc(11, hy,  2.2, 0, Math.PI * 2); ctx.fill();
     ctx.beginPath(); ctx.arc(-2, hy + 8, 1.8, 0, Math.PI * 2); ctx.fill();
     ctx.restore();
@@ -61,6 +59,26 @@ function drawSunShroom(ctx, x, y, animTime, producePulse) {
     // Nụ cười
     ctx.strokeStyle = '#4a2604'; ctx.lineWidth = 1.5; ctx.lineCap = 'round';
     ctx.beginPath(); ctx.arc(0, eyeY + 6, 5, 0.35, Math.PI - 0.35); ctx.stroke();
+}
 
-    ctx.restore();
+function drawSunShroom(ctx, x, y, animTime, producePulse, stackCount = 1) {
+    if (stackCount === 2) {
+        // Con trái (còn sống) — vẽ trước để nằm phía sau
+        ctx.save();
+        ctx.translate(Math.round(x) - 9, Math.round(y));
+        ctx.scale(0.76, 0.76);
+        _drawSunShroomBody(ctx, animTime, producePulse);
+        ctx.restore();
+        // Con phải (bị ăn trước) — vẽ sau để nằm phía trước
+        ctx.save();
+        ctx.translate(Math.round(x) + 8, Math.round(y) + 2);
+        ctx.scale(0.76, 0.76);
+        _drawSunShroomBody(ctx, animTime * 1.08 + 0.5, producePulse);
+        ctx.restore();
+    } else {
+        ctx.save();
+        ctx.translate(Math.round(x), Math.round(y));
+        _drawSunShroomBody(ctx, animTime, producePulse);
+        ctx.restore();
+    }
 }

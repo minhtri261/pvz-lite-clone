@@ -9,10 +9,14 @@
 class FlagZombie extends Zombie {
     constructor(row) { super('flag', row); }
 
+    get render() {
+        return {
+            drawGearFn: !(this.state === 'dying' && this.deathT > 0.6) ? _drawFlagGear : null,
+        };
+    }
+
     draw(ctx) {
         this.drawHitFlash(ctx);
-        // drawFlagZombie = drawBasicZombie + cột cờ + cờ vẫy
-        drawFlagZombie(ctx, this.x, this.y, this.animTime, this.state, this.hpPct, this.deathT);
-        this.drawSlowOverlay(ctx);
+        drawZombieBase(ctx, this);
     }
 }

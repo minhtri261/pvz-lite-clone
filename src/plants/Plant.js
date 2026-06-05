@@ -19,6 +19,7 @@ class Plant {
             animTime: 0,   // đồng hồ hoạt ảnh (tính bằng giây, tăng liên tục)
             dead: false,   // true → sẽ bị xóa khỏi game
             hitFlash: 0,   // bộ đếm hiệu ứng flash đỏ khi trúng đòn (giây)
+            stackCount: 1, // số lượng xếp chồng (chỉ có nghĩa với Shroom, tối đa 2)
         });
     }
 
@@ -28,9 +29,18 @@ class Plant {
 
     // Nhận sát thương từ zombie
     takeDamage(amount) {
-        this.hp -= amount;
-        this.hitFlash = 0.15; // kích hoạt flash đỏ trong 0.15 giây
-        if (this.hp <= 0) this.dead = true;
+        this.hitFlash = 0.15;
+        if (this.stackCount === 2) {
+            // Con bên phải bị ăn trước — khi hết HP thì con trái tiếp quản nguyên HP
+            this._rightHp -= amount;
+            if (this._rightHp <= 0) {
+                this.stackCount = 1;
+                this.hp = this.maxHp;
+            }
+        } else {
+            this.hp -= amount;
+            if (this.hp <= 0) this.dead = true;
+        }
     }
 
     // Gọi mỗi frame — subclass override để thêm logic riêng

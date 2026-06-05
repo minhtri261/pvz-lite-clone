@@ -49,10 +49,12 @@ class ConeheadZombie extends Zombie {
         }
     }
 
+    get render() {
+        return { drawHatFn: this.hasCone ? _drawConeHat : null };
+    }
+
     draw(ctx) {
         this.drawHitFlash(ctx);
-        // hasCone điều khiển việc vẽ hay không vẽ nón
-        drawConeheadZombie(ctx, this.x, this.y, this.animTime, this.state, this.hpPct, this.hasCone, this.deathT);
-        this.drawSlowOverlay(ctx);
+        drawZombieBase(ctx, this);
     }
 }

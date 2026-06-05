@@ -49,10 +49,12 @@ class BucketZombie extends Zombie {
         }
     }
 
+    get render() {
+        return { drawHatFn: this.hasBucket ? _drawBucketHat : null };
+    }
+
     draw(ctx) {
         this.drawHitFlash(ctx);
-        // hasBucket điều khiển việc vẽ hay không vẽ xô
-        drawBucketZombie(ctx, this.x, this.y, this.animTime, this.state, this.hpPct, this.hasBucket, this.deathT);
-        this.drawSlowOverlay(ctx);
+        drawZombieBase(ctx, this);
     }
 }

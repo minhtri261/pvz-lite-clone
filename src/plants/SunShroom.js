@@ -32,11 +32,13 @@ class SunShroom extends Plant {
             this.sunTimer    = 0;
             this.producePulse = 0.5;
             game.suns.push(new Sun(this.cx + randFloat(-25, 25), this.cy - 50, false));
+            if (this.stackCount === 2)
+                game.suns.push(new Sun(this.cx + randFloat(-25, 25), this.cy - 70, false));
         }
     }
 
     draw(ctx) {
         this.drawHitFlash(ctx);
-        drawSunShroom(ctx, this.cx, this.cy, this.animTime, this.producePulse);
+        drawSunShroom(ctx, this.cx, this.cy, this.animTime, this.producePulse, this.stackCount);
     }
 }

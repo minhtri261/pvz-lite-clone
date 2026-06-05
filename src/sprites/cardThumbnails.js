@@ -44,7 +44,7 @@ function drawCardThumbnails() {
         fn(c); // vẽ sprite
 
         // ── Huy hiệu ⚗ nhỏ ở góc trên-phải cho cây có thể kết hợp ──
-        const fusionSources = new Set(['art-peashooter', 'art-sunflower', 'art-wallnut']);
+        const fusionSources = new Set(['art-peashooter', 'art-sunflower', 'art-wallnut', 'art-potatomine', 'art-puffshroom']);
         if (fusionSources.has(id)) {
             c.fillStyle = 'rgba(0,0,0,0.5)';
             c.beginPath(); c.arc(48, 10, 9, 0, Math.PI * 2); c.fill();

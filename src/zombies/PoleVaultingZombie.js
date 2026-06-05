@@ -96,13 +96,20 @@ class PoleVaultingZombie extends Zombie {
         }
     }
 
+    get render() {
+        return {
+            drawOutfitFn: _drawAthleticOutfit,
+            drawArmsFn: this.hasVault
+                ? (ctx, animTime) => _drawVaultArms(ctx, animTime, this.vaulting, this.vaultT)
+                : null,
+            drawGearFn: this.hasVault
+                ? (ctx, animTime) => _drawPoleGear(ctx, animTime, this.vaulting, this.vaultT)
+                : null,
+        };
+    }
+
     draw(ctx) {
         this.drawHitFlash(ctx);
-        drawPoleVaultingZombie(ctx,
-            this.x, this.y, this.animTime,
-            this.state, this.hpPct,
-            this.hasVault, this.vaulting, this.vaultT,
-            this.deathT);
-        this.drawSlowOverlay(ctx);
+        drawZombieBase(ctx, this);
     }
 }

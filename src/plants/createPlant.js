@@ -23,6 +23,8 @@ function createPlant(type, col, row) {
         case 'potatoshooter': return new PotatoShooter(col, row);
         case 'minenut':       return new MineNut(col, row);
         case 'sunshroom':     return new SunShroom(col, row);
+        case 'peashroom':     return new PeaShroom(col, row);
+        case 'nutshroom':     return new NutShroom(col, row);
         case 'snowpea':       return new SnowPea(col, row);
     }
 }

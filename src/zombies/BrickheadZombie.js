@@ -54,15 +54,14 @@ class BrickheadZombie extends Zombie {
         }
     }
 
+    get render() {
+        if (!this.hasBrick) return {};
+        const brickPct = Math.max(0, this.brickHp / ZOMBIE_DEFS.brickhead.brickHp);
+        return { drawHatFn: (ctx, hy) => _drawBrickHat(ctx, hy, brickPct) };
+    }
+
     draw(ctx) {
         this.drawHitFlash(ctx);
-        const brickPct = this.hasBrick
-            ? Math.max(0, this.brickHp / ZOMBIE_DEFS.brickhead.brickHp)
-            : 0;
-        drawBrickheadZombie(ctx,
-            this.x, this.y, this.animTime,
-            this.state, this.hpPct,
-            this.hasBrick, brickPct, this.deathT);
-        this.drawSlowOverlay(ctx);
+        drawZombieBase(ctx, this);
     }
 }

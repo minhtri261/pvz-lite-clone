@@ -43,12 +43,16 @@ class NewspaperZombie extends Zombie {
         }
     }
 
+    get render() {
+        const showPaper = this.hasPaper && !(this.state === 'dying' && this.deathT > 0.6);
+        return {
+            rageEyes:   !this.hasPaper,
+            drawGearFn: showPaper ? _drawNewspaperGear : null,
+        };
+    }
+
     draw(ctx) {
         this.drawHitFlash(ctx);
-        drawNewspaperZombie(ctx,
-            this.x, this.y, this.animTime,
-            this.state, this.hpPct,
-            this.hasPaper, this.deathT);
-        this.drawSlowOverlay(ctx);
+        drawZombieBase(ctx, this);
     }
 }

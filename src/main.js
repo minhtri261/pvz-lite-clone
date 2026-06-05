@@ -8,21 +8,27 @@
 
 // Di chuột → cập nhật ô hover để vẽ highlight và bóng ma cây
 canvas.addEventListener('mousemove', e => {
-    const r = canvas.getBoundingClientRect(); // vị trí canvas trong trang
-    game.handleMouseMove(e.clientX - r.left, e.clientY - r.top);
+    const r = canvas.getBoundingClientRect();
+    const sx = canvas.width / r.width;
+    const sy = canvas.height / r.height;
+    game.handleMouseMove((e.clientX - r.left) * sx, (e.clientY - r.top) * sy);
 });
 
 // Click chuột trái → thu sun / đào cây (xẻng) / đặt cây
 canvas.addEventListener('click', e => {
     const r = canvas.getBoundingClientRect();
-    game.handleClick(e.clientX - r.left, e.clientY - r.top);
+    const sx = canvas.width / r.width;
+    const sy = canvas.height / r.height;
+    game.handleClick((e.clientX - r.left) * sx, (e.clientY - r.top) * sy);
 });
 
 // Click chuột phải → hủy lựa chọn (không hiện menu chuột phải)
 canvas.addEventListener('contextmenu', e => {
     e.preventDefault(); // tắt menu mặc định của trình duyệt
     const r = canvas.getBoundingClientRect();
-    game.handleRightClick(e.clientX - r.left, e.clientY - r.top);
+    const sx = canvas.width / r.width;
+    const sy = canvas.height / r.height;
+    game.handleRightClick((e.clientX - r.left) * sx, (e.clientY - r.top) * sy);
 });
 
 // ── Phím tắt ──────────────────────────────────────────────────

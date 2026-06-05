@@ -35,7 +35,18 @@ class Zombie {
     }
 
     get hpPct()  { return this.hp / this.maxHp; }
-    get isDead() { return this.remove; } // Game dùng isDead để lọc mảng
+    get isDead() { return this.remove; }
+
+    // Default render config — subclasses override to add hat/gear/outfit/rageEyes.
+    get render()  { return {}; }
+
+    // Active status effects as a string array consumed by drawZombieBase.
+    // Add more flags here as new mechanics are introduced.
+    get effects() {
+        const fx = [];
+        if (this.slowed) fx.push('slow');
+        return fx;
+    }
 
     // Nhận sát thương — lớp con override nếu có giáp
     takeDamage(amount, particles) {

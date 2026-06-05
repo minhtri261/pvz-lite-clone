@@ -71,6 +71,20 @@ const PLANT_DEFS = {
         sunIntervalDay:   25000, // ban ngày: 25s/sun
         sunIntervalNight: 20000, // ban đêm: 20s/sun (nấm thích bóng tối!)
     },
+    peashroom: {
+        name: 'Pea-shroom',
+        cost: 0,           // fusion-only: puffshroom + peashooter
+        hp: 200,           // yếu như PuffShroom — nấm mỏng manh
+        cooldownMs: 7500,
+        fireRate: 1500,    // bắn 1 viên mỗi 1.5s
+        peaDamage: 20,     // sát thương bằng Peashooter, đạn xanh lá
+    },
+    nutshroom: {
+        name: 'Nut-shroom',
+        cost: 0,           // fusion-only: puffshroom + wallnut
+        hp: 2200,          // trung bình — ít hơn WallNut (4000) nhưng hơn WallNut thu nhỏ
+        cooldownMs: 30000, // cooldown dài như WallNut
+    },
     sunnut: {
         name: 'Sun-nut',
         cost: 0,           // fusion-only: wallnut(50) + sunflower(50)

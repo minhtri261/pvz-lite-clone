@@ -9,10 +9,10 @@ const LEVEL_DEF_8 = {
     isNight:   true,
     title:    'Level 8 Complete!',
     subtitle: 'You defended the garden across all 8 levels! Legend!',
-    newPlant:  null,
+    newPlant:  'Chomper',
     newZombie: 'Brickhead Zombie',
     activeRows:      [0, 1, 2, 3, 4],
-    availablePlants: ['sunflower', 'peashooter', 'wallnut', 'potatomine', 'puffshroom'],
+    availablePlants: ['sunflower', 'peashooter', 'wallnut', 'potatomine', 'puffshroom', 'chomper'],
     startingSun: 150,
     waves: [
         {

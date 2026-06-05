@@ -37,16 +37,15 @@ class PuffShroom extends Plant {
             if (hasTarget) {
                 this.shootTimer = 0;
                 this.shootAnim  = 1;
-                // isSpore = true → viên đạn màu tím bào tử
-                game.projectiles.push(
-                    new Projectile(this.cx + 36, this.cy + 3, this.row, false, false, false, true)
-                );
+                game.projectiles.push(new Projectile(this.cx + 36, this.cy + 3, this.row, false, false, false, true));
+                if (this.stackCount === 2)
+                    game.projectiles.push(new Projectile(this.cx + 36, this.cy - 6, this.row, false, false, false, true));
             }
         }
     }
 
     draw(ctx) {
         this.drawHitFlash(ctx);
-        drawPuffShroom(ctx, this.cx, this.cy, this.animTime, this.shootAnim);
+        drawPuffShroom(ctx, this.cx, this.cy, this.animTime, this.shootAnim, this.stackCount);
     }
 }
