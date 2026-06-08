@@ -30,7 +30,8 @@ class Repeater extends Plant {
         if (this._burst === 1) {
             this._burstTimer -= dt;
             if (this._burstTimer <= 0) {
-                if (game.zombies.some(z => z.row === this.row && !z.dying && z.x > this.cx)) {
+                if (game.zombies.some(z => z.row === this.row && !z.dying && z.x > this.cx)
+                 || game.tombs.some(t => !t.dead && t.row === this.row && t.cellX > this.cx)) {
                     this.shootAnim2 = 1;
                     game.projectiles.push(new Projectile(this.cx + 42, this.cy - 2, this.row, false, false));
                 }
@@ -42,7 +43,8 @@ class Repeater extends Plant {
         // Pha 1: bắn viên đầu tiên
         this.shootTimer += dt;
         if (this.shootTimer >= PLANT_DEFS.repeater.fireRate) {
-            if (game.zombies.some(z => z.row === this.row && !z.dying && z.x > this.cx)) {
+            if (game.zombies.some(z => z.row === this.row && !z.dying && z.x > this.cx)
+             || game.tombs.some(t => !t.dead && t.row === this.row && t.cellX > this.cx)) {
                 this.shootTimer  = 0;
                 this.shootAnim1  = 1;
                 game.projectiles.push(new Projectile(this.cx + 42, this.cy - 10, this.row, false, false));

@@ -58,6 +58,19 @@
                 <div class="cd-bar"><div class="cd-fill" id="cd-chomper"></div></div>
             </div>
 
+            <div class="pcard" id="card-cabbage" data-type="cabbage">
+                <canvas class="card-art" id="art-cabbage" width="58" height="58"></canvas>
+                <div class="card-name">Cabbage-pult</div>
+                <div class="card-cost"><span class="cost-sun">☀</span>100</div>
+                <div class="cd-bar"><div class="cd-fill" id="cd-cabbage"></div></div>
+            </div>
+
+            <div class="pcard" id="card-snowpea" data-type="snowpea">
+                <canvas class="card-art" id="art-snowpea" width="58" height="58"></canvas>
+                <div class="card-name">Snow Pea</div>
+                <div class="cd-bar"><div class="cd-fill" id="cd-snowpea"></div></div>
+            </div>
+
             <div class="pcard" id="card-repeater" data-type="repeater">
                 <canvas class="card-art" id="art-repeater" width="58" height="58"></canvas>
                 <div class="card-name">Repeater</div>
@@ -86,12 +99,6 @@
                 <canvas class="card-art" id="art-puffshroom" width="58" height="58"></canvas>
                 <div class="card-name">Puff-shroom</div>
                 <div class="cd-bar"><div class="cd-fill" id="cd-puffshroom"></div></div>
-            </div>
-
-            <div class="pcard" id="card-snowpea" data-type="snowpea">
-                <canvas class="card-art" id="art-snowpea" width="58" height="58"></canvas>
-                <div class="card-name">Snow Pea</div>
-                <div class="cd-bar"><div class="cd-fill" id="cd-snowpea"></div></div>
             </div>
 
         </div>
@@ -130,8 +137,17 @@
         </div>
     </div>
 
-    <!-- Start Screen / Level Select -->
+    <!-- ══ START SCREEN / LEVEL SELECT ══════════════════════════ -->
     <div id="screen-start" class="fullscreen-overlay">
+        <!-- Left sidebar: Plant Almanac -->
+        <div class="start-sidebar">
+            <button class="sidebar-book-btn" onclick="game.showPlantList()">
+                <span class="sidebar-btn-icon">📖</span>
+                <span class="sidebar-btn-label">Plant<br>Almanac</span>
+            </button>
+        </div>
+
+        <!-- Center: logo + era/level select -->
         <div class="screen-box">
             <div class="pvz-logo">
                 <span class="logo-p">Plants</span>
@@ -140,7 +156,7 @@
             </div>
             <p class="logo-sub">Fan Clone</p>
 
-            <!-- ══ ERA SELECT (Hệ thống Thời Kỳ) ════════════════ -->
+            <!-- ══ ERA SELECT ════════════════════════════════ -->
             <div class="era-container">
 
                 <!-- Thời Kỳ 1: Hiện Tại (Present) -->
@@ -153,44 +169,49 @@
                         </div>
                     </div>
 
-                    <!-- Buổi Sáng (màn 1-5) -->
+                    <!-- Buổi Sáng (màn 1–5) -->
                     <div class="era-section">
                         <div class="era-period-title era-day">☀ Buổi Sáng</div>
                         <div class="era-levels-row">
                             <div class="lvl-btn-wrap" id="lvlwrap-1"><button class="lvl-btn unlocked" id="lvl-btn-1" onclick="game.startLevel(1)"><span class="lvl-num">1</span><span class="lvl-name">First Steps</span></button></div>
-                            <div class="lvl-btn-wrap" id="lvlwrap-2"><button class="lvl-btn locked" id="lvl-btn-2" onclick="game.startLevel(2)"><span class="lvl-num">2</span><span class="lvl-name">More Lawn</span></button></div>
-                            <div class="lvl-btn-wrap" id="lvlwrap-3"><button class="lvl-btn locked" id="lvl-btn-3" onclick="game.startLevel(3)"><span class="lvl-num">3</span><span class="lvl-name">Conehead</span></button></div>
-                            <div class="lvl-btn-wrap" id="lvlwrap-4"><button class="lvl-btn locked" id="lvl-btn-4" onclick="game.startLevel(4)"><span class="lvl-num">4</span><span class="lvl-name">Cherry Season</span></button></div>
-                            <div class="lvl-btn-wrap" id="lvlwrap-5"><button class="lvl-btn locked" id="lvl-btn-5" onclick="game.startLevel(5)"><span class="lvl-num">5</span><span class="lvl-name">Potato Field</span></button></div>
+                            <div class="lvl-btn-wrap" id="lvlwrap-2"><button class="lvl-btn locked"   id="lvl-btn-2" onclick="game.startLevel(2)"><span class="lvl-num">2</span><span class="lvl-name">More Lawn</span></button></div>
+                            <div class="lvl-btn-wrap" id="lvlwrap-3"><button class="lvl-btn locked"   id="lvl-btn-3" onclick="game.startLevel(3)"><span class="lvl-num">3</span><span class="lvl-name">Conehead</span></button></div>
+                            <div class="lvl-btn-wrap" id="lvlwrap-4"><button class="lvl-btn locked"   id="lvl-btn-4" onclick="game.startLevel(4)"><span class="lvl-num">4</span><span class="lvl-name">Cherry Season</span></button></div>
+                            <div class="lvl-btn-wrap" id="lvlwrap-5"><button class="lvl-btn locked"   id="lvl-btn-5" onclick="game.startLevel(5)"><span class="lvl-num">5</span><span class="lvl-name">Potato Field</span></button></div>
                         </div>
                     </div>
 
-                    <!-- Buổi Tối (màn 6-10) -->
+                    <!-- Buổi Tối (màn 6–10) -->
                     <div class="era-section">
                         <div class="era-period-title era-night">🌙 Buổi Tối</div>
                         <div class="era-levels-row">
-                            <div class="lvl-btn-wrap" id="lvlwrap-6"><button class="lvl-btn locked" id="lvl-btn-6" onclick="game.startLevel(6)"><span class="lvl-num">6</span><span class="lvl-name">Vaulting</span></button></div>
-                            <div class="lvl-btn-wrap" id="lvlwrap-7"><button class="lvl-btn locked" id="lvl-btn-7" onclick="game.startLevel(7)"><span class="lvl-num">7</span><span class="lvl-name">Buckets</span></button></div>
-                            <div class="lvl-btn-wrap" id="lvlwrap-8"><button class="lvl-btn locked" id="lvl-btn-8" onclick="game.startLevel(8)"><span class="lvl-num">8</span><span class="lvl-name">Assault</span></button></div>
-                            <div class="lvl-btn-wrap" id="lvlwrap-9"><button class="lvl-btn locked" id="lvl-btn-9" onclick="game.startLevel(9)"><span class="lvl-num">9</span><span class="lvl-name">Peanuts</span></button></div>
-                            <div class="lvl-btn-wrap" id="lvlwrap-10"><button class="lvl-btn locked" id="lvl-btn-10" onclick="game.startLevel(10)"><span class="lvl-num">10</span><span class="lvl-name">Brick</span></button></div>
+                            <div class="lvl-btn-wrap" id="lvlwrap-6"><button class="lvl-btn locked night-btn" id="lvl-btn-6"  onclick="game.startLevel(6)"><span class="lvl-num">6</span><span class="lvl-name">Vaulting</span></button></div>
+                            <div class="lvl-btn-wrap" id="lvlwrap-7"><button class="lvl-btn locked night-btn" id="lvl-btn-7"  onclick="game.startLevel(7)"><span class="lvl-num">7</span><span class="lvl-name">Buckets</span></button></div>
+                            <div class="lvl-btn-wrap" id="lvlwrap-8"><button class="lvl-btn locked night-btn" id="lvl-btn-8"  onclick="game.startLevel(8)"><span class="lvl-num">8</span><span class="lvl-name">Assault</span></button></div>
+                            <div class="lvl-btn-wrap" id="lvlwrap-9"><button class="lvl-btn locked night-btn" id="lvl-btn-9"  onclick="game.startLevel(9)"><span class="lvl-num">9</span><span class="lvl-name">Peanuts</span></button></div>
+                            <div class="lvl-btn-wrap" id="lvlwrap-10"><button class="lvl-btn locked night-btn" id="lvl-btn-10" onclick="game.startLevel(10)"><span class="lvl-num">10</span><span class="lvl-name">Brick</span></button></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Thời Kỳ Tiếp Theo (Coming Soon) -->
-                <div class="era-card era-locked-card">
+                <!-- Thời Kỳ 2: Ancient Egypt -->
+                <div class="era-card era-egypt-card">
                     <div class="era-card-header">
-                        <span class="era-icon era-lock-icon">🔒</span>
+                        <span class="era-icon">🏜</span>
                         <div>
-                            <div class="era-title-text era-locked-text">Thời Kỳ Tiếp Theo</div>
-                            <div class="era-meta era-coming">Sắp Ra Mắt...</div>
+                            <div class="era-title-text era-egypt-title">Ancient Egypt</div>
+                            <div class="era-meta">4000 BC · 5 màn</div>
                         </div>
                     </div>
-                    <!-- Giữ buttons ẩn trong DOM cho _updateLevelSelectUI -->
-                    <div style="display:none">
-                        <div class="lvl-btn-wrap" id="lvlwrap-11"><button class="lvl-btn locked" id="lvl-btn-11" onclick="game.startLevel(11)"><span class="lvl-num">11</span><span class="lvl-name">First Night</span></button></div>
-                        <div class="lvl-btn-wrap" id="lvlwrap-12"><button class="lvl-btn locked" id="lvl-btn-12" onclick="game.startLevel(12)"><span class="lvl-num">12</span><span class="lvl-name">Final Night</span></button></div>
+                    <div class="era-section">
+                        <div class="era-period-title era-egypt-period">🌅 Sa Mạc Cổ Đại</div>
+                        <div class="era-levels-row">
+                            <div class="lvl-btn-wrap" id="lvlwrap-11"><button class="lvl-btn locked egypt-btn" id="lvl-btn-11" onclick="game.startLevel(11)"><span class="lvl-num">11</span><span class="lvl-name">Sand & Sun</span></button></div>
+                            <div class="lvl-btn-wrap" id="lvlwrap-12"><button class="lvl-btn locked egypt-btn" id="lvl-btn-12" onclick="game.startLevel(12)"><span class="lvl-num">12</span><span class="lvl-name">Sarcophagus</span></button></div>
+                            <div class="lvl-btn-wrap" id="lvlwrap-13"><button class="lvl-btn locked egypt-btn" id="lvl-btn-13" onclick="game.startLevel(13)"><span class="lvl-num">13</span><span class="lvl-name">Newspaper</span></button></div>
+                            <div class="lvl-btn-wrap" id="lvlwrap-14"><button class="lvl-btn locked egypt-btn" id="lvl-btn-14" onclick="game.startLevel(14)"><span class="lvl-num">14</span><span class="lvl-name">Brickwall</span></button></div>
+                            <div class="lvl-btn-wrap" id="lvlwrap-15"><button class="lvl-btn locked egypt-btn" id="lvl-btn-15" onclick="game.startLevel(15)"><span class="lvl-num">15</span><span class="lvl-name">Final Stand</span></button></div>
+                        </div>
                     </div>
                 </div>
 
@@ -202,6 +223,36 @@
                 <p style="font-size:11px;color:#b0e0b0;">☀+☀=TwinSun · 🪨+🪨=Hồi HP · 🪨+☀=SunNut · ☀+💣=SunMine · Đậu+💣=PotatoShooter</p>
                 <p style="font-size:11px;color:#c8c8ff;">Trồng 2 cây lên cùng 1 ô để kết hợp!</p>
             </div>
+        </div>
+
+        <!-- Right sidebar: Zombie Notes -->
+        <div class="start-sidebar">
+            <button class="sidebar-book-btn sidebar-zombie-btn" onclick="game.showZombieList()">
+                <span class="sidebar-btn-icon">🧟</span>
+                <span class="sidebar-btn-label">Zombie<br>Notes</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ══ PLANT ALMANAC ════════════════════════════════════════ -->
+    <div id="screen-plantlist" class="fullscreen-overlay hidden">
+        <div class="almanac-box">
+            <div class="almanac-header">
+                <h2 class="almanac-title">📖 Plant Almanac</h2>
+                <button class="almanac-close-btn" onclick="game.hidePlantList()">✕</button>
+            </div>
+            <div id="plantlist-grid" class="almanac-grid"></div>
+        </div>
+    </div>
+
+    <!-- ══ ZOMBIE NOTES ══════════════════════════════════════════ -->
+    <div id="screen-zombielist" class="fullscreen-overlay hidden">
+        <div class="almanac-box">
+            <div class="almanac-header">
+                <h2 class="almanac-title">🧟 Zombie Notes</h2>
+                <button class="almanac-close-btn" onclick="game.hideZombieList()">✕</button>
+            </div>
+            <div id="zombielist-grid" class="almanac-grid"></div>
         </div>
     </div>
 
@@ -245,11 +296,11 @@
         </div>
     </div>
 
-    <!-- Victory (all 5 levels) -->
+    <!-- Victory (all 15 levels) -->
     <div id="screen-win" class="fullscreen-overlay hidden">
         <div class="screen-box">
             <h1 class="win-title">🌻 Victory! 🌻</h1>
-            <p class="win-sub">You saved the garden across all 5 levels!</p>
+            <p class="win-sub">You saved the garden across all 15 levels!</p>
             <button class="big-btn green-btn" id="btn-winplay">Play Again</button>
         </div>
     </div>
@@ -279,6 +330,9 @@
 <script src="src/data/levels/level10.js"></script>
 <script src="src/data/levels/level11.js"></script>
 <script src="src/data/levels/level12.js"></script>
+<script src="src/data/levels/level13.js"></script>
+<script src="src/data/levels/level14.js"></script>
+<script src="src/data/levels/level15.js"></script>
 <script src="src/data/levels/levelDefs.js"></script>
 
 <!-- §4 Sprites (pure draw functions, no classes) -->
@@ -297,6 +351,9 @@
 <script src="src/sprites/plants/drawTwinSun.js"></script>
 <script src="src/sprites/plants/drawPeanut.js"></script>
 <script src="src/sprites/plants/drawPuffShroom.js"></script>
+<script src="src/sprites/plants/drawCabbage.js"></script>
+<script src="src/sprites/plants/drawChompNut.js"></script>
+<script src="src/sprites/plants/drawChompMine.js"></script>
 
 <!-- §4b Zombie sprites — drawZombieBase phải load trước vì tất cả zombie khác gọi nó -->
 <script src="src/sprites/zombies/drawZombieBase.js"></script>
@@ -317,6 +374,7 @@
 <script src="src/sprites/plants/drawNutShroom.js"></script>
 
 <script src="src/sprites/miscSprites.js"></script>
+<script src="src/sprites/drawTomb.js"></script>
 <script src="src/sprites/cardThumbnails.js"></script>
 
 <!-- §5 Particle system -->
@@ -343,6 +401,9 @@
 <script src="src/plants/PeaShroom.js"></script>
 <script src="src/plants/NutShroom.js"></script>
 <script src="src/plants/SnowPea.js"></script>
+<script src="src/plants/Cabbage.js"></script>
+<script src="src/plants/ChompNut.js"></script>
+<script src="src/plants/ChompMine.js"></script>
 <script src="src/plants/createPlant.js"></script>
 
 <!-- §7 Zombie classes (base → subclasses → factory) -->
@@ -361,6 +422,8 @@
 <script src="src/entities/Sun.js"></script>
 <script src="src/entities/LawnMower.js"></script>
 <script src="src/entities/Grid.js"></script>
+<script src="src/entities/CabbageProjectile.js"></script>
+<script src="src/entities/Tomb.js"></script>
 
 <!-- §9 Game class + entry point (must be last) -->
 <script src="src/Game.js"></script>

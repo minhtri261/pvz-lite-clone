@@ -28,8 +28,8 @@ class TwinSun extends Plant {
             this.sunTimer    = 0;
             this.producePulse = 0.5;
             // Hai đầu hoa → hai sun xuất hiện ở hai vị trí khác nhau
-            game.suns.push(new Sun(this.cx - 20 + randFloat(-12, 12), this.cy - 50, false));
-            game.suns.push(new Sun(this.cx + 20 + randFloat(-12, 12), this.cy - 50, false));
+            game.suns.push(new Sun(this.cx - 20 + randFloat(-12, 12), this.cy - 50, false, PLANT_DEFS.twinsun.sunAmount));
+            game.suns.push(new Sun(this.cx + 20 + randFloat(-12, 12), this.cy - 50, false, PLANT_DEFS.twinsun.sunAmount));
         }
     }
 

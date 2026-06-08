@@ -58,7 +58,7 @@ document.addEventListener('keydown', e => {
 
 // ── Gắn sự kiện cho thẻ cây trong HUD ─────────────────────────
 ['sunflower', 'peashooter', 'wallnut', 'cherrybomb', 'potatomine',
- 'chomper', 'repeater', 'sunshooter', 'twinsun', 'peanut', 'puffshroom', 'snowpea'].forEach(type => {
+ 'chomper', 'repeater', 'sunshooter', 'twinsun', 'peanut', 'puffshroom', 'snowpea', 'cabbage'].forEach(type => {
     document.getElementById(`card-${type}`).addEventListener('click', () => game.selectCard(type));
 });
 

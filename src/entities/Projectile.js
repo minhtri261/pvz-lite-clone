@@ -9,13 +9,14 @@
 // ══════════════════════════════════════════════════════════════
 
 class Projectile {
-    constructor(x, y, row, isIce = false, isYellow = false, isBrown = false, isSpore = false) {
+    constructor(x, y, row, isIce = false, isYellow = false, isBrown = false, isSpore = false, pierce = false) {
         Object.assign(this, {
-            x, y, row, isIce, isYellow, isBrown, isSpore,
+            x, y, row, isIce, isYellow, isBrown, isSpore, pierce,
             speed:    8,
             dead:     false,
             animTime: Math.random() * Math.PI * 2,
             damage:   PLANT_DEFS.peashooter.peaDamage,
+            hitTargets: pierce ? new Set() : null, // tránh trúng lại cùng 1 mục tiêu khi xuyên
         });
     }
 

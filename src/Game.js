@@ -21,6 +21,9 @@ const FUSION_RECIPES = [
     { a: 'peashooter', b: 'wallnut',    result: 'peanut'          },
     { a: 'sunflower',  b: 'sunflower',  result: 'twinsun'         },
     { a: 'wallnut',    b: 'wallnut',    result: 'wallnut_heal'     }, // đặc biệt: hồi HP
+    { a: 'wallnut',    b: 'peanut',     result: 'wallnut_heal'     }, // đặc biệt: Wall-nut hồi đầy HP cho Peanut
+    { a: 'wallnut',    b: 'sunnut',     result: 'wallnut_heal'     }, // đặc biệt: Wall-nut hồi đầy HP cho Sun-nut
+    { a: 'wallnut',    b: 'chompnut',   result: 'wallnut_heal'     }, // đặc biệt: Wall-nut hồi đầy HP cho Chomp-nut
     { a: 'wallnut',    b: 'sunflower',  result: 'sunnut'          },
     { a: 'sunflower',  b: 'potatomine', result: 'sunmine'         },
     { a: 'peashooter', b: 'potatomine', result: 'potatoshooter'   },
@@ -28,18 +31,20 @@ const FUSION_RECIPES = [
     { a: 'puffshroom', b: 'sunflower',  result: 'sunshroom'       },
     { a: 'puffshroom', b: 'peashooter', result: 'peashroom'       },
     { a: 'puffshroom', b: 'wallnut',    result: 'nutshroom'       },
+    { a: 'chomper',    b: 'wallnut',    result: 'chompnut'        },
+    { a: 'chomper',    b: 'potatomine', result: 'chompmine'       },
 ];
 
 // Label hiển thị cho fusion result đặc biệt (không phải tên plant)
 const FUSION_RESULT_LABELS = {
-    'wallnut_heal': '🔋 Hồi HP Wall-nut!',
+    'wallnut_heal': '🔋 Hồi đầy HP!',
 };
 
 // Cây chỉ có thể có qua kết hợp — KHÔNG đặt trực tiếp từ thanh card
 const FUSION_ONLY = new Set([
     'repeater', 'sunshooter', 'peanut', 'twinsun', 'snowpea',
     'sunnut', 'sunmine', 'potatoshooter', 'minenut', 'sunshroom',
-    'peashroom', 'nutshroom',
+    'peashroom', 'nutshroom', 'chompnut', 'chompmine',
 ]);
 
 // Các loại Shroom — có thể xếp chồng 2 con cùng loại trong 1 ô
@@ -56,7 +61,7 @@ class Game {
         this._overridePlants = null;      // danh sách cây người chơi chọn (màn 7+)
         this._pickSelected   = new Set(); // Set của plant types đang được chọn trên pick screen
         this.cooldowns = { sunflower: 0, peashooter: 0, wallnut: 0, cherrybomb: 0, potatomine: 0,
-                           chomper: 0, repeater: 0, sunshooter: 0, twinsun: 0, peanut: 0, puffshroom: 0, snowpea: 0 };
+                           chomper: 0, repeater: 0, sunshooter: 0, twinsun: 0, peanut: 0, puffshroom: 0, snowpea: 0, cabbage: 0 };
         this.hoverCol = -1; this.hoverRow = -1;
         this.mouseX = 0;    this.mouseY = 0;
         this.skySunTimer = 4000;    // ms cho đến khi sun tiếp theo rơi từ trời
@@ -66,8 +71,12 @@ class Game {
     // Truy cập nhanh định nghĩa màn hiện tại và các hàng đang hoạt động
     get levelDef()        { return LEVEL_DEFS[this.currentLevelId - 1]; }
     get activeRows()      { return this.levelDef.activeRows; }
-    // isNight: true cho màn 11-12 → không có sun trời, sun plants chậm hơn 50%
+    // isNight: true → không có sun trời, sun plants chậm hơn 50%
     get isNight()         { return this.levelDef?.isNight === true; }
+    // isEgypt: true → chủ đề sa mạc, nhạc egypt
+    get isEgypt()         { return this.levelDef?.isEgypt === true; }
+    // bgTheme: truyền vào drawBackground và audioManager.play
+    get bgTheme()         { return this.isEgypt ? 'egypt' : this.isNight ? 'night' : 'day'; }
     // availablePlants: bị ghi đè bởi lựa chọn của người chơi ở màn 7+
     get availablePlants() { return this._overridePlants || this.levelDef.availablePlants; }
 
@@ -80,6 +89,7 @@ class Game {
         this.projectiles = []; // viên đạn đang bay
         this.suns        = []; // ánh nắng chưa thu
         this.particles   = []; // hạt hiệu ứng
+        this.tombs       = []; // lăng mộ Ai Cập (chỉ Egypt levels)
         this.grid        = new Grid(); // lưới 5×9 quản lý vị trí cây
         this.lawnMowers      = [];
         this.zombiesKilled   = 0;
@@ -110,7 +120,6 @@ class Game {
     // ── Vòng đời màn chơi ─────────────────────────────────────
     startLevel(id) {
         if (id > highestUnlocked) return;
-        if (id > 10) return; // màn 11-12 tạm khoá
         this.currentLevelId = id;
         // Màn 7+ có hơn 6 cây → hiện màn chọn cây
         if (id >= 7 && this.levelDef.availablePlants.length > 6) {
@@ -130,14 +139,18 @@ class Game {
         this.shovelMode   = false;
         document.getElementById('shovel-btn').classList.remove('selected');
         this.cooldowns = { sunflower: 0, peashooter: 0, wallnut: 0, cherrybomb: 0, potatomine: 0,
-                           chomper: 0, repeater: 0, sunshooter: 0, twinsun: 0, peanut: 0, puffshroom: 0, snowpea: 0 };
+                           chomper: 0, repeater: 0, sunshooter: 0, twinsun: 0, peanut: 0, puffshroom: 0, snowpea: 0, cabbage: 0 };
         this.skySunTimer = 4000;
         this.sun = this.levelDef.startingSun;
+        // Khởi tạo lăng mộ Egypt từ cấu hình level
+        this.tombs = (this.levelDef.tombs || []).map(
+            d => new Tomb(d.col, d.row, d.hp, d.spawnRateMs, d.zombieTypes)
+        );
         this.state = 'playing';
         this._hideAllScreens();
         this._lastNight = null; // buộc refresh card puffshroom
         this._updateUI();
-        audioManager.play(!this.isNight);
+        audioManager.play(this.bgTheme);
     }
 
     // ── Pause / Resume ────────────────────────────────────────
@@ -146,7 +159,7 @@ class Game {
             this.state = 'paused';
             const names = ['First Steps','More Lawn','Conehead','Cherry Season','Potato Field',
                            'Vaulting Grounds','Bucket Brigade','Final Assault','Peanut Gallery','Brick by Brick',
-                           '🌙 First Night','🌙 Final Night'];
+                           '🏜 Dawn of Sand','🏜 Desert Night','🏜 Awakened Tomb','🏜 Pharaoh\'s Hall','🏜 Battle of the Ages'];
             document.getElementById('pause-level-info').textContent =
                 `Level ${this.currentLevelId} — ${names[this.currentLevelId - 1] || ''}`;
             document.getElementById('screen-pause').classList.remove('hidden');
@@ -300,9 +313,81 @@ class Game {
 
         for (const z of this.zombies) z.update(dt, this.plants);
 
+        // Cập nhật lăng mộ Egypt (triệu hồi zombie, hit flash)
+        for (const tomb of this.tombs) {
+            if (!tomb.dead) tomb.update(dt, this);
+        }
+        this.tombs = this.tombs.filter(t => !t.dead);
+
         // Va chạm đạn ↔ zombie (O(n×m) — chấp nhận được ở quy mô nhỏ)
         for (const proj of this.projectiles) {
             if (proj.dead) continue;
+
+            if (proj.isCabbage) {
+                // Bắp cải: cập nhật arc trước, sau đó kiểm tra hạ cánh
+                proj.update(dt);
+                if (proj.landed) {
+                    // Sát thương tất cả zombie trong vòng 32px ở điểm đáp
+                    for (const z of this.zombies) {
+                        if (!z.dying && z.row === proj.row && Math.abs(proj.x - z.x) < 32) {
+                            const was = z.dying;
+                            z.takeDamage(proj.damage, this.particles);
+                            if (!was && z.dying) this.zombiesKilled++;
+                        }
+                    }
+                    // Bắp cải cũng phá lăng mộ khi hạ cánh trong vòng AoE
+                    for (const tomb of this.tombs) {
+                        if (!tomb.dead && tomb.row === proj.row && Math.abs(proj.x - tomb.cellX) < 32) {
+                            tomb.takeDamage(proj.damage, this.particles);
+                        }
+                    }
+                    spawnHitParticles(proj.x, proj.y, this.particles);
+                    audioManager.playSFX('hit');
+                    proj.dead = true;
+                }
+                continue;
+            }
+
+            if (proj.pierce) {
+                // Đạn xuyên: gây sát thương mọi lăng mộ + zombie trên đường bay,
+                // không dừng lại — mỗi mục tiêu chỉ trúng 1 lần (theo dõi qua hitTargets)
+                for (const tomb of this.tombs) {
+                    if (!tomb.dead && tomb.row === proj.row && Math.abs(proj.x - tomb.cellX) < 28
+                     && !proj.hitTargets.has(tomb)) {
+                        proj.hitTargets.add(tomb);
+                        tomb.takeDamage(proj.damage, this.particles);
+                        spawnHitParticles(proj.x, proj.y, this.particles);
+                        audioManager.playSFX('hit');
+                    }
+                }
+                for (const z of this.zombies) {
+                    if (!z.dying && z.row === proj.row && Math.abs(proj.x - z.x) < 24
+                     && !proj.hitTargets.has(z)) {
+                        proj.hitTargets.add(z);
+                        const was = z.dying;
+                        z.takeDamage(proj.damage, this.particles);
+                        if (proj.isIce) { z.slowed = true; z.slowTimer = PLANT_DEFS.snowpea.slowMs; }
+                        spawnHitParticles(proj.x, proj.y, this.particles);
+                        audioManager.playSFX('hit');
+                        if (!was && z.dying) this.zombiesKilled++;
+                    }
+                }
+                proj.update(dt);
+                continue;
+            }
+
+            // Đạn tuyến tính bị chặn bởi lăng mộ TRƯỚC khi kiểm tra zombie
+            for (const tomb of this.tombs) {
+                if (!tomb.dead && tomb.row === proj.row && Math.abs(proj.x - tomb.cellX) < 28) {
+                    tomb.takeDamage(proj.damage, this.particles);
+                    spawnHitParticles(proj.x, proj.y, this.particles);
+                    audioManager.playSFX('hit');
+                    proj.dead = true;
+                    break;
+                }
+            }
+            if (proj.dead) { proj.update(dt); continue; }
+
             for (const z of this.zombies) {
                 // Cùng hàng và khoảng cách < 24px → trúng
                 if (!z.dying && z.row === proj.row && Math.abs(proj.x - z.x) < 24) {
@@ -312,7 +397,7 @@ class Game {
                     if (proj.isIce) { z.slowed = true; z.slowTimer = PLANT_DEFS.snowpea.slowMs; }
                     proj.dead = true;
                     spawnHitParticles(proj.x, proj.y, this.particles);
-                    audioManager.playSFX('hit'); // âm thanh trúng đạn (file: assets/sounds/hit.mp3)
+                    audioManager.playSFX('hit');
                     if (!was && z.dying) this.zombiesKilled++;
                     break; // 1 viên đạn chỉ trúng 1 zombie
                 }
@@ -504,10 +589,10 @@ class Game {
         // Chờ 2 giây rồi mới hiện màn hình thắng (cho zombie chết hết animation)
         setTimeout(() => {
             if (this.state !== 'playing') return;
-            // Màn 10 = màn cuối hiện tại (màn 11-12 tạm khoá)
-            if (this.currentLevelId === 10) {
+            // Màn 15 = màn cuối
+            if (this.currentLevelId === 15) {
                 this.state = 'win';
-                highestUnlocked = 10;
+                highestUnlocked = 15;
                 document.getElementById('screen-win').classList.remove('hidden');
             } else {
                 // Còn màn tiếp → màn hình hoàn thành màn + mở khóa màn kế
@@ -555,7 +640,7 @@ class Game {
                 const dx = mx - s.x, dy = my - s.y;
                 if (dx * dx + dy * dy < 50 * 50) {
                     s.collect();
-                    this.sun += 25;
+                    this.sun += s.amount;
                     spawnSunCollectParticles(s.x, s.y, this.particles);
                     this._updateUI(); return;
                 }
@@ -641,6 +726,9 @@ class Game {
         const d    = PLANT_DEFS[type];
         if (this.sun < cost || this.cooldowns[type] > 0) return;
 
+        // Ô đang có lăng mộ → không thể đặt cây
+        if (this.tombs.some(t => !t.dead && t.col === col && t.row === row)) return;
+
         if (this.grid.isOccupied(col, row)) {
             const existing = this.grid.getPlant(col, row);
             if (existing && !existing.dying && !existing.isDead) {
@@ -693,7 +781,7 @@ class Game {
     _doFusion(resultType, existingPlant, col, row, secondCost, secondCooldown) {
         const secondType = this.selectedType;
 
-        // ── Trường hợp đặc biệt: WallNut + WallNut = Hồi HP đầy ──
+        // ── Trường hợp đặc biệt: Wall-nut kết hợp lại (với Wall-nut/Peanut/Sun-nut/Chomp-nut) → hồi đầy HP ──
         if (resultType === 'wallnut_heal') {
             existingPlant.hp = existingPlant.maxHp; // hồi full HP
             this.sun -= secondCost;
@@ -736,7 +824,7 @@ class Game {
         document.getElementById('sun-count').textContent = this.sun;
         const available = this.availablePlants;
         const all = ['sunflower', 'peashooter', 'wallnut', 'cherrybomb', 'potatomine',
-                     'chomper', 'repeater', 'sunshooter', 'twinsun', 'peanut', 'puffshroom', 'snowpea'];
+                     'chomper', 'repeater', 'sunshooter', 'twinsun', 'peanut', 'puffshroom', 'snowpea', 'cabbage'];
         for (const type of all) {
             const card   = document.getElementById(`card-${type}`);
             const cdFill = document.getElementById(`cd-${type}`);
@@ -792,28 +880,20 @@ class Game {
     _updateCardSelection() {
         // Fusion-only plants không có card → bỏ qua khi cập nhật selected state
         ['sunflower', 'peashooter', 'wallnut', 'cherrybomb', 'potatomine',
-         'chomper', 'puffshroom'].forEach(t => {
-            document.getElementById(`card-${t}`).classList.toggle('selected', this.selectedType === t);
+         'chomper', 'puffshroom', 'cabbage', 'snowpea', 'repeater'].forEach(t => {
+            const el = document.getElementById(`card-${t}`);
+            if (el) el.classList.toggle('selected', this.selectedType === t);
         });
     }
 
-    // Cập nhật giao diện chọn màn: nút unlocked = xanh, locked = xám
+    // Cập nhật giao diện chọn màn: nút unlocked = xanh/vàng, locked = xám
     _updateLevelSelectUI() {
-        for (let i = 1; i <= 12; i++) {
+        for (let i = 1; i <= 15; i++) {
             const btn = document.getElementById(`lvl-btn-${i}`);
-            // Màn 11-12 tạm khoá — chưa ra mắt
-            const permanentlyLocked = i > 10;
-            const unlocked = !permanentlyLocked && i <= highestUnlocked;
+            if (!btn) continue;
+            const unlocked = i <= highestUnlocked;
             if (unlocked) { btn.classList.add('unlocked'); btn.classList.remove('locked'); }
             else           { btn.classList.add('locked');   btn.classList.remove('unlocked'); }
-            // Thêm label "Sắp Ra Mắt" cho màn 11-12
-            if (permanentlyLocked) {
-                const nameEl = btn.querySelector('.lvl-name');
-                if (nameEl && !nameEl.dataset.locked) {
-                    nameEl.dataset.locked = '1';
-                    nameEl.textContent = 'Sắp Ra Mắt';
-                }
-            }
         }
     }
 
@@ -825,7 +905,7 @@ class Game {
         drawBackground(ctx, this.activeRows,
             (this.selectedType && !this.shovelMode) ? this.hoverCol : -1,
             (this.selectedType && !this.shovelMode) ? this.hoverRow : -1,
-            this.isNight); // truyền trạng thái ngày/đêm
+            this.bgTheme);
 
         // Highlight đỏ khi xẻng hover trên ô
         if (this.shovelMode && this.hoverCol >= 0 && this.hoverRow >= 0 && this.activeRows.includes(this.hoverRow)) {
@@ -838,6 +918,8 @@ class Game {
 
         // Vẽ theo thứ tự depth (hàng thấp hơn index → vẽ trước, bị che bởi hàng cao hơn)
         for (const m of this.lawnMowers) m.draw(ctx);
+        // Lăng mộ vẽ trước cây và zombie (nằm phía sau trong depth order)
+        [...this.tombs].sort((a, b) => a.row - b.row).forEach(t => t.draw(ctx));
         [...this.plants].sort((a, b) => a.row - b.row).forEach(p => p.draw(ctx));
         [...this.zombies].sort((a, b) => a.row - b.row).forEach(z => z.draw(ctx));
         for (const p of this.projectiles) p.draw(ctx);
@@ -850,6 +932,18 @@ class Game {
         if (this.selectedType && !this.shovelMode && this.hoverCol >= 0 && this.activeRows.includes(this.hoverRow)) {
             const px       = cx(this.hoverCol), py = cy(this.hoverRow);
             const existing = this.grid.getPlant(this.hoverCol, this.hoverRow);
+            // Ô có lăng mộ → gợi ý đỏ, không cho đặt
+            const tombOnCell = this.tombs.some(
+                t => !t.dead && t.col === this.hoverCol && t.row === this.hoverRow
+            );
+            if (tombOnCell) {
+                ctx.fillStyle   = 'rgba(255,50,50,0.18)';
+                ctx.strokeStyle = 'rgba(255,80,50,0.65)';
+                ctx.lineWidth   = 2;
+                rr(ctx, GX + this.hoverCol * CELL_W + 1, GY + this.hoverRow * CELL_H + 1, CELL_W - 2, CELL_H - 2, 6);
+                ctx.fill(); ctx.stroke();
+                // skip plant ghost
+            } else
 
             if (existing && !existing.dying) {
                 const sel = this.selectedType;
@@ -907,6 +1001,8 @@ class Game {
                             case 'sunmine':       drawSunMine(ctx, px, py, 0, false, false, 0, false); break;
                             case 'potatoshooter': drawPotatoShooter(ctx, px, py, 0, false, false, 0, 0); break;
                             case 'minenut':       drawMineNut(ctx, px, py, 0, 1, false, 0);             break;
+                            case 'chompnut':      drawChompNut(ctx, px, py, 0, 1, false, 0, false);     break;
+                            case 'chompmine':     drawChompMine(ctx, px, py, 0, false, 0, false, false, 0); break;
                             case 'sunshroom':     drawSunShroom(ctx, px, py, 0, false, ghostStack);                  break;
                             case 'peashroom':     drawPeaShroom(ctx, px, py, 0, 0, ghostStack);                    break;
                             case 'nutshroom':     drawNutShroom(ctx, px, py, 0, 1, ghostStack, 1);                 break;
@@ -940,8 +1036,11 @@ class Game {
                     case 'wallnut':    drawWallNut(ctx, px, py, 0, 1);                break;
                     case 'cherrybomb': drawCherryBomb(ctx, px, py, 0, 0, false, 0);   break;
                     case 'potatomine': drawPotatoMine(ctx, px, py, 0, false, false, 0); break;
-                    case 'chomper':    drawChomper(ctx, px, py, 0, false, 0, false);   break;
-                    case 'puffshroom': drawPuffShroom(ctx, px, py, 0, 0);             break;
+                    case 'chomper':    drawChomper(ctx, px, py, 0, false, 0, false);    break;
+                    case 'puffshroom': drawPuffShroom(ctx, px, py, 0, 0);              break;
+                    case 'cabbage':    drawCabbage(ctx, px, py, 0, 1, 0);              break;
+                    case 'snowpea':    drawSnowPea(ctx, px, py, 0, 0);                 break;
+                    case 'repeater':   drawRepeater(ctx, px, py, 0, 0, 0);             break;
                 }
                 ctx.restore();
             }
@@ -1138,12 +1237,151 @@ class Game {
         if (this.state !== 'playing') return;
         const names = ['First Steps', 'More Lawn', 'Conehead', 'Cherry Season', 'Potato Field',
                        'Vaulting Grounds', 'Bucket Brigade', 'Final Assault', 'Peanut Gallery', 'Brick by Brick',
-                       '🌙 First Night', '🌙 Final Night'];
+                       '🏜 Sand & Sun', '🏜 Sarcophagus', '🏜 Newspaper', '🏜 Brickwall', '🏜 Final Stand'];
         ctx.save();
         ctx.fillStyle = 'rgba(0,0,0,0.4)';
         rr(ctx, W - 110, 2, 108, 26, 8); ctx.fill();
-        ctx.fillStyle = '#a0e860'; ctx.font = 'bold 13px Arial'; ctx.textAlign = 'right';
+        ctx.fillStyle = this.isEgypt ? '#f0c860' : '#a0e860';
+        ctx.font = 'bold 13px Arial'; ctx.textAlign = 'right';
         ctx.fillText(`Level ${this.currentLevelId} — ${names[this.currentLevelId - 1]}`, W - 6, 20);
         ctx.restore();
+    }
+
+    // ── Plant Almanac / Zombie Notes overlays ──────────────────
+    showPlantList() {
+        const overlay = document.getElementById('screen-plantlist');
+        const grid    = document.getElementById('plantlist-grid');
+        if (!overlay || !grid) return;
+
+        const plants = [
+            { type: 'sunflower',  desc: 'Tạo mặt trời · 50☀' },
+            { type: 'peashooter', desc: 'Bắn đậu · 100☀' },
+            { type: 'wallnut',    desc: 'Tường máu · 50☀' },
+            { type: 'cherrybomb', desc: 'Nổ AoE · 150☀' },
+            { type: 'potatomine', desc: 'Mìn đất · 25☀' },
+            { type: 'chomper',    desc: 'Nuốt zombie · 150☀' },
+            { type: 'cabbage',    desc: 'Catapult · 100☀' },
+            { type: 'snowpea',    desc: 'Đạn băng làm chậm' },
+            { type: 'puffshroom', desc: 'Nấm miễn phí · 0☀' },
+            { type: 'repeater',   desc: 'Bắn 2 đạn · ⚗ Đậu×2' },
+            { type: 'sunshooter', desc: 'Bắn + tạo ☀ · ⚗' },
+            { type: 'twinsun',    desc: 'x2 mặt trời · ⚗ ☀×2' },
+            { type: 'peanut',     desc: 'Bắn + chắn · ⚗ Đậu+🪨' },
+        ];
+
+        grid.innerHTML = '';
+        for (const { type, desc } of plants) {
+            const name = PLANT_DEFS[type]?.name || type;
+            const entry = document.createElement('div');
+            entry.className = 'almanac-entry';
+
+            const c = document.createElement('canvas');
+            c.width = 72; c.height = 72;
+            entry.appendChild(c);
+
+            const nameEl = document.createElement('div');
+            nameEl.className = 'almanac-entry-name';
+            nameEl.textContent = name;
+            entry.appendChild(nameEl);
+
+            const descEl = document.createElement('div');
+            descEl.className = 'almanac-entry-desc';
+            descEl.textContent = desc;
+            entry.appendChild(descEl);
+
+            grid.appendChild(entry);
+
+            // Draw sprite onto mini canvas
+            const ctx2 = c.getContext('2d');
+            ctx2.fillStyle = '#1a3c08';
+            rr(ctx2, 0, 0, 72, 72, 6); ctx2.fill();
+            ctx2.save(); ctx2.translate(36, 44); ctx2.scale(0.72, 0.72);
+            try {
+                switch (type) {
+                    case 'sunflower':  drawSunflower(ctx2,  0, 0, 0.3, false);         break;
+                    case 'peashooter': drawPeashooter(ctx2, 0, 0, 0.3, 0);             break;
+                    case 'wallnut':    drawWallNut(ctx2,    0, 0, 0, 1);               break;
+                    case 'cherrybomb': drawCherryBomb(ctx2, 0, 0, 0.3, 0, false, 0);   break;
+                    case 'potatomine': drawPotatoMine(ctx2, 0, 0, 0, true, false, 0);  break;
+                    case 'chomper':    drawChomper(ctx2,    0, 0, 0.3, false, 0, false); break;
+                    case 'cabbage':    drawCabbage(ctx2,    0, 0, 0.3, 1, 0);          break;
+                    case 'snowpea':    drawSnowPea(ctx2,    0, 0, 0.3, 0);             break;
+                    case 'puffshroom': drawPuffShroom(ctx2, 0, 0, 0.3, 0);             break;
+                    case 'repeater':   drawRepeater(ctx2,   0, 0, 0.3, 0, 0);          break;
+                    case 'sunshooter': drawSunShooter(ctx2, 0, 0, 0.3, 0, false);      break;
+                    case 'twinsun':    drawTwinSun(ctx2,    0, 0, 0.3, false);         break;
+                    case 'peanut':     drawPeanut(ctx2,     0, 0, 0.3, 1, 0);          break;
+                }
+            } catch(e) {}
+            ctx2.restore();
+        }
+
+        overlay.classList.remove('hidden');
+    }
+
+    hidePlantList() {
+        document.getElementById('screen-plantlist')?.classList.add('hidden');
+    }
+
+    showZombieList() {
+        const overlay = document.getElementById('screen-zombielist');
+        const grid    = document.getElementById('zombielist-grid');
+        if (!overlay || !grid) return;
+
+        const zombies = [
+            { type: 'basic',       name: 'Zombie',            desc: 'Zombie thường, ít HP' },
+            { type: 'flag',        name: 'Flag Zombie',        desc: 'Báo hiệu wave mới' },
+            { type: 'conehead',    name: 'Conehead',           desc: 'Mũ nón, HP trung bình' },
+            { type: 'bucket',      name: 'Bucket Zombie',      desc: 'Xô thép, HP cao' },
+            { type: 'polevaulting',name: 'Pole Vaulting',      desc: 'Nhảy qua 1 cây đầu' },
+            { type: 'brickhead',   name: 'Brickhead',          desc: 'Đầu gạch, HP rất cao' },
+            { type: 'newspaper',   name: 'Newspaper Zombie',   desc: 'Điên khi mất báo' },
+        ];
+
+        grid.innerHTML = '';
+        for (const { type, name, desc } of zombies) {
+            const entry = document.createElement('div');
+            entry.className = 'almanac-entry';
+
+            const c = document.createElement('canvas');
+            c.width = 72; c.height = 72;
+            entry.appendChild(c);
+
+            const nameEl = document.createElement('div');
+            nameEl.className = 'almanac-entry-name';
+            nameEl.textContent = name;
+            entry.appendChild(nameEl);
+
+            const descEl = document.createElement('div');
+            descEl.className = 'almanac-entry-desc';
+            descEl.textContent = desc;
+            entry.appendChild(descEl);
+
+            grid.appendChild(entry);
+
+            // Draw zombie sprite thumbnail (positional args: ctx, x, y, animTime, state, hpPct, ...)
+            const ctx2 = c.getContext('2d');
+            ctx2.fillStyle = '#1a0a0a';
+            rr(ctx2, 0, 0, 72, 72, 6); ctx2.fill();
+            ctx2.save(); ctx2.translate(38, 62); ctx2.scale(0.52, 0.52);
+            try {
+                switch (type) {
+                    case 'basic':        drawBasicZombie(ctx2, 0, 0, 0, 'walking', 1, 0, false);             break;
+                    case 'flag':         drawFlagZombie(ctx2, 0, 0, 0, 'walking', 1, 0);                     break;
+                    case 'conehead':     drawConeheadZombie(ctx2, 0, 0, 0, 'walking', 1, true, 0);           break;
+                    case 'bucket':       drawBucketZombie(ctx2, 0, 0, 0, 'walking', 1, true, 0);             break;
+                    case 'polevaulting': drawPoleVaultingZombie(ctx2, 0, 0, 0, 'walking', 1, true, false, 0, 0); break;
+                    case 'brickhead':    drawBrickheadZombie(ctx2, 0, 0, 0, 'walking', 1, true, 1, 0);       break;
+                    case 'newspaper':    drawNewspaperZombie(ctx2, 0, 0, 0, 'walking', 1, true, 0);           break;
+                }
+            } catch(e) {}
+            ctx2.restore();
+        }
+
+        overlay.classList.remove('hidden');
+    }
+
+    hideZombieList() {
+        document.getElementById('screen-zombielist')?.classList.add('hidden');
     }
 }

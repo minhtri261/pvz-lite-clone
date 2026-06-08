@@ -31,9 +31,9 @@ class SunShroom extends Plant {
         if (this.sunTimer >= interval) {
             this.sunTimer    = 0;
             this.producePulse = 0.5;
-            game.suns.push(new Sun(this.cx + randFloat(-25, 25), this.cy - 50, false));
+            game.suns.push(new Sun(this.cx + randFloat(-25, 25), this.cy - 50, false, PLANT_DEFS.sunshroom.sunAmount));
             if (this.stackCount === 2)
-                game.suns.push(new Sun(this.cx + randFloat(-25, 25), this.cy - 70, false));
+                game.suns.push(new Sun(this.cx + randFloat(-25, 25), this.cy - 70, false, PLANT_DEFS.sunshroom.sunAmount));
         }
     }
 

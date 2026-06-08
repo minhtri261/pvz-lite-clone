@@ -26,12 +26,13 @@ class Peanut extends Plant {
         this.shootTimer += dt;
 
         if (this.shootTimer >= PLANT_DEFS.peanut.fireRate) {
-            if (game.zombies.some(z => z.row === this.row && !z.dying && z.x > this.cx)) {
+            if (game.zombies.some(z => z.row === this.row && !z.dying && z.x > this.cx)
+             || game.tombs.some(t => !t.dead && t.row === this.row && t.cellX > this.cx)) {
                 this.shootTimer = 0;
                 this.shootAnim  = 1;
-                // isBrown=true → drawPea vẽ màu nâu đất
+                // isBrown=true → drawPea vẽ màu nâu đất | pierce=true → xuyên qua mọi mục tiêu
                 game.projectiles.push(
-                    new Projectile(this.cx + 52, this.cy, this.row, false, false, true)
+                    new Projectile(this.cx + 52, this.cy, this.row, false, false, true, false, PLANT_DEFS.peanut.pierce)
                 );
             }
         }

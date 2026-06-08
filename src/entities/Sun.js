@@ -10,7 +10,8 @@
 // ══════════════════════════════════════════════════════════════
 
 class Sun {
-    constructor(x, y, fromSky) {
+    constructor(x, y, fromSky, amount = 25) {
+        this.amount = amount;
         this.x    = x;
         this.y    = fromSky ? -30 : y;
         this.targetY = fromSky

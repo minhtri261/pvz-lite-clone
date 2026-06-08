@@ -20,6 +20,7 @@ function drawCardThumbnails() {
         ['art-peanut',     c => { c.save(); c.translate(20, 32); c.scale(0.65, 0.65); drawPeanut(c, 0, 0, 0.5, 1, 0); c.restore(); }],
         ['art-puffshroom', c => { c.save(); c.translate(22, 38); c.scale(0.65, 0.65); drawPuffShroom(c, 0, 0, 0.5, 0); c.restore(); }],
         ['art-snowpea',    c => { c.save(); c.translate(20, 36); c.scale(0.56, 0.56); drawSnowPea(c, 0, 0, 0.5, 0); c.restore(); }],
+        ['art-cabbage',    c => { c.save(); c.translate(22, 38); c.scale(0.60, 0.60); drawCabbage(c, 0, 0, 0.3, 1, 0); c.restore(); }],
     ];
 
     for (const [id, fn] of arts) {

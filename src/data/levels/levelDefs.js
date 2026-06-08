@@ -6,4 +6,5 @@
 // ══════════════════════════════════════════════════════════════
 const LEVEL_DEFS = [LEVEL_DEF_1,  LEVEL_DEF_2,  LEVEL_DEF_3,  LEVEL_DEF_4,
                     LEVEL_DEF_5,  LEVEL_DEF_6,  LEVEL_DEF_7,  LEVEL_DEF_8,
-                    LEVEL_DEF_9,  LEVEL_DEF_10, LEVEL_DEF_11, LEVEL_DEF_12];
+                    LEVEL_DEF_9,  LEVEL_DEF_10, LEVEL_DEF_11, LEVEL_DEF_12,
+                    LEVEL_DEF_13, LEVEL_DEF_14, LEVEL_DEF_15];

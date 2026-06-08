@@ -478,3 +478,200 @@ body {
     transform: none !important;
 }
 .ppcard.disabled:hover { transform: none; border-color: #4a8a20; box-shadow: 0 2px 6px rgba(0,0,0,0.5); }
+
+/* ══════════════════════════════════════════════════
+   Start Screen — 3-column layout
+   ══════════════════════════════════════════════════ */
+#screen-start {
+    align-items: stretch;
+    justify-content: space-between;
+    padding: 0;
+    overflow-y: auto;
+}
+#screen-start .screen-box {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 10px;
+    max-height: 100%;
+    scrollbar-width: thin;
+    scrollbar-color: #4a8a20 #1a3c08;
+}
+
+/* Sidebar strips on left and right */
+.start-sidebar {
+    width: 64px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.35);
+    border-right: 2px solid rgba(80,180,40,0.25);
+    border-left:  2px solid rgba(80,180,40,0.25);
+    padding: 12px 0;
+}
+.start-sidebar + .screen-box { border-left: none; }
+
+/* Tall sidebar book buttons */
+.sidebar-book-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 52px;
+    padding: 10px 4px;
+    border-radius: 10px;
+    border: 3px solid #4a8a20;
+    background: linear-gradient(180deg, #2e6014 0%, #1a3c08 100%);
+    color: #c8f080;
+    cursor: pointer;
+    font-family: inherit;
+    transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+}
+.sidebar-book-btn:hover {
+    transform: scale(1.07);
+    border-color: #78c030;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.6), 0 0 12px rgba(120,200,48,0.35);
+}
+.sidebar-btn-icon { font-size: 22px; line-height: 1; }
+.sidebar-btn-label {
+    font-size: 8.5px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    text-align: center;
+    line-height: 1.3;
+    color: #d0f898;
+}
+/* Red/orange tint for zombie button */
+.sidebar-zombie-btn {
+    border-color: #8a4020;
+    background: linear-gradient(180deg, #5a2010 0%, #2e0e04 100%);
+}
+.sidebar-zombie-btn:hover {
+    border-color: #d06030;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.6), 0 0 12px rgba(200,80,40,0.35);
+}
+.sidebar-zombie-btn .sidebar-btn-label { color: #f8c0a0; }
+
+/* ── Egypt era card ─────────────────────────────── */
+.era-egypt-card {
+    border-color: #c89020;
+    background: linear-gradient(160deg, rgba(60,35,5,0.50) 0%, rgba(30,20,5,0.35) 100%);
+}
+.era-egypt-title { color: #f0d080; }
+.era-egypt-period {
+    font-size: 10px; font-weight: 900;
+    text-transform: uppercase; letter-spacing: 1.5px;
+    margin-bottom: 4px;
+    color: #f8b840;
+}
+/* Egypt level buttons — sand/gold theme */
+.lvl-btn.egypt-btn.unlocked {
+    background: linear-gradient(180deg, #c89828 0%, #7a5808 100%);
+    border-color: #f0c840;
+    color: #fff8d0;
+}
+.lvl-btn.egypt-btn.unlocked:hover { border-color: #ffe878; transform: translateY(-4px); }
+.lvl-btn.egypt-btn.locked {
+    background: linear-gradient(180deg, #2a2010, #181008);
+    border-color: #443810;
+    color: #4a3c18;
+    cursor: not-allowed;
+}
+.lvl-btn.egypt-btn.locked:hover { transform: none; }
+
+/* ══════════════════════════════════════════════════
+   Plant Almanac & Zombie Notes overlays
+   ══════════════════════════════════════════════════ */
+#screen-plantlist  { background: rgba(5, 30, 5,  0.93); z-index: 110; }
+#screen-zombielist { background: rgba(30, 5, 5,  0.93); z-index: 110; }
+
+.almanac-box {
+    display: flex;
+    flex-direction: column;
+    width: min(520px, 96%);
+    max-height: 88%;
+    background: rgba(0,0,0,0.55);
+    border: 3px solid #4a8a20;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.8);
+}
+#screen-zombielist .almanac-box { border-color: #8a3010; }
+
+.almanac-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px 10px;
+    background: rgba(0,0,0,0.35);
+    border-bottom: 2px solid rgba(80,180,40,0.25);
+    flex-shrink: 0;
+}
+#screen-zombielist .almanac-header { border-bottom-color: rgba(200,80,40,0.3); }
+
+.almanac-title {
+    font-size: 22px; color: #c8f080; font-weight: 900;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.6);
+}
+#screen-zombielist .almanac-title { color: #f8c0a0; }
+
+.almanac-close-btn {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 2px solid #4a8a20;
+    background: rgba(0,0,0,0.4);
+    color: #c8f080;
+    font-size: 16px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 900;
+    transition: background 0.12s, border-color 0.12s;
+    display: flex; align-items: center; justify-content: center;
+}
+.almanac-close-btn:hover { background: rgba(100,40,40,0.5); border-color: #ff6040; color: #ff8060; }
+
+.almanac-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 14px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #4a8a20 #1a3c08;
+}
+#screen-zombielist .almanac-grid { scrollbar-color: #8a3010 #2a0a05; }
+
+/* Individual entry card in almanac */
+.almanac-entry {
+    width: 100px;
+    background: rgba(0,0,0,0.45);
+    border: 2px solid rgba(80,180,40,0.35);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 6px 10px;
+    gap: 6px;
+    transition: border-color 0.12s, transform 0.12s;
+}
+.almanac-entry:hover { border-color: rgba(120,210,60,0.7); transform: translateY(-2px); }
+#screen-zombielist .almanac-entry { border-color: rgba(200,80,40,0.35); }
+#screen-zombielist .almanac-entry:hover { border-color: rgba(240,120,60,0.7); }
+
+.almanac-entry canvas { border-radius: 6px; display: block; }
+.almanac-entry-name {
+    font-size: 8.5px; font-weight: 900;
+    color: #c8f080; text-align: center;
+    text-transform: uppercase; letter-spacing: 0.2px;
+    line-height: 1.2;
+}
+#screen-zombielist .almanac-entry-name { color: #f8c0a0; }
+.almanac-entry-desc {
+    font-size: 7px; color: #90c060;
+    text-align: center; line-height: 1.3;
+}
+#screen-zombielist .almanac-entry-desc { color: #e0a080; }

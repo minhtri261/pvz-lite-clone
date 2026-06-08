@@ -26,7 +26,7 @@ class SunNut extends Plant {
         if (this.sunTimer >= interval) {
             this.sunTimer     = 0;
             this.producePulse = 0.5;
-            game.suns.push(new Sun(this.cx + randFloat(-28, 28), this.cy - 55, false));
+            game.suns.push(new Sun(this.cx + randFloat(-28, 28), this.cy - 55, false, PLANT_DEFS.sunnut.sunAmount));
         }
     }
 

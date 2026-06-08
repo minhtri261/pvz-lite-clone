@@ -1,8 +1,8 @@
 'use strict';
 // ══════════════════════════════════════════════════════════════
 //  Sunflower.js — Hoa Hướng Dương: sản xuất ánh nắng
-//  Cost: 50 ☀ | HP: 300 | Cooldown: 7.5s
-//  Cứ 23 giây tạo 1 sun (25 ánh nắng) xuất hiện gần cây
+//  Cost: 50 ☀ | HP: 300 | Cooldown: 5s
+//  Cứ 23 giây tạo 1 sun (50 ánh nắng) xuất hiện gần cây
 // ══════════════════════════════════════════════════════════════
 
 class Sunflower extends Plant {
@@ -22,7 +22,7 @@ class Sunflower extends Plant {
         if (this.sunTimer >= interval) {
             this.sunTimer    = 0;
             this.producePulse = 0.5;
-            game.suns.push(new Sun(this.cx + randFloat(-30, 30), this.cy - 50, false));
+            game.suns.push(new Sun(this.cx + randFloat(-30, 30), this.cy - 50, false, PLANT_DEFS.sunflower.sunAmount));
         }
     }
 

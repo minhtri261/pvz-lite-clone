@@ -22,9 +22,8 @@ class SnowPea extends Plant {
         this.shootTimer += dt;
 
         if (this.shootTimer >= PLANT_DEFS.snowpea.fireRate) {
-            const hasTarget = game.zombies.some(
-                z => z.row === this.row && !z.dying && z.x > this.cx
-            );
+            const hasTarget = game.zombies.some(z => z.row === this.row && !z.dying && z.x > this.cx)
+                           || game.tombs.some(t => !t.dead && t.row === this.row && t.cellX > this.cx);
             if (hasTarget) {
                 this.shootTimer = 0;
                 this.shootAnim  = 1;

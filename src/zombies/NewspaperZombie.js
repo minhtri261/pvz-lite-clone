@@ -31,6 +31,7 @@ class NewspaperZombie extends Zombie {
                 this.hasPaper   = false;
                 this.speed      = ZOMBIE_DEFS.newspaper.ragespeed;      // 0.5
                 this.attackRate = ZOMBIE_DEFS.newspaper.rageAttackRate; // 2000
+                this.damage     = ZOMBIE_DEFS.newspaper.rageDamage;     // 250 — cắn mạnh hơn để bù nhịp cắn chậm
             }
         }
 

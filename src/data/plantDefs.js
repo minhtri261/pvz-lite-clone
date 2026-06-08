@@ -9,15 +9,15 @@ const PLANT_DEFS = {
         name: 'Sunflower',
         cost: 50,          // giá đặt (ánh nắng)
         hp: 300,           // máu
-        cooldownMs: 7000,  // thời gian chờ sau khi dùng (ms)
+        cooldownMs: 5000,  // thời gian chờ sau khi dùng (ms)
         sunInterval: 23000,// cứ 23s sản xuất 1 ánh nắng
-        sunAmount: 25,     // mỗi lần sản xuất được 25 ánh nắng
+        sunAmount: 50,     // mỗi lần sản xuất được 50 ánh nắng
     },
     peashooter: {
         name: 'Peashooter',
         cost: 100,
         hp: 300,
-        cooldownMs: 7000,
+        cooldownMs: 5000,
         fireRate: 1500,    // bắn 1 viên mỗi 1.5 giây
         peaDamage: 20,     // sát thương mỗi viên đạn
     },
@@ -52,6 +52,15 @@ const PLANT_DEFS = {
         chompRange: 120,    // tầm cắn 120px — gấp đôi, vươn xa để bắt zombie trước
         chompDmg:   900,    
         biteInterval: 1500, // ms giữa 2 nhát cắn khi zombie chưa chết
+    },
+    cabbage: {
+        name: 'Cabbage-pult',
+        cost: 100,
+        hp: 300,
+        cooldownMs: 7000,
+        fireRate: 2500,    // ném bắp cải mỗi 2.5s (chậm hơn Peashooter)
+        damage: 40,        // 40 dmg mỗi quả — gấp đôi Peashooter
+        arcHeight: 90,     // chiều cao vòng cung (px)
     },
     // ── Fusion-only plants (không đặt trực tiếp) ────────────────
     minenut: {
@@ -90,7 +99,7 @@ const PLANT_DEFS = {
         cost: 0,           // fusion-only: wallnut(50) + sunflower(50)
         hp: 4000,          // WallNut HP — vẫn chặn được zombie
         cooldownMs: 30000, // WallNut cooldown
-        sunInterval: 28000,// hơi chậm hơn Sunflower (23s)
+        sunInterval: 23000,// hơi chậm hơn Sunflower (23s)
         sunAmount: 25,
     },
     sunmine: {
@@ -126,9 +135,9 @@ const PLANT_DEFS = {
         name: 'Sun-Shooter',
         cost: 125,         // kết hợp Sunflower + Peashooter
         hp: 300,
-        cooldownMs: 7000,
+        cooldownMs: 5000,
         sunInterval: 23000,
-        sunAmount: 25,
+        sunAmount: 50,
         fireRate: 1500,  
         peaDamage: 15,     // bắn đạn yếu hơn Peashooter, nhưng có thể sản xuất sun
     },
@@ -136,9 +145,9 @@ const PLANT_DEFS = {
         name: 'Twin Sunflower',
         cost: 125,          // PvZ2: 125 sun
         hp: 300,
-        cooldownMs: 15000,  // cooldown dài hơn Sunflower vì hiệu quả hơn
+        cooldownMs: 10000,  // cooldown dài hơn Sunflower vì hiệu quả hơn
         sunInterval: 23000, // sản xuất 2 sun mỗi 25s (= 50 sun) vs Sunflower 25sun/23s
-        sunAmount: 25,      // mỗi lần drop 25, nhưng drop 2 cùng lúc → 50 sun/chu kỳ
+        sunAmount: 50,      // mỗi lần drop 50, nhưng drop 2 cùng lúc → 100 sun/chu kỳ
     },
     peanut: {
         name: 'Peanut',
@@ -147,6 +156,7 @@ const PLANT_DEFS = {
         cooldownMs: 30000,  // cooldown bằng Wall-nut
         fireRate: 2000,     // chậm hơn Peashooter (nó là cây chặn mà)
         peaDamage: 20,      // sát thương bằng Peashooter, đạn màu nâu
+        pierce: true,       // đạn xuyên qua tất cả zombie + lăng mộ trên đường bay
     },
     puffshroom: {
         name: 'Puff-shroom',
@@ -166,5 +176,27 @@ const PLANT_DEFS = {
         fireRate: 1500,
         peaDamage: 20,
         slowMs: 3000,      // zombie trúng đạn bị chậm 50% trong 3 giây
+    },
+    chompnut: {
+        name: 'Chomp-nut',
+        cost: 0,            // fusion-only: chomper + wallnut
+        hp: 4000,           // máu trâu như Wall-nut
+        cooldownMs: 30000,  // cooldown bằng Wall-nut
+        rechargeMs: 35000,  // tiêu hoá giống Chomper
+        chompRange: 120,
+        chompDmg:   900,
+        biteInterval: 1500,
+    },
+    chompmine: {
+        name: 'Chomp Mine',
+        cost: 0,            // fusion-only: chomper + potatomine
+        hp: 400,            // máu giống Chomper
+        cooldownMs: 20000,  // cooldown gần PotatoMine
+        rechargeMs: 20000,  // tiêu hoá NHANH hơn Chomper (35s → 20s)
+        chompRange: 120,
+        chompDmg:   900,
+        biteInterval: 1000, // hồi cắn nhanh hơn Chomper (1500ms → 1000ms)
+        blastDmg:   1800,   // nổ như PotatoMine khi bị zombie ăn
+        blastRange: 80,     // bán kính nổ — trong phạm vi 1 ô (≈ CELL_W)
     },
 };

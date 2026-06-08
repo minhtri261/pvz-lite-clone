@@ -31,11 +31,17 @@ class AudioManager {
         });
     }
 
-    // Phát nhạc theo thời gian: isDayTime=true → day.mp3, false → night.mp3
-    play(isDayTime = true) {
-        const src = isDayTime
-            ? 'assets/music/day.mp3'
-            : 'assets/music/night.mp3';
+    // Phát nhạc theo theme: 'day' | 'night' | 'egypt'
+    // Giữ tương thích ngược: isDayTime=true → day, false → night
+    play(themeOrDay = true) {
+        let src;
+        if (themeOrDay === 'egypt') {
+            src = 'assets/music/egypt.mp3';
+        } else if (themeOrDay === 'night' || themeOrDay === false) {
+            src = 'assets/music/night.mp3';
+        } else {
+            src = 'assets/music/day.mp3';
+        }
         this.playTrack(src);
     }
 

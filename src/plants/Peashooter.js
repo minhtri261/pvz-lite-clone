@@ -20,9 +20,8 @@ class Peashooter extends Plant {
 
         if (this.shootTimer >= PLANT_DEFS.peashooter.fireRate) {
             // Chỉ bắn nếu có zombie sống ở cùng hàng phía bên phải
-            const hasTarget = game.zombies.some(
-                z => z.row === this.row && !z.dying && z.x > this.cx
-            );
+            const hasTarget = game.zombies.some(z => z.row === this.row && !z.dying && z.x > this.cx)
+                           || game.tombs.some(t => !t.dead && t.row === this.row && t.cellX > this.cx);
             if (hasTarget) {
                 this.shootTimer = 0;
                 this.shootAnim  = 1; // kích hoạt animation giật nòng

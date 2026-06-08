@@ -26,5 +26,8 @@ function createPlant(type, col, row) {
         case 'peashroom':     return new PeaShroom(col, row);
         case 'nutshroom':     return new NutShroom(col, row);
         case 'snowpea':       return new SnowPea(col, row);
+        case 'cabbage':       return new Cabbage(col, row);
+        case 'chompnut':      return new ChompNut(col, row);
+        case 'chompmine':     return new ChompMine(col, row);
     }
 }

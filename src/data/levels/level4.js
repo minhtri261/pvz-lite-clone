@@ -16,20 +16,25 @@ const LEVEL_DEF_4 = {
     waves: [
         {
             // Màn 4 vẫn có 2 wave
-            // Wave 1
+            // Wave 1 — mỗi nhóm cách nhau 20s, trong nhóm cách nhau 0.5s, tăng dần đều
             scouts: [
                 { type: 'basic', row: null, delay: 0 },
-                { type: 'basic', row: null, delay: 15000 },
-                { type: 'basic', row: null, delay: 30000 },
-                { type: 'basic', row: null, delay: 45000 },
 
-                { type: 'conehead', row: null, delay: 60000 },
+                { type: 'basic', row: null, delay: 20000 },
 
-                { type: 'conehead', row: null, delay: 75000 },
+                { type: 'basic', row: null, delay: 40000 },
+                { type: 'basic', row: null, delay: 40500 },
 
-                { type: 'basic', row: null, delay: 90000 },
-                { type: 'basic', row: null, delay: 90500 },
-                { type: 'basic', row: null, delay: 91000 },
+                { type: 'basic', row: null, delay: 60000 },
+                { type: 'conehead', row: null, delay: 60500 },
+
+                { type: 'conehead', row: null, delay: 80000 },
+                { type: 'basic', row: null, delay: 80500 },
+                { type: 'basic', row: null, delay: 81000 },
+
+                { type: 'basic', row: null, delay: 100000 },
+                { type: 'conehead', row: null, delay: 100500 },
+                { type: 'conehead', row: null, delay: 101000 },
             ],
             surge: [
                 { type: 'flag',  row: null, delay: 0 },    // flag zombie đi trước
@@ -40,35 +45,32 @@ const LEVEL_DEF_4 = {
             ],
         },
         {
-            // Wave 2
+            // Wave 2 — mỗi nhóm cách nhau 10s, trong nhóm cách nhau 0.5s, tăng dần đều
             scouts: [
                 { type: 'polevaulting', row: null, delay: 0 },
 
-                { type: 'polevaulting', row: null, delay: 10000 },
+                { type: 'basic', row: null, delay: 10000 },
+                { type: 'basic', row: null, delay: 10500 },
 
-                { type: 'conehead', row: null, delay: 20000 },
-                { type: 'basic', row: null, delay: 20500 },
+                { type: 'polevaulting', row: null, delay: 20000 },
+                { type: 'conehead', row: null, delay: 20500 },
 
                 { type: 'basic', row: null, delay: 30000 },
                 { type: 'basic', row: null, delay: 30500 },
                 { type: 'basic', row: null, delay: 31000 },
-                { type: 'basic', row: null, delay: 31500 },
-                { type: 'basic', row: null, delay: 32000 },
 
-                { type: 'basic', row: null, delay: 40000 },
-                { type: 'conehead', row: null, delay: 40500 },
+                { type: 'conehead', row: null, delay: 40000 },
+                { type: 'polevaulting', row: null, delay: 40500 },
                 { type: 'basic', row: null, delay: 41000 },
 
                 { type: 'basic', row: null, delay: 50000 },
                 { type: 'conehead', row: null, delay: 50500 },
-                { type: 'basic', row: null, delay: 51000 },
-                { type: 'basic', row: null, delay: 51500 },
+                { type: 'polevaulting', row: null, delay: 51000 },
 
-                { type: 'basic', row: null, delay: 60000 },
-                { type: 'conehead', row: null, delay: 60500 },
+                { type: 'conehead', row: null, delay: 60000 },
+                { type: 'polevaulting', row: null, delay: 60500 },
                 { type: 'basic', row: null, delay: 61000 },
                 { type: 'basic', row: null, delay: 61500 },
-                { type: 'polevaulting', row: null, delay: 62000 },
             ],
             surge: [
                 { type: 'flag',     row: null, delay: 0 },

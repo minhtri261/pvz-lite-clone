@@ -32,14 +32,15 @@ class SunShooter extends Plant {
         if (this.sunTimer >= sunInterval) {
             this.sunTimer    = 0;
             this.producePulse = 0.5;
-            game.suns.push(new Sun(this.cx + randFloat(-30, 30), this.cy - 50, false));
+            game.suns.push(new Sun(this.cx + randFloat(-30, 30), this.cy - 50, false, PLANT_DEFS.sunshooter.sunAmount));
         }
 
         // ── Bắn đạn vàng (đầu phải) ─────────────────────────
         this.shootAnim = Math.max(0, this.shootAnim - dt / 300);
         this.shootTimer += dt;
         if (this.shootTimer >= PLANT_DEFS.sunshooter.fireRate) {
-            if (game.zombies.some(z => z.row === this.row && !z.dying && z.x > this.cx)) {
+            if (game.zombies.some(z => z.row === this.row && !z.dying && z.x > this.cx)
+             || game.tombs.some(t => !t.dead && t.row === this.row && t.cellX > this.cx)) {
                 this.shootTimer = 0;
                 this.shootAnim  = 1;
                 // isIce=false, isYellow=true → vẽ màu vàng cam
