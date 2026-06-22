@@ -48,9 +48,27 @@ const ZOMBIE_DEFS = {
     },
     brickhead: {
         maxHp: 2470,      // 2200 (gạch) + 270 (cơ thể) = 2470 tổng
-        speed: 0.2,     
+        speed: 0.2,
         damage: 100,
         attackRate: 1000,
         brickHp: 2200,    // cục gạch hấp thụ 2200 sát thương trước khi vỡ
+    },
+    explorer: {
+        maxHp: 270,        // bằng basic — nhà khảo cổ dày dạn
+        speed: 0.4,       // cao hơn basic
+        damage: 100,       // sát thương cắn khi đuốc đã tắt (hành xử như Basic)
+        attackRate: 1000, // nhịp cắn khi đuốc đã tắt (hành xử như Basic)
+        burnDamage: 10000000,    //  sát thương đốt mỗi tick (cây nào trong tầm sẽ bị đốt cháy ngay lập tức)
+        burnRate: 500,     // tick đốt mỗi 0.5s → 140 dps (mạnh hơn Basic 100 dps)
+    },
+    tombraiser: {
+        maxHp: 270,       // bằng basic
+        speed: 0.26,      // hơi chậm hơn basic — bận đào mộ
+        damage: 100,
+        attackRate: 1000,
+        tombCreateInterval: 20000, // cứ 20s kể từ lúc spawn, tạo 1 lăng mộ phía trước
+        tombHp: 280,               // máu của lăng mộ vừa tạo
+        tombSpawnRateMs: 40000,    // lăng mộ vừa tạo sinh zombie mỗi 40s
+        tombZombieTypes: ['conehead'], // lăng mộ vừa tạo chỉ sinh Conehead Zombie
     },
 };

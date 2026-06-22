@@ -417,6 +417,20 @@ body {
 }
 .tips-box p { font-size: 12px; color: #c0f080; }
 
+/* Dev tools: tiện ích cho tester (mở khóa tất cả / reset tiến trình) */
+.dev-tools { display: flex; gap: 8px; margin-top: 8px; justify-content: center; }
+.dev-btn {
+    font-size: 11px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.25);
+    background: rgba(0,0,0,0.35);
+    color: #d0d0d0;
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+}
+.dev-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+
 /* ── Utility ────────────────────────────────────── */
 .hidden { display: none !important; }
 #gameCanvas.placing { cursor: crosshair; }

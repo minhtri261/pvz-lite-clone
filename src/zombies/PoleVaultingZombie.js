@@ -29,10 +29,16 @@ class PoleVaultingZombie extends Zombie {
     // Override hoàn toàn — xử lý vault trước mọi logic bình thường
     update(dt, plants) {
         this.animTime += dt / 1000;
-        if (this.hitFlash  > 0) this.hitFlash  -= dt / 1000;
-        if (this.slowTimer > 0) {
-            this.slowTimer -= dt;
-            if (this.slowTimer <= 0) { this.slowTimer = 0; this.slowed = false; }
+        if (this.hitFlash > 0) this.hitFlash -= dt / 1000;
+
+        // Đếm ngược hiệu ứng đóng băng / làm lạnh (Ice Lettuce, Snow Pea)
+        if (this.frozenTimer > 0) {
+            this.frozenTimer -= dt;
+            if (this.frozenTimer < 0) this.frozenTimer = 0;
+        }
+        if (this.chillTimer > 0) {
+            this.chillTimer -= dt;
+            if (this.chillTimer < 0) this.chillTimer = 0;
         }
 
         if (this.dying) {
@@ -40,6 +46,9 @@ class PoleVaultingZombie extends Zombie {
             if (this.deathT >= 1) this.remove = true;
             return;
         }
+
+        // Đóng băng hoàn toàn → không di chuyển, không tấn công, không vault
+        if (this.frozen) return;
 
         // ── Phase: đang bay (vault animation) ─────────────────
         if (this.vaulting) {
@@ -84,7 +93,7 @@ class PoleVaultingZombie extends Zombie {
         const target = this.hasVault ? null : this.findTarget(plants);
         if (target) {
             this.state = 'eating';
-            this.eatTimer += dt;
+            this.eatTimer += this.chilled ? dt * 0.5 : dt;
             if (this.eatTimer >= this.attackRate) {
                 this.eatTimer = 0;
                 target.takeDamage(this.damage);
@@ -92,7 +101,8 @@ class PoleVaultingZombie extends Zombie {
         } else {
             this.state    = 'walking';
             this.eatTimer = 0;
-            this.x -= (this.slowed ? this.speed * 0.45 : this.speed) * (dt / 16.67);
+            const speedMul = this.chilled ? 0.5 : 1;
+            this.x -= this.speed * speedMul * (dt / 16.67);
         }
     }
 

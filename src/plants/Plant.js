@@ -49,6 +49,38 @@ class Plant {
         if (this.hitFlash > 0) this.hitFlash -= dt / 1000;
     }
 
+    // Có mục tiêu (zombie và/hoặc lăng mộ) phía trước trong cùng hàng không?
+    // maxRange: giới hạn khoảng cách (px), mặc định không giới hạn
+    // includeTombs: có tính cả lăng mộ làm mục tiêu không (mặc định có)
+    hasTargetInRow(game, { maxRange = Infinity, includeTombs = true } = {}) {
+        const inRange = d => d > 0 && d <= maxRange;
+        if (game.zombies.some(z => z.row === this.row && !z.dying && inRange(z.x - this.cx))) return true;
+        if (includeTombs && game.tombs.some(t => !t.dead && t.row === this.row && inRange(t.cellX - this.cx))) return true;
+        return false;
+    }
+
+    // Tìm tọa độ X mục tiêu để ném (zombie gần nhất, hoặc lăng mộ gần nhất nếu
+    // không có zombie) trong cùng hàng — dùng cho Cabbage / Ice Cabbage
+    findLobTargetX(game) {
+        let nearest = null, bestDist = Infinity;
+        for (const z of game.zombies) {
+            if (!z.dying && z.row === this.row && z.x > this.cx) {
+                const d = z.x - this.cx;
+                if (d < bestDist) { bestDist = d; nearest = z; }
+            }
+        }
+        if (nearest) return nearest.x;
+
+        let targetX = null, bestTombDist = Infinity;
+        for (const t of game.tombs) {
+            if (!t.dead && t.row === this.row && t.cellX > this.cx) {
+                const d = t.cellX - this.cx;
+                if (d < bestTombDist) { bestTombDist = d; targetX = t.cellX; }
+            }
+        }
+        return targetX;
+    }
+
     // Vẽ vòng tròn đỏ mờ khi cây vừa bị đánh — subclass gọi trước khi vẽ sprite
     drawHitFlash(ctx) {
         if (this.hitFlash <= 0) return;

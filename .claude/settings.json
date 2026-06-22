@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node tmp_test_fusion.js)",
+      "Bash(python -m http.server 8123)",
+      "Read(//c/Program Files \\(x86\\)/Microsoft/Edge/Application/**)",
+      "Read(//c/Program Files/Microsoft/Edge/Application/**)",
+      "Bash(grep -rn \"^\\\\s*//.*\" /d/PvZCustom/src --include=\"*.js\")",
+      "Bash(grep -E \"^\\\\s*//\\\\s*\\(TODO|FIXME|DEBUG|OLD|UNUSED\\)\")",
+      "Bash(grep -rn \"^\\\\s*/\\\\*\" /d/PvZCustom/src --include=\"*.js\")"
+    ]
+  }
+}

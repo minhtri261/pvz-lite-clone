@@ -70,11 +70,26 @@ class AudioManager {
     // Phát âm thanh hiệu ứng (one-shot, không loop)
     // name: tên file trong assets/sounds/ (không cần .mp3)
     // Đặt file vào: assets/sounds/hit.mp3, assets/sounds/plant.mp3, v.v.
+    //
+    // Khi nhiều zombie/đạn trúng cùng lúc, phát liên tục cùng 1 file gốc
+    // sẽ chồng âm rất chói tai. Để giảm việc này dù chỉ có 1 file:
+    //   - pitch random: mỗi lần phát đổi nhẹ playbackRate → giả lập
+    //     nhiều "biến thể" âm thanh từ cùng 1 file gốc
+    //   - cooldown: bỏ qua các lần phát quá gần nhau (cùng tên SFX)
     playSFX(name) {
         if (this.muted) return;
+
+        if (!this._sfxCooldowns) this._sfxCooldowns = {};
+        const now = performance.now();
+        const last = this._sfxCooldowns[name] || 0;
+        const cooldownMs = 45; // tối thiểu giữa 2 lần phát cùng tên SFX
+        if (now - last < cooldownMs) return;
+        this._sfxCooldowns[name] = now;
+
         const src = `assets/sounds/${name}.mp3`;
         const sfx = new Audio(src);
         sfx.volume = 0.45;
+        sfx.playbackRate = 0.85 + Math.random() * 0.3; // 0.85x – 1.15x: đổi cao độ ngẫu nhiên
         sfx.play().catch(() => {}); // bỏ qua nếu file chưa có
     }
 

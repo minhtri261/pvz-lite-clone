@@ -20,7 +20,9 @@ function drawCardThumbnails() {
         ['art-peanut',     c => { c.save(); c.translate(20, 32); c.scale(0.65, 0.65); drawPeanut(c, 0, 0, 0.5, 1, 0); c.restore(); }],
         ['art-puffshroom', c => { c.save(); c.translate(22, 38); c.scale(0.65, 0.65); drawPuffShroom(c, 0, 0, 0.5, 0); c.restore(); }],
         ['art-snowpea',    c => { c.save(); c.translate(20, 36); c.scale(0.56, 0.56); drawSnowPea(c, 0, 0, 0.5, 0); c.restore(); }],
+        ['art-icelettuce', c => { c.save(); c.translate(29, 34); c.scale(0.85, 0.85); drawIceLettuce(c, 0, 0, 0.5, 0); c.restore(); }],
         ['art-cabbage',    c => { c.save(); c.translate(22, 38); c.scale(0.60, 0.60); drawCabbage(c, 0, 0, 0.3, 1, 0); c.restore(); }],
+        ['art-gravebuster',c => { c.save(); c.translate(29, 32); c.scale(0.78, 0.78); drawGraveBuster(c, 0, 0, 0.5, 0); c.restore(); }],
     ];
 
     for (const [id, fn] of arts) {
@@ -32,6 +34,7 @@ function drawCardThumbnails() {
         // Màu nền theo từng loại cây
         c.fillStyle = id === 'art-cherrybomb' ? '#4a1010'
                     : id === 'art-snowpea'    ? '#0a2a3a'
+                    : id === 'art-icelettuce' ? '#0a2a3a'
                     : id === 'art-potatomine' ? '#3a2808'
                     : id === 'art-chomper'    ? '#2a0a3a'
                     : id === 'art-repeater'  ? '#1a4a0a'
@@ -39,6 +42,7 @@ function drawCardThumbnails() {
                     : id === 'art-twinsun'   ? '#3a3000'
                     : id === 'art-peanut'    ? '#4a2a00'
                     : id === 'art-puffshroom'? '#2a0a3a'
+                    : id === 'art-gravebuster'? '#3a3414'
                     :                           '#2a6a14';
         rr(c, 0, 0, 58, 58, 5); c.fill();
 

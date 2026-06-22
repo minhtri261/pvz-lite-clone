@@ -71,6 +71,13 @@
                 <div class="cd-bar"><div class="cd-fill" id="cd-snowpea"></div></div>
             </div>
 
+            <div class="pcard" id="card-icelettuce" data-type="icelettuce">
+                <canvas class="card-art" id="art-icelettuce" width="58" height="58"></canvas>
+                <div class="card-name">Ice Lettuce</div>
+                <div class="card-cost"><span class="cost-sun">☀</span>175</div>
+                <div class="cd-bar"><div class="cd-fill" id="cd-icelettuce"></div></div>
+            </div>
+
             <div class="pcard" id="card-repeater" data-type="repeater">
                 <canvas class="card-art" id="art-repeater" width="58" height="58"></canvas>
                 <div class="card-name">Repeater</div>
@@ -99,6 +106,12 @@
                 <canvas class="card-art" id="art-puffshroom" width="58" height="58"></canvas>
                 <div class="card-name">Puff-shroom</div>
                 <div class="cd-bar"><div class="cd-fill" id="cd-puffshroom"></div></div>
+            </div>
+
+            <div class="pcard" id="card-gravebuster" data-type="gravebuster">
+                <canvas class="card-art" id="art-gravebuster" width="58" height="58"></canvas>
+                <div class="card-name">Grave Buster</div>
+                <div class="cd-bar"><div class="cd-fill" id="cd-gravebuster"></div></div>
             </div>
 
         </div>
@@ -223,6 +236,12 @@
                 <p style="font-size:11px;color:#b0e0b0;">☀+☀=TwinSun · 🪨+🪨=Hồi HP · 🪨+☀=SunNut · ☀+💣=SunMine · Đậu+💣=PotatoShooter</p>
                 <p style="font-size:11px;color:#c8c8ff;">Trồng 2 cây lên cùng 1 ô để kết hợp!</p>
             </div>
+
+            <!-- Tiện ích cho tester: tiến trình tự lưu, có thể mở khóa hết / reset -->
+            <div class="dev-tools">
+                <button class="dev-btn" onclick="game.unlockAllLevels()">🔓 Mở khóa tất cả màn</button>
+                <button class="dev-btn" onclick="game.resetProgress()">♻ Reset tiến trình</button>
+            </div>
         </div>
 
         <!-- Right sidebar: Zombie Notes -->
@@ -344,6 +363,7 @@
 <script src="src/sprites/plants/drawWallNut.js"></script>
 <script src="src/sprites/plants/drawCherryBomb.js"></script>
 <script src="src/sprites/plants/drawSnowPea.js"></script>
+<script src="src/sprites/plants/drawIceLettuce.js"></script>
 <script src="src/sprites/plants/drawPotatoMine.js"></script>
 <script src="src/sprites/plants/drawChomper.js"></script>
 <script src="src/sprites/plants/drawRepeater.js"></script>
@@ -352,8 +372,10 @@
 <script src="src/sprites/plants/drawPeanut.js"></script>
 <script src="src/sprites/plants/drawPuffShroom.js"></script>
 <script src="src/sprites/plants/drawCabbage.js"></script>
+<script src="src/sprites/plants/drawIceCabbage.js"></script>
 <script src="src/sprites/plants/drawChompNut.js"></script>
 <script src="src/sprites/plants/drawChompMine.js"></script>
+<script src="src/sprites/plants/drawGraveBuster.js"></script>
 
 <!-- §4b Zombie sprites — drawZombieBase phải load trước vì tất cả zombie khác gọi nó -->
 <script src="src/sprites/zombies/drawZombieBase.js"></script>
@@ -364,6 +386,8 @@
 <script src="src/sprites/zombies/drawPoleVaultingZombie.js"></script>
 <script src="src/sprites/zombies/drawBrickheadZombie.js"></script>
 <script src="src/sprites/zombies/drawNewspaperZombie.js"></script>
+<script src="src/sprites/zombies/drawExplorerZombie.js"></script>
+<script src="src/sprites/zombies/drawTombRaiserZombie.js"></script>
 
 <script src="src/sprites/plants/drawSunNut.js"></script>
 <script src="src/sprites/plants/drawSunMine.js"></script>
@@ -401,9 +425,12 @@
 <script src="src/plants/PeaShroom.js"></script>
 <script src="src/plants/NutShroom.js"></script>
 <script src="src/plants/SnowPea.js"></script>
+<script src="src/plants/IceLettuce.js"></script>
 <script src="src/plants/Cabbage.js"></script>
+<script src="src/plants/IceCabbage.js"></script>
 <script src="src/plants/ChompNut.js"></script>
 <script src="src/plants/ChompMine.js"></script>
+<script src="src/plants/GraveBuster.js"></script>
 <script src="src/plants/createPlant.js"></script>
 
 <!-- §7 Zombie classes (base → subclasses → factory) -->
@@ -415,6 +442,8 @@
 <script src="src/zombies/PoleVaultingZombie.js"></script>
 <script src="src/zombies/BrickheadZombie.js"></script>
 <script src="src/zombies/NewspaperZombie.js"></script>
+<script src="src/zombies/ExplorerZombie.js"></script>
+<script src="src/zombies/TombRaiserZombie.js"></script>
 <script src="src/zombies/createZombie.js"></script>
 
 <!-- §8 Other game entities -->

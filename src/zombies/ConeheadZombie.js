@@ -16,37 +16,9 @@ class ConeheadZombie extends Zombie {
         this.hasCone = true;
     }
 
-    // Override để xử lý hệ thống giáp 2 lớp
+    // Override để xử lý hệ thống giáp 2 lớp (nón → cơ thể)
     takeDamage(amount, particles) {
-        if (this.dying) return;
-        this.hitFlash = 0.1;
-
-        if (this.hasCone && this.coneHp > 0) {
-            this.coneHp -= amount;
-            if (this.coneHp <= 0) {
-                const overflow = -this.coneHp; // sát thương thừa sau khi phá nón
-                this.hasCone = false;
-                this.maxHp   = ZOMBIE_DEFS.basic.maxHp; // đặt lại maxHp về 200
-                this.hp      = Math.min(this.hp, this.maxHp);
-                // Áp phần sát thương thừa vào HP cơ thể (fix: không bỏ phí)
-                if (overflow > 0) {
-                    this.hp -= overflow;
-                    if (this.hp <= 0) {
-                        this.dying = true;
-                        this.state = 'dying';
-                        spawnDeathParticles(this.x, this.y - 20, particles || []);
-                    }
-                }
-            }
-        } else {
-            // Nón đã rơi → tấn công trực tiếp vào HP
-            this.hp -= amount;
-            if (this.hp <= 0) {
-                this.dying = true;
-                this.state = 'dying';
-                spawnDeathParticles(this.x, this.y - 20, particles || []);
-            }
-        }
+        this._takeArmoredDamage(amount, particles, 'coneHp', 'hasCone');
     }
 
     get render() {

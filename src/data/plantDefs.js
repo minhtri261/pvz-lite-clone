@@ -170,12 +170,31 @@ const PLANT_DEFS = {
     },
     snowpea: {
         name: 'Snow Pea',
-        cost: 150,
+        cost: 0,           // fusion-only: peashooter + icelettuce
         hp: 300,
         cooldownMs: 7000,
         fireRate: 1500,
         peaDamage: 20,
-        slowMs: 3000,      // zombie trúng đạn bị chậm 50% trong 3 giây
+        chillMs: 3000,     // zombie trúng đạn bị làm lạnh (chậm 50% đi + ăn) trong 3 giây
+    },
+    icecabbage: {
+        name: 'Ice Cabbage',
+        cost: 0,           // fusion-only: cabbage + icelettuce
+        hp: 300,
+        cooldownMs: 7000,
+        fireRate: 2500,
+        damage: 40,        // sát thương bằng Cabbage
+        arcHeight: 90,
+        chillMs: 3000,     // zombie trúng đòn bị làm lạnh (chậm 50% đi + ăn) trong 3 giây
+    },
+    icelettuce: {
+        name: 'Ice Lettuce',
+        cost: 0,
+        hp: 300,
+        cooldownMs: 20000,
+        range: 60,         // tầm phát hiện zombie phía trước (px) — phải đến sát mới đóng băng
+        freezeMs: 5000,    // đóng băng hoàn toàn 5 giây
+        chillMs: 10000,    // tổng thời gian chịu hiệu ứng làm lạnh (gồm cả lúc đóng băng)
     },
     chompnut: {
         name: 'Chomp-nut',
@@ -198,5 +217,12 @@ const PLANT_DEFS = {
         biteInterval: 1000, // hồi cắn nhanh hơn Chomper (1500ms → 1000ms)
         blastDmg:   1800,   // nổ như PotatoMine khi bị zombie ăn
         blastRange: 80,     // bán kính nổ — trong phạm vi 1 ô (≈ CELL_W)
+    },
+    gravebuster: {
+        name: 'Grave Buster',
+        cost: 0,
+        hp: 300,
+        cooldownMs: 10000, // recharge 10s
+        bustMs: 3000,      // thời gian rễ khoan phá mộ (3 giây)
     },
 };

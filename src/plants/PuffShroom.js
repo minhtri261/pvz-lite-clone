@@ -28,13 +28,7 @@ class PuffShroom extends Plant {
 
         if (this.shootTimer >= PLANT_DEFS.puffshroom.fireRate) {
             // Chỉ bắn zombie trong tầm 3 ô (range = 240px)
-            const hasTarget = game.zombies.some(z =>
-                z.row === this.row &&
-                !z.dying &&
-                z.x > this.cx &&
-                (z.x - this.cx) <= PLANT_DEFS.puffshroom.range
-            );
-            if (hasTarget) {
+            if (this.hasTargetInRow(game, { maxRange: PLANT_DEFS.puffshroom.range, includeTombs: false })) {
                 this.shootTimer = 0;
                 this.shootAnim  = 1;
                 game.projectiles.push(new Projectile(this.cx + 36, this.cy + 3, this.row, false, false, false, true));

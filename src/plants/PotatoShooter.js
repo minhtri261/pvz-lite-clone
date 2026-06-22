@@ -36,7 +36,7 @@ class PotatoShooter extends Plant {
         // ── Bắn đạn nâu (bắt đầu ngay, không cần arm) ────────
         this.shootTimer += dt;
         if (this.shootTimer >= PLANT_DEFS.potatoshooter.fireRate) {
-            if (game.zombies.some(z => z.row === this.row && !z.dying && z.x > this.cx)) {
+            if (this.hasTargetInRow(game, { includeTombs: false })) {
                 this.shootTimer = 0;
                 this.shootAnim  = 1;
                 // isBrown = true → đạn màu nâu đất

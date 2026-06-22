@@ -1,60 +1,58 @@
 'use strict';
 // ══════════════════════════════════════════════════════════════
-//  drawCabbage.js — Vẽ Cabbage-pult và bắp cải đang bay
+//  drawIceCabbage.js — Vẽ Ice Cabbage và bắp cải băng đang bay
+//  Fusion: Cabbage + Ice Lettuce
 //
-//  drawCabbage(ctx, cx, cy, animTime, hpPct, lobAnim)
-//    cx, cy    — tâm cây
-//    animTime  — thời gian animation (giây)
-//    hpPct     — phần trăm máu (0–1) để thể hiện damage tint
-//    lobAnim   — 0–1, > 0 khi đang animation vung tay
+//  Giống hệt Cabbage, chỉ đổi màu thân + đạn sang tông băng
+//  (giống Ice Lettuce). Nhánh đỡ + rổ giữ nguyên như Cabbage.
 //
-//  drawCabbageLob(ctx, x, y, angle)
-//    Vẽ bắp cải đang bay (gọi từ CabbageProjectile.draw)
+//  drawIceCabbage(ctx, cx, cy, animTime, hpPct, lobAnim)
+//  drawIceCabbageLob(ctx, x, y, angle) — đạn bắp cải băng đang bay
 // ══════════════════════════════════════════════════════════════
 
-// Vẽ bắp cải đang bay theo vòng cung
-function drawCabbageLob(ctx, x, y, angle) {
+// Vẽ bắp cải băng đang bay theo vòng cung
+function drawIceCabbageLob(ctx, x, y, angle) {
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(angle);
 
-    // Thân bắp cải — hình cầu màu xanh
+    // Thân bắp cải — hình cầu màu băng
     const cg = ctx.createRadialGradient(-5, -5, 2, 0, 0, 14);
-    cg.addColorStop(0,   '#a8e860');
-    cg.addColorStop(0.5, '#5cb830');
-    cg.addColorStop(1,   '#2a6808');
+    cg.addColorStop(0,    '#F0FBFF');
+    cg.addColorStop(0.5,  '#4FC3F7');
+    cg.addColorStop(1,    '#0277BD');
     ctx.fillStyle = cg;
     ctx.beginPath(); ctx.arc(0, 0, 13, 0, Math.PI * 2); ctx.fill();
 
     // Đường vân lá bắp cải
-    ctx.strokeStyle = 'rgba(30,90,10,0.55)'; ctx.lineWidth = 1.5; ctx.lineCap = 'round';
+    ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 1.5; ctx.lineCap = 'round';
     ctx.beginPath(); ctx.moveTo(-8, -4); ctx.quadraticCurveTo(0, 0, 8, -3); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(-7, 2);  ctx.quadraticCurveTo(0, 5, 7, 2);  ctx.stroke();
 
     // Highlight sáng góc trái trên
-    ctx.fillStyle = 'rgba(200,255,140,0.35)';
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
     ctx.beginPath(); ctx.ellipse(-4, -5, 5, 3.5, -0.7, 0, Math.PI * 2); ctx.fill();
 
     ctx.restore();
 }
 
-// Vẽ một viên đạn bắp cải nhỏ (dùng cho đạn nằm sẵn trong rổ)
-function _drawCabbageAmmo(ctx, x, y, r, alpha = 1) {
+// Vẽ một viên đạn bắp cải băng nhỏ (dùng cho đạn nằm sẵn trong rổ)
+function _drawIceCabbageAmmo(ctx, x, y, r, alpha = 1) {
     ctx.save();
     ctx.globalAlpha *= alpha;
     const g = ctx.createRadialGradient(x - r * 0.3, y - r * 0.3, r * 0.15, x, y, r);
-    g.addColorStop(0,    '#b8f078');
-    g.addColorStop(0.55, '#5cb830');
-    g.addColorStop(1,    '#2a6808');
-    ctx.fillStyle = g; ctx.strokeStyle = '#2a5a08'; ctx.lineWidth = 1;
+    g.addColorStop(0,    '#F0FBFF');
+    g.addColorStop(0.55, '#4FC3F7');
+    g.addColorStop(1,    '#0277BD');
+    ctx.fillStyle = g; ctx.strokeStyle = '#01579B'; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-    ctx.strokeStyle = 'rgba(30,90,10,0.5)'; ctx.lineWidth = 1; ctx.lineCap = 'round';
+    ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 1; ctx.lineCap = 'round';
     ctx.beginPath(); ctx.moveTo(x - r * 0.6, y - r * 0.2); ctx.quadraticCurveTo(x, y + r * 0.15, x + r * 0.6, y - r * 0.15); ctx.stroke();
     ctx.restore();
 }
 
-// Cây Cabbage chính — thân bắp cải tròn dẹt, nhánh cong đỡ rổ đạn phía trên
-function drawCabbage(ctx, cx, cy, animTime, hpPct, lobAnim = 0) {
+// Cây Ice Cabbage chính — giống Cabbage, thân + đạn đổi màu băng
+function drawIceCabbage(ctx, cx, cy, animTime, hpPct, lobAnim = 0) {
     ctx.save();
     ctx.translate(cx, cy);
 
@@ -67,7 +65,7 @@ function drawCabbage(ctx, cx, cy, animTime, hpPct, lobAnim = 0) {
 
     // ── Nhánh cong + rổ đạn (vẽ trước để thân đè lên gốc nhánh) ──
     const ax = -9, ay = -8 + bob;   // điểm gắn ~10h trên thân
-    const bx = -12, by = -31 + bob;  // tâm rổ
+    const bx = -12, by = -31 + bob; // tâm rổ
     const flick = lobAnim > 0
         ? -Math.sin(lobAnim * Math.PI) * 0.45  // vung lên khi ném
         : Math.sin(animTime * 2) * 0.05;       // lắc nhẹ khi idle
@@ -95,11 +93,11 @@ function drawCabbage(ctx, cx, cy, animTime, hpPct, lobAnim = 0) {
     ctx.fillStyle = bg; ctx.strokeStyle = '#3a1a00'; ctx.lineWidth = 1.5;
     ctx.beginPath(); ctx.arc(0, 0, basketR, 0, Math.PI, false); ctx.closePath(); ctx.fill(); ctx.stroke();
 
-    // Đạn bắp cải nằm sẵn trong rổ — viên trên cùng mờ dần khi vừa ném
+    // Đạn bắp cải băng nằm sẵn trong rổ — viên trên cùng mờ dần khi vừa ném
     const topAlpha = lobAnim > 0.5 ? Math.max(0, 1 - (lobAnim - 0.5) * 2) : 1;
-    _drawCabbageAmmo(ctx, -5, -1, 6);
-    _drawCabbageAmmo(ctx, 4, -3, 6.5);
-    _drawCabbageAmmo(ctx, -1, -7, 6, topAlpha);
+    _drawIceCabbageAmmo(ctx, -5, -1, 6);
+    _drawIceCabbageAmmo(ctx, 4, -3, 6.5);
+    _drawIceCabbageAmmo(ctx, -1, -7, 6, topAlpha);
 
     // Viền miệng rổ — vẽ sau cùng để rổ trông ôm lấy đạn
     ctx.strokeStyle = '#5a3208'; ctx.lineWidth = 2;
@@ -107,21 +105,21 @@ function drawCabbage(ctx, cx, cy, animTime, hpPct, lobAnim = 0) {
 
     ctx.restore(); // end nhánh + rổ
 
-    // ── Thân chính — khối cầu hơi dẹt, nằm sát đất ───────────────
+    // ── Thân chính — khối cầu hơi dẹt, nằm sát đất, tông màu băng ──
     const tg = ctx.createRadialGradient(-8, by0 - 8, 4, 0, by0, 24);
-    tg.addColorStop(0,    '#c8f598');
-    tg.addColorStop(0.55, '#7ed348');
-    tg.addColorStop(1,    '#3f8a16');
-    ctx.fillStyle = tg; ctx.strokeStyle = '#2a5a08'; ctx.lineWidth = 2;
+    tg.addColorStop(0,    '#F0FBFF');
+    tg.addColorStop(0.55, '#4FC3F7');
+    tg.addColorStop(1,    '#0277BD');
+    ctx.fillStyle = tg; ctx.strokeStyle = '#01579B'; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.ellipse(0, by0, 21, 15, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
 
-    // Đường vân lá bắp cải
-    ctx.strokeStyle = 'rgba(40,100,10,0.4)'; ctx.lineWidth = 1.5; ctx.lineCap = 'round';
+    // Đường vân lá bắp cải (vân băng)
+    ctx.strokeStyle = 'rgba(255,255,255,0.45)'; ctx.lineWidth = 1.5; ctx.lineCap = 'round';
     ctx.beginPath(); ctx.moveTo(-14, by0 - 2); ctx.quadraticCurveTo(0, by0 + 4, 14, by0 - 1); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(-12, by0 + 6); ctx.quadraticCurveTo(0, by0 + 10, 12, by0 + 5); ctx.stroke();
 
     // Highlight góc trái trên cho cảm giác tròn, mềm
-    ctx.fillStyle = 'rgba(220,255,170,0.4)';
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
     ctx.beginPath(); ctx.ellipse(-8, by0 - 7, 8, 5, -0.6, 0, Math.PI * 2); ctx.fill();
 
     // ── Mắt — kích thước tương đương IceLettuce, nhìn về phía trước ──

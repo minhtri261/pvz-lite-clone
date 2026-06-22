@@ -14,5 +14,7 @@ function createZombie(type, row) {
         case 'polevaulting': return new PoleVaultingZombie(row);
         case 'brickhead':    return new BrickheadZombie(row);
         case 'newspaper':    return new NewspaperZombie(row);
+        case 'explorer':     return new ExplorerZombie(row);
+        case 'tombraiser':   return new TombRaiserZombie(row);
     }
 }

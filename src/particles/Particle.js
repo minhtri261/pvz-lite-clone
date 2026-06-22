@@ -97,6 +97,34 @@ function spawnSunCollectParticles(x, y, particles) {
     }
 }
 
+// Bụi cát nhỏ bật lên khi Grave Buster đang khoan rễ vào lăng mộ
+function spawnGraveDustParticles(x, y, particles) {
+    for (let i = 0; i < 3; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const s = randFloat(0.4, 1.8);
+        particles.push(new Particle(
+            x, y,
+            Math.cos(a) * s, -randFloat(0.4, 1.8),
+            `hsl(${randInt(35, 48)}, 45%, ${randInt(55, 75)}%)`, // cát vàng nhạt
+            randFloat(2, 4), randFloat(250, 450)
+        ));
+    }
+}
+
+// Đá vụn / mảnh lăng mộ bay ra khi Grave Buster phá mộ thành công
+function spawnGraveDebrisParticles(x, y, particles) {
+    for (let i = 0; i < 18; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const s = randFloat(2, 8);
+        particles.push(new Particle(
+            x, y,
+            Math.cos(a) * s, Math.sin(a) * s - 4,
+            `hsl(${randInt(28, 48)}, ${randInt(25, 45)}%, ${randInt(35, 60)}%)`, // nâu đất / vàng cát
+            randFloat(3, 7), randFloat(450, 850)
+        ));
+    }
+}
+
 // Hiệu ứng kết hợp plant (Fusion) — tia vàng + điểm sáng trắng
 function spawnFusionParticles(x, y, particles) {
     // Vòng tia vàng/xanh lá bùng ra

@@ -26,8 +26,7 @@ class Peanut extends Plant {
         this.shootTimer += dt;
 
         if (this.shootTimer >= PLANT_DEFS.peanut.fireRate) {
-            if (game.zombies.some(z => z.row === this.row && !z.dying && z.x > this.cx)
-             || game.tombs.some(t => !t.dead && t.row === this.row && t.cellX > this.cx)) {
+            if (this.hasTargetInRow(game)) {
                 this.shootTimer = 0;
                 this.shootAnim  = 1;
                 // isBrown=true → drawPea vẽ màu nâu đất | pierce=true → xuyên qua mọi mục tiêu

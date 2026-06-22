@@ -20,7 +20,7 @@
 //      └─ replaces default arm pose; use for raised-arm / special grips
 //
 //  zombie.effects strings:
-//    'slow' | 'burn' | 'poison' | 'frozen'
+//    'burn' | 'poison' | 'frozen'
 //    Future: 'butter' | 'hypno' | 'electric' | 'curse' | 'stun' | 'shield'
 //
 //  Render order (layer 1, inside body-sway transform):
@@ -165,14 +165,6 @@ function _drawZombieHead(ctx, hy, animTime, hpPct, rageEyes) {
 
 // ── Status effect overlays ─────────────────────────────────────
 
-function _drawSlowedOverlay(ctx) {
-    ctx.save();
-    ctx.globalAlpha *= 0.28;
-    ctx.fillStyle = '#00E5FF';
-    ctx.beginPath(); ctx.ellipse(0, -20, 24, 35, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.restore();
-}
-
 function _drawBurningOverlay(ctx, animTime) {
     ctx.save();
     const f = 0.5 + Math.sin(animTime * 17) * 0.35;
@@ -213,7 +205,6 @@ function _drawStatusEffects(ctx, zombie) {
     const t = zombie.animTime;
     for (const fx of effects) {
         switch (fx) {
-            case 'slow':   _drawSlowedOverlay(ctx);       break;
             case 'burn':   _drawBurningOverlay(ctx, t);   break;
             case 'poison': _drawPoisonedOverlay(ctx, t);  break;
             case 'frozen': _drawFrozenOverlay(ctx);        break;

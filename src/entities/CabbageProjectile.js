@@ -5,10 +5,13 @@
 //  Cabbage-pult nhắm vào zombie gần nhất và ném theo arc.
 //  Khi hạ cánh (t ≥ 1) → landed = true → Game xử lý sát thương.
 //  Sát thương áp dụng lên tất cả zombie trong vòng 32px ở vị trí đáp.
+//
+//  isIce=true (Ice Cabbage) → khi hạ cánh, Game.js cũng áp dụng
+//  hiệu ứng làm lạnh (z.applyChill) lên các zombie trúng AoE.
 // ══════════════════════════════════════════════════════════════
 
 class CabbageProjectile {
-    constructor(fromX, fromY, toX, row, damage) {
+    constructor(fromX, fromY, toX, row, damage, isIce = false) {
         this.x       = fromX;
         this.y       = fromY;
         this.startX  = fromX;
@@ -17,6 +20,7 @@ class CabbageProjectile {
         this.row     = row;
         this.damage  = damage;
         this.isCabbage = true;
+        this.isIce   = isIce;
         this.dead    = false;
         this.landed  = false;
         this.t       = 0;
@@ -43,6 +47,7 @@ class CabbageProjectile {
     }
 
     draw(ctx) {
-        drawCabbageLob(ctx, this.x, this.y, this.spinAngle);
+        if (this.isIce) drawIceCabbageLob(ctx, this.x, this.y, this.spinAngle);
+        else drawCabbageLob(ctx, this.x, this.y, this.spinAngle);
     }
 }

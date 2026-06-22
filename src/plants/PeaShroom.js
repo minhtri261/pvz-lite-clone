@@ -18,10 +18,7 @@ class PeaShroom extends Plant {
         this.shootTimer += dt;
 
         if (this.shootTimer >= PLANT_DEFS.peashroom.fireRate) {
-            const hasTarget = game.zombies.some(
-                z => z.row === this.row && !z.dying && z.x > this.cx
-            );
-            if (hasTarget) {
+            if (this.hasTargetInRow(game, { includeTombs: false })) {
                 this.shootTimer = 0;
                 this.shootAnim  = 1;
                 game.projectiles.push(new Projectile(this.cx + 36, this.cy + 3, this.row, false));

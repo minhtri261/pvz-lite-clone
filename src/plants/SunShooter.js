@@ -39,8 +39,7 @@ class SunShooter extends Plant {
         this.shootAnim = Math.max(0, this.shootAnim - dt / 300);
         this.shootTimer += dt;
         if (this.shootTimer >= PLANT_DEFS.sunshooter.fireRate) {
-            if (game.zombies.some(z => z.row === this.row && !z.dying && z.x > this.cx)
-             || game.tombs.some(t => !t.dead && t.row === this.row && t.cellX > this.cx)) {
+            if (this.hasTargetInRow(game)) {
                 this.shootTimer = 0;
                 this.shootAnim  = 1;
                 // isIce=false, isYellow=true → vẽ màu vàng cam

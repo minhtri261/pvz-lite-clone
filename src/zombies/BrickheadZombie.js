@@ -27,31 +27,7 @@ class BrickheadZombie extends Zombie {
 
     // Override: xử lý lớp giáp gạch trước khi giảm HP cơ thể
     takeDamage(amount, particles) {
-        if (this.dying) return;
-        this.hitFlash = 0.1;
-
-        if (this.hasBrick && this.brickHp > 0) {
-            this.brickHp -= amount;
-            if (this.brickHp <= 0) {
-                const overflow = -this.brickHp; // sát thương thừa
-                this.hasBrick = false;
-                this.maxHp   = ZOMBIE_DEFS.basic.maxHp; // reset về 200
-                this.hp      = Math.min(this.hp, this.maxHp);
-                if (overflow > 0) {
-                    this.hp -= overflow;
-                    if (this.hp <= 0) {
-                        this.dying = true; this.state = 'dying';
-                        spawnDeathParticles(this.x, this.y - 20, particles || []);
-                    }
-                }
-            }
-        } else {
-            this.hp -= amount;
-            if (this.hp <= 0) {
-                this.dying = true; this.state = 'dying';
-                spawnDeathParticles(this.x, this.y - 20, particles || []);
-            }
-        }
+        this._takeArmoredDamage(amount, particles, 'brickHp', 'hasBrick');
     }
 
     get render() {

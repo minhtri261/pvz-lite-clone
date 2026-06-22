@@ -17,7 +17,7 @@ const LEVEL_DEF_9 = {
     newPlant:  null,
     newZombie: null,
     activeRows:      [0, 1, 2, 3, 4],
-    availablePlants: ['sunflower', 'peashooter', 'wallnut', 'potatomine', 'puffshroom', 'Chomper'],
+    availablePlants: ['sunflower', 'peashooter', 'wallnut', 'potatomine', 'puffshroom', 'chomper'],
     startingSun: 150,
     waves: [
         {
@@ -91,6 +91,12 @@ const LEVEL_DEF_9 = {
                 { type: 'basic', row: null, delay: 4500 },
                 { type: 'conehead', row: null, delay: 5000 },
                 { type: 'conehead', row: null, delay: 5500 },
+                { type: 'basic', row: null, delay: 6000 },
+                { type: 'basic', row: null, delay: 6500 },
+                { type: 'conehead', row: null, delay: 7000 },
+                { type: 'basic', row: null, delay: 7500 },
+                { type: 'basic', row: null, delay: 8000 },
+                { type: 'basic', row: null, delay: 8500 },
             ],
         },
         {
@@ -150,6 +156,9 @@ const LEVEL_DEF_9 = {
                 { type: 'conehead',     row: null, delay: 9000 },
                 { type: 'conehead',     row: null, delay: 9500 },
                 { type: 'basic',     row: null, delay: 10000 },
+                { type: 'basic',     row: null, delay: 10500 },
+                { type: 'basic',     row: null, delay: 11000 },
+                { type: 'basic',     row: null, delay: 11500 },
             ],
         },
     ],

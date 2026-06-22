@@ -26,6 +26,7 @@ class Tomb {
         this.spawnTimer   = spawnRateMs * (0.35 + Math.random() * 0.35);
         this.dead         = false;
         this.hitFlash     = 0; // ms remaining for white flash on hit
+        this.shakeIntensity = 0; // > 0 → đang bị Grave Buster khoan, rung lắc
     }
 
     get cellX() { return cx(this.col); }
@@ -61,6 +62,9 @@ class Tomb {
     draw(ctx) {
         if (this.dead) return;
         const flash = this.hitFlash > 0 ? Math.min(1, this.hitFlash / 80) : 0;
-        drawTomb(ctx, this.cellX, this.cellY, this.hp / this.maxHp, flash);
+        // Rung lắc nhẹ khi Grave Buster đang khoan rễ vào lăng mộ
+        const jx = this.shakeIntensity > 0 ? (Math.random() - 0.5) * this.shakeIntensity * 2 : 0;
+        const jy = this.shakeIntensity > 0 ? (Math.random() - 0.5) * this.shakeIntensity * 2 : 0;
+        drawTomb(ctx, this.cellX + jx, this.cellY + jy, this.hp / this.maxHp, flash);
     }
 }

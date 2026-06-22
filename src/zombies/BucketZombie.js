@@ -16,37 +16,9 @@ class BucketZombie extends Zombie {
         this.hasBucket = true;
     }
 
-    // Override để xử lý lớp giáp xô
+    // Override để xử lý lớp giáp xô (xô → cơ thể)
     takeDamage(amount, particles) {
-        if (this.dying) return;
-        this.hitFlash = 0.1;
-
-        if (this.hasBucket && this.bucketHp > 0) {
-            this.bucketHp -= amount;
-            if (this.bucketHp <= 0) {
-                const overflow = -this.bucketHp; // sát thương thừa sau khi phá xô
-                this.hasBucket = false;
-                this.maxHp     = ZOMBIE_DEFS.basic.maxHp; // đặt lại maxHp về 200
-                this.hp        = Math.min(this.hp, this.maxHp);
-                // Áp phần sát thương thừa vào HP cơ thể
-                if (overflow > 0) {
-                    this.hp -= overflow;
-                    if (this.hp <= 0) {
-                        this.dying = true;
-                        this.state = 'dying';
-                        spawnDeathParticles(this.x, this.y - 20, particles || []);
-                    }
-                }
-            }
-        } else {
-            // Xô đã rơi → tấn công trực tiếp vào HP
-            this.hp -= amount;
-            if (this.hp <= 0) {
-                this.dying = true;
-                this.state = 'dying';
-                spawnDeathParticles(this.x, this.y - 20, particles || []);
-            }
-        }
+        this._takeArmoredDamage(amount, particles, 'bucketHp', 'hasBucket');
     }
 
     get render() {

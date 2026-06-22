@@ -29,13 +29,18 @@ class Zombie {
             deathT: 0,         // tiến trình animation chết (0→1)
             hitFlash: 0,       // flash đỏ khi trúng đạn
             remove: false,     // true → xóa khỏi mảng game.zombies
-            slowTimer: 0,      // thời gian hiệu ứng chậm còn lại (ms)
-            slowed: false,     // true → đang bị Snow Pea làm chậm
+            frozenTimer: 0,    // > 0 → đang bị đóng băng hoàn toàn (Ice Lettuce)
+            chillTimer:  0,    // > 0 → đang chịu hiệu ứng làm lạnh (đóng băng + sau rã đông)
         });
     }
 
     get hpPct()  { return this.hp / this.maxHp; }
     get isDead() { return this.remove; }
+
+    // true khi đang bị đóng băng hoàn toàn — không di chuyển, không tấn công
+    get frozen()  { return this.frozenTimer > 0; }
+    // true khi đang chịu hiệu ứng làm lạnh (đóng băng hoặc sau khi rã đông) — chậm 50%
+    get chilled() { return this.chillTimer > 0; }
 
     // Default render config — subclasses override to add hat/gear/outfit/rageEyes.
     get render()  { return {}; }
@@ -44,8 +49,22 @@ class Zombie {
     // Add more flags here as new mechanics are introduced.
     get effects() {
         const fx = [];
-        if (this.slowed) fx.push('slow');
+        if (this.chillTimer > 0) fx.push('frozen');
         return fx;
+    }
+
+    // Ice Lettuce: đóng băng hoàn toàn freezeMs, rồi chịu hiệu ứng làm lạnh
+    // (chậm 50%) cho đến khi tổng thời gian chillMs trôi qua
+    applyFreeze(freezeMs, chillMs) {
+        this.frozenTimer = Math.max(this.frozenTimer, freezeMs);
+        this.chillTimer  = Math.max(this.chillTimer, chillMs);
+    }
+
+    // Snow Pea (và các plant làm lạnh khác trong tương lai): chỉ áp hiệu
+    // ứng làm lạnh (chậm 50% di chuyển + ăn, phủ xanh dương nhạt), không
+    // đóng băng hoàn toàn — dùng chung cơ chế chillTimer với Ice Lettuce
+    applyChill(chillMs) {
+        this.chillTimer = Math.max(this.chillTimer, chillMs);
     }
 
     // Nhận sát thương — lớp con override nếu có giáp
@@ -57,6 +76,40 @@ class Zombie {
             this.dying = true;
             this.state = 'dying';
             spawnDeathParticles(this.x, this.y - 20, particles);
+        }
+    }
+
+    // Trừ thẳng vào HP cơ thể — dùng bởi takeDamage() và bởi lớp con khi
+    // sát thương "thừa" sau khi phá vỡ giáp (nón/xô) cần dồn vào cơ thể
+    _applyBodyDamage(amount, particles) {
+        this.hp -= amount;
+        if (this.hp <= 0) {
+            this.dying = true;
+            this.state = 'dying';
+            spawnDeathParticles(this.x, this.y - 20, particles || []);
+        }
+    }
+
+    // Sát thương trừ vào lớp giáp (nón/xô) trước; khi giáp vỡ, phần sát
+    // thương thừa dồn vào HP cơ thể và maxHp trở về basic.
+    // armorField: tên field HP giáp (vd 'coneHp'), hasArmorField: tên field
+    // cờ còn giáp (vd 'hasCone') — dùng bởi ConeheadZombie, BucketZombie
+    _takeArmoredDamage(amount, particles, armorField, hasArmorField) {
+        if (this.dying) return;
+        this.hitFlash = 0.1;
+
+        if (this[hasArmorField] && this[armorField] > 0) {
+            this[armorField] -= amount;
+            if (this[armorField] <= 0) {
+                const overflow = -this[armorField]; // sát thương thừa sau khi phá giáp
+                this[hasArmorField] = false;
+                this.maxHp = ZOMBIE_DEFS.basic.maxHp; // đặt lại maxHp về 200
+                this.hp    = Math.min(this.hp, this.maxHp);
+                if (overflow > 0) this._applyBodyDamage(overflow, particles);
+            }
+        } else {
+            // Giáp đã rơi → tấn công trực tiếp vào HP
+            this._applyBodyDamage(amount, particles);
         }
     }
 
@@ -79,10 +132,14 @@ class Zombie {
         this.animTime += dt / 1000;
         if (this.hitFlash > 0) this.hitFlash -= dt / 1000;
 
-        // Đếm ngược hiệu ứng chậm (Snow Pea)
-        if (this.slowTimer > 0) {
-            this.slowTimer -= dt;
-            if (this.slowTimer <= 0) { this.slowTimer = 0; this.slowed = false; }
+        // Đếm ngược hiệu ứng đóng băng / làm lạnh (Ice Lettuce, Snow Pea)
+        if (this.frozenTimer > 0) {
+            this.frozenTimer -= dt;
+            if (this.frozenTimer < 0) this.frozenTimer = 0;
+        }
+        if (this.chillTimer > 0) {
+            this.chillTimer -= dt;
+            if (this.chillTimer < 0) this.chillTimer = 0;
         }
 
         if (this.dying) {
@@ -92,11 +149,15 @@ class Zombie {
             return;
         }
 
+        // Đóng băng hoàn toàn → không di chuyển, không tấn công
+        if (this.frozen) return;
+
         const target = this.findTarget(plants);
         if (target) {
             // Có cây trước mặt → đứng lại tấn công
             this.state = 'eating';
-            this.eatTimer += dt;
+            // Hiệu ứng làm lạnh: tốc độ ăn chậm hơn 50%
+            this.eatTimer += this.chilled ? dt * 0.5 : dt;
             if (this.eatTimer >= this.attackRate) {
                 this.eatTimer = 0;
                 target.takeDamage(this.damage);
@@ -105,8 +166,9 @@ class Zombie {
             // Không có cây → tiếp tục đi
             this.state = 'walking';
             this.eatTimer = 0;
-            // Tốc độ giảm 55% khi bị chậm
-            this.x -= (this.slowed ? this.speed * 0.45 : this.speed) * (dt / 16.67);
+            // Tốc độ giảm 50% khi đang chịu hiệu ứng làm lạnh
+            const speedMul = this.chilled ? 0.5 : 1;
+            this.x -= this.speed * speedMul * (dt / 16.67);
         }
     }
 
@@ -117,18 +179,6 @@ class Zombie {
         ctx.globalAlpha = clamp(this.hitFlash / 0.1, 0, 1) * 0.6;
         ctx.fillStyle = '#FF4444';
         ctx.beginPath(); ctx.arc(this.x, this.y - 20, 28, 0, Math.PI * 2); ctx.fill();
-        ctx.restore();
-    }
-
-    // Lớp phủ xanh băng khi đang bị Snow Pea làm chậm
-    drawSlowOverlay(ctx) {
-        if (!this.slowed || this.dying) return;
-        ctx.save();
-        ctx.globalAlpha = 0.28;
-        ctx.fillStyle = '#00E5FF';
-        ctx.beginPath();
-        ctx.ellipse(this.x, this.y - 20, 24, 35, 0, 0, Math.PI * 2);
-        ctx.fill();
         ctx.restore();
     }
 }

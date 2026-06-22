@@ -10,8 +10,21 @@
 //    - Vẽ toàn bộ khung hình (draw)
 // ══════════════════════════════════════════════════════════════
 
-// Biến session: màn cao nhất đã mở khóa (mất khi tải lại trang)
-let highestUnlocked = 1;
+// ── Lưu tiến trình (localStorage) ────────────────────────────
+// Màn cao nhất đã mở khóa, được khôi phục lại mỗi khi tải trang
+// → tester không cần chơi lại từ màn 1 sau mỗi lần sửa code.
+const SAVE_KEY = 'pvz_progress_highestUnlocked';
+
+function _loadHighestUnlocked() {
+    const saved = parseInt(localStorage.getItem(SAVE_KEY), 10);
+    return (saved >= 1 && saved <= 15) ? saved : 1;
+}
+
+function _saveHighestUnlocked(value) {
+    localStorage.setItem(SAVE_KEY, String(value));
+}
+
+let highestUnlocked = _loadHighestUnlocked();
 
 // ── Hệ thống kết hợp cây (Plant Fusion) ──────────────────────
 // Đặt 2 cây cùng 1 ô → tự động kết hợp (thứ tự a/b không quan trọng)
@@ -33,18 +46,22 @@ const FUSION_RECIPES = [
     { a: 'puffshroom', b: 'wallnut',    result: 'nutshroom'       },
     { a: 'chomper',    b: 'wallnut',    result: 'chompnut'        },
     { a: 'chomper',    b: 'potatomine', result: 'chompmine'       },
+    { a: 'peashooter', b: 'icelettuce', result: 'snowpea'         },
+    { a: 'cabbage',    b: 'icelettuce', result: 'icecabbage'      },
+    { a: 'icelettuce', b: 'icelettuce', result: 'icelettuce_freezeall' }, // đặc biệt: đóng băng toàn màn hình
 ];
 
 // Label hiển thị cho fusion result đặc biệt (không phải tên plant)
 const FUSION_RESULT_LABELS = {
     'wallnut_heal': '🔋 Hồi đầy HP!',
+    'icelettuce_freezeall': '❄ Đóng băng toàn màn hình!',
 };
 
 // Cây chỉ có thể có qua kết hợp — KHÔNG đặt trực tiếp từ thanh card
 const FUSION_ONLY = new Set([
     'repeater', 'sunshooter', 'peanut', 'twinsun', 'snowpea',
     'sunnut', 'sunmine', 'potatoshooter', 'minenut', 'sunshroom',
-    'peashroom', 'nutshroom', 'chompnut', 'chompmine',
+    'peashroom', 'nutshroom', 'chompnut', 'chompmine', 'icecabbage',
 ]);
 
 // Các loại Shroom — có thể xếp chồng 2 con cùng loại trong 1 ô
@@ -61,7 +78,7 @@ class Game {
         this._overridePlants = null;      // danh sách cây người chơi chọn (màn 7+)
         this._pickSelected   = new Set(); // Set của plant types đang được chọn trên pick screen
         this.cooldowns = { sunflower: 0, peashooter: 0, wallnut: 0, cherrybomb: 0, potatomine: 0,
-                           chomper: 0, repeater: 0, sunshooter: 0, twinsun: 0, peanut: 0, puffshroom: 0, snowpea: 0, cabbage: 0 };
+                           chomper: 0, repeater: 0, sunshooter: 0, twinsun: 0, peanut: 0, puffshroom: 0, snowpea: 0, cabbage: 0, icelettuce: 0, gravebuster: 0 };
         this.hoverCol = -1; this.hoverRow = -1;
         this.mouseX = 0;    this.mouseY = 0;
         this.skySunTimer = 4000;    // ms cho đến khi sun tiếp theo rơi từ trời
@@ -139,7 +156,7 @@ class Game {
         this.shovelMode   = false;
         document.getElementById('shovel-btn').classList.remove('selected');
         this.cooldowns = { sunflower: 0, peashooter: 0, wallnut: 0, cherrybomb: 0, potatomine: 0,
-                           chomper: 0, repeater: 0, sunshooter: 0, twinsun: 0, peanut: 0, puffshroom: 0, snowpea: 0, cabbage: 0 };
+                           chomper: 0, repeater: 0, sunshooter: 0, twinsun: 0, peanut: 0, puffshroom: 0, snowpea: 0, cabbage: 0, icelettuce: 0, gravebuster: 0 };
         this.skySunTimer = 4000;
         this.sun = this.levelDef.startingSun;
         // Khởi tạo lăng mộ Egypt từ cấu hình level
@@ -311,7 +328,7 @@ class Game {
         }
         for (const mower of this.lawnMowers) mower.update(dt, this.zombies, this.particles);
 
-        for (const z of this.zombies) z.update(dt, this.plants);
+        for (const z of this.zombies) z.update(dt, this.plants, this);
 
         // Cập nhật lăng mộ Egypt (triệu hồi zombie, hit flash)
         for (const tomb of this.tombs) {
@@ -332,6 +349,8 @@ class Game {
                         if (!z.dying && z.row === proj.row && Math.abs(proj.x - z.x) < 32) {
                             const was = z.dying;
                             z.takeDamage(proj.damage, this.particles);
+                            // Bắp cải băng → áp hiệu ứng làm lạnh lên zombie trúng AoE
+                            if (proj.isIce) z.applyChill(PLANT_DEFS.icecabbage.chillMs);
                             if (!was && z.dying) this.zombiesKilled++;
                         }
                     }
@@ -366,7 +385,7 @@ class Game {
                         proj.hitTargets.add(z);
                         const was = z.dying;
                         z.takeDamage(proj.damage, this.particles);
-                        if (proj.isIce) { z.slowed = true; z.slowTimer = PLANT_DEFS.snowpea.slowMs; }
+                        if (proj.isIce) z.applyChill(PLANT_DEFS.snowpea.chillMs);
                         spawnHitParticles(proj.x, proj.y, this.particles);
                         audioManager.playSFX('hit');
                         if (!was && z.dying) this.zombiesKilled++;
@@ -393,8 +412,8 @@ class Game {
                 if (!z.dying && z.row === proj.row && Math.abs(proj.x - z.x) < 24) {
                     const was = z.dying;
                     z.takeDamage(proj.damage, this.particles);
-                    // Đạn băng → áp hiệu ứng chậm
-                    if (proj.isIce) { z.slowed = true; z.slowTimer = PLANT_DEFS.snowpea.slowMs; }
+                    // Đạn băng → áp hiệu ứng làm lạnh
+                    if (proj.isIce) z.applyChill(PLANT_DEFS.snowpea.chillMs);
                     proj.dead = true;
                     spawnHitParticles(proj.x, proj.y, this.particles);
                     audioManager.playSFX('hit');
@@ -593,11 +612,13 @@ class Game {
             if (this.currentLevelId === 15) {
                 this.state = 'win';
                 highestUnlocked = 15;
+                _saveHighestUnlocked(highestUnlocked);
                 document.getElementById('screen-win').classList.remove('hidden');
             } else {
                 // Còn màn tiếp → màn hình hoàn thành màn + mở khóa màn kế
                 this.state = 'levelcomplete';
                 highestUnlocked = Math.max(highestUnlocked, this.currentLevelId + 1);
+                _saveHighestUnlocked(highestUnlocked);
                 const ld = this.levelDef;
                 document.getElementById('levelcomplete-title').textContent = ld.title;
                 document.getElementById('levelcomplete-sub').textContent   = ld.subtitle;
@@ -726,8 +747,15 @@ class Game {
         const d    = PLANT_DEFS[type];
         if (this.sun < cost || this.cooldowns[type] > 0) return;
 
-        // Ô đang có lăng mộ → không thể đặt cây
-        if (this.tombs.some(t => !t.dead && t.col === col && t.row === row)) return;
+        const tombHere = this.tombs.some(t => !t.dead && t.col === col && t.row === row);
+
+        if (type === 'gravebuster') {
+            // Grave Buster CHỈ đặt được trên ô đang có lăng mộ và còn trống
+            if (!tombHere || this.grid.isOccupied(col, row)) return;
+        } else if (tombHere) {
+            // Ô đang có lăng mộ → không thể đặt cây thường
+            return;
+        }
 
         if (this.grid.isOccupied(col, row)) {
             const existing = this.grid.getPlant(col, row);
@@ -792,6 +820,22 @@ class Game {
             return;
         }
 
+        // ── Trường hợp đặc biệt: 2 Ice Lettuce kết hợp → đóng băng toàn bộ zombie
+        // trên bản đồ ngay lập tức, sau đó cây biến mất (dùng 1 lần) ──
+        if (resultType === 'icelettuce_freezeall') {
+            const def = PLANT_DEFS.icelettuce;
+            for (const z of this.zombies) {
+                if (!z.dying) z.applyFreeze(def.freezeMs, def.chillMs);
+            }
+            existingPlant.dead = true; // dùng 1 lần — biến mất sau khi đóng băng toàn màn hình
+            this.sun -= secondCost;
+            this.cooldowns[secondType] = secondCooldown;
+            spawnFusionParticles(existingPlant.cx, existingPlant.cy - 10, this.particles);
+            this._deselect();
+            this._updateUI();
+            return;
+        }
+
         // Xóa cây gốc ngay lập tức
         existingPlant.dead = true;
         this.grid.remove(col, row);
@@ -824,7 +868,7 @@ class Game {
         document.getElementById('sun-count').textContent = this.sun;
         const available = this.availablePlants;
         const all = ['sunflower', 'peashooter', 'wallnut', 'cherrybomb', 'potatomine',
-                     'chomper', 'repeater', 'sunshooter', 'twinsun', 'peanut', 'puffshroom', 'snowpea', 'cabbage'];
+                     'chomper', 'repeater', 'sunshooter', 'twinsun', 'peanut', 'puffshroom', 'snowpea', 'cabbage', 'icelettuce', 'gravebuster'];
         for (const type of all) {
             const card   = document.getElementById(`card-${type}`);
             const cdFill = document.getElementById(`cd-${type}`);
@@ -880,7 +924,7 @@ class Game {
     _updateCardSelection() {
         // Fusion-only plants không có card → bỏ qua khi cập nhật selected state
         ['sunflower', 'peashooter', 'wallnut', 'cherrybomb', 'potatomine',
-         'chomper', 'puffshroom', 'cabbage', 'snowpea', 'repeater'].forEach(t => {
+         'chomper', 'puffshroom', 'cabbage', 'snowpea', 'icelettuce', 'repeater', 'gravebuster'].forEach(t => {
             const el = document.getElementById(`card-${t}`);
             if (el) el.classList.toggle('selected', this.selectedType === t);
         });
@@ -895,6 +939,22 @@ class Game {
             if (unlocked) { btn.classList.add('unlocked'); btn.classList.remove('locked'); }
             else           { btn.classList.add('locked');   btn.classList.remove('unlocked'); }
         }
+    }
+
+    // ── Tiện ích cho tester (nút trên màn hình Start) ──────────
+    // Mở khóa toàn bộ 15 màn ngay lập tức để test bất kỳ màn nào
+    unlockAllLevels() {
+        highestUnlocked = 15;
+        _saveHighestUnlocked(highestUnlocked);
+        this._updateLevelSelectUI();
+    }
+
+    // Xóa tiến trình đã lưu, quay về trạng thái chỉ mở khóa màn 1
+    resetProgress() {
+        if (!confirm('Xóa toàn bộ tiến trình và quay về Màn 1?')) return;
+        highestUnlocked = 1;
+        _saveHighestUnlocked(highestUnlocked);
+        this._updateLevelSelectUI();
     }
 
     // ── Vẽ frame ───────────────────────────────────────────────
@@ -936,7 +996,25 @@ class Game {
             const tombOnCell = this.tombs.some(
                 t => !t.dead && t.col === this.hoverCol && t.row === this.hoverRow
             );
-            if (tombOnCell) {
+            if (this.selectedType === 'gravebuster') {
+                // Grave Buster: chỉ hợp lệ trên ô có lăng mộ còn trống
+                if (tombOnCell && !existing) {
+                    ctx.fillStyle   = 'rgba(150,210,80,0.20)';
+                    ctx.strokeStyle = 'rgba(150,220,80,0.85)';
+                    ctx.lineWidth   = 2;
+                    rr(ctx, GX + this.hoverCol * CELL_W + 1, GY + this.hoverRow * CELL_H + 1, CELL_W - 2, CELL_H - 2, 6);
+                    ctx.fill(); ctx.stroke();
+                    ctx.save(); ctx.globalAlpha = 0.7;
+                    drawGraveBuster(ctx, px, py, 0, 0);
+                    ctx.restore();
+                } else {
+                    ctx.fillStyle   = 'rgba(255,50,50,0.18)';
+                    ctx.strokeStyle = 'rgba(255,80,50,0.65)';
+                    ctx.lineWidth   = 2;
+                    rr(ctx, GX + this.hoverCol * CELL_W + 1, GY + this.hoverRow * CELL_H + 1, CELL_W - 2, CELL_H - 2, 6);
+                    ctx.fill(); ctx.stroke();
+                }
+            } else if (tombOnCell) {
                 ctx.fillStyle   = 'rgba(255,50,50,0.18)';
                 ctx.strokeStyle = 'rgba(255,80,50,0.65)';
                 ctx.lineWidth   = 2;
@@ -1003,6 +1081,12 @@ class Game {
                             case 'minenut':       drawMineNut(ctx, px, py, 0, 1, false, 0);             break;
                             case 'chompnut':      drawChompNut(ctx, px, py, 0, 1, false, 0, false);     break;
                             case 'chompmine':     drawChompMine(ctx, px, py, 0, false, 0, false, false, 0); break;
+                            case 'icecabbage':    drawIceCabbage(ctx, px, py, 0, 1, 0);          break;
+                            case 'icelettuce_freezeall':
+                                ctx.globalAlpha = 0.5;
+                                ctx.fillStyle = '#4FC3F7';
+                                ctx.beginPath(); ctx.arc(px, py, 34, 0, Math.PI * 2); ctx.fill();
+                                break;
                             case 'sunshroom':     drawSunShroom(ctx, px, py, 0, false, ghostStack);                  break;
                             case 'peashroom':     drawPeaShroom(ctx, px, py, 0, 0, ghostStack);                    break;
                             case 'nutshroom':     drawNutShroom(ctx, px, py, 0, 1, ghostStack, 1);                 break;
@@ -1022,7 +1106,9 @@ class Game {
                         ctx.font = 'bold 11px Arial'; ctx.textAlign = 'center';
                         ctx.strokeStyle = 'rgba(0,0,0,0.85)'; ctx.lineWidth = 3;
                         ctx.strokeText(`⚗ ${fuseName}${stackSuffix}`, labelX, labelY);
-                        ctx.fillStyle = fusionResult === 'wallnut_heal' ? '#80FF80' : '#FFD700';
+                        ctx.fillStyle = fusionResult === 'wallnut_heal' ? '#80FF80'
+                                       : fusionResult === 'icelettuce_freezeall' ? '#80D8FF'
+                                       : '#FFD700';
                         ctx.fillText(`⚗ ${fuseName}${stackSuffix}`, labelX, labelY);
                         ctx.textAlign = 'left';
                     }
@@ -1040,6 +1126,7 @@ class Game {
                     case 'puffshroom': drawPuffShroom(ctx, px, py, 0, 0);              break;
                     case 'cabbage':    drawCabbage(ctx, px, py, 0, 1, 0);              break;
                     case 'snowpea':    drawSnowPea(ctx, px, py, 0, 0);                 break;
+                    case 'icelettuce': drawIceLettuce(ctx, px, py, 0, 0);              break;
                     case 'repeater':   drawRepeater(ctx, px, py, 0, 0, 0);             break;
                 }
                 ctx.restore();
@@ -1262,11 +1349,14 @@ class Game {
             { type: 'chomper',    desc: 'Nuốt zombie · 150☀' },
             { type: 'cabbage',    desc: 'Catapult · 100☀' },
             { type: 'snowpea',    desc: 'Đạn băng làm chậm' },
+            { type: 'icelettuce', desc: 'Đóng băng zombie · 175☀' },
+            { type: 'icecabbage', desc: 'Catapult băng · ⚗ Bắp cải+Băng' },
             { type: 'puffshroom', desc: 'Nấm miễn phí · 0☀' },
             { type: 'repeater',   desc: 'Bắn 2 đạn · ⚗ Đậu×2' },
             { type: 'sunshooter', desc: 'Bắn + tạo ☀ · ⚗' },
             { type: 'twinsun',    desc: 'x2 mặt trời · ⚗ ☀×2' },
             { type: 'peanut',     desc: 'Bắn + chắn · ⚗ Đậu+🪨' },
+            { type: 'gravebuster',desc: 'Khoan phá lăng mộ · 0☀' },
         ];
 
         grid.innerHTML = '';
@@ -1306,11 +1396,14 @@ class Game {
                     case 'chomper':    drawChomper(ctx2,    0, 0, 0.3, false, 0, false); break;
                     case 'cabbage':    drawCabbage(ctx2,    0, 0, 0.3, 1, 0);          break;
                     case 'snowpea':    drawSnowPea(ctx2,    0, 0, 0.3, 0);             break;
+                    case 'icelettuce': drawIceLettuce(ctx2, 0, 0, 0.3, 0);             break;
+                    case 'icecabbage': drawIceCabbage(ctx2, 0, 0, 0.3, 1, 0);          break;
                     case 'puffshroom': drawPuffShroom(ctx2, 0, 0, 0.3, 0);             break;
                     case 'repeater':   drawRepeater(ctx2,   0, 0, 0.3, 0, 0);          break;
                     case 'sunshooter': drawSunShooter(ctx2, 0, 0, 0.3, 0, false);      break;
                     case 'twinsun':    drawTwinSun(ctx2,    0, 0, 0.3, false);         break;
                     case 'peanut':     drawPeanut(ctx2,     0, 0, 0.3, 1, 0);          break;
+                    case 'gravebuster':drawGraveBuster(ctx2, 0, 0, 0.3, 0);            break;
                 }
             } catch(e) {}
             ctx2.restore();
@@ -1336,6 +1429,8 @@ class Game {
             { type: 'polevaulting',name: 'Pole Vaulting',      desc: 'Nhảy qua 1 cây đầu' },
             { type: 'brickhead',   name: 'Brickhead',          desc: 'Đầu gạch, HP rất cao' },
             { type: 'newspaper',   name: 'Newspaper Zombie',   desc: 'Điên khi mất báo' },
+            { type: 'explorer',    name: 'Explorer Zombie',    desc: 'Đuốc đốt mọi cây trong tầm ăn' },
+            { type: 'tombraiser',  name: 'Tomb Raiser Zombie', desc: 'Cứ 20s tạo 1 lăng mộ phía trước, sinh Conehead mỗi 40s' },
         ];
 
         grid.innerHTML = '';
@@ -1373,6 +1468,8 @@ class Game {
                     case 'polevaulting': drawPoleVaultingZombie(ctx2, 0, 0, 0, 'walking', 1, true, false, 0, 0); break;
                     case 'brickhead':    drawBrickheadZombie(ctx2, 0, 0, 0, 'walking', 1, true, 1, 0);       break;
                     case 'newspaper':    drawNewspaperZombie(ctx2, 0, 0, 0, 'walking', 1, true, 0);           break;
+                    case 'explorer':     drawExplorerZombie(ctx2, 0, 0, 0, 'walking', 1, true, 0);            break;
+                    case 'tombraiser':   drawTombRaiserZombie(ctx2, 0, 0, 0, 'walking', 1, 0);                break;
                 }
             } catch(e) {}
             ctx2.restore();
