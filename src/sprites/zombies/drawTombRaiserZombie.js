@@ -45,6 +45,23 @@ function _drawTombRaiserHead(ctx, hy, animTime, hpPct, rageEyes) {
     ctx.shadowBlur = 0;
 }
 
+// Giơ 2 tay lên trời khi làm nghi lễ tạo mộ — t: tiến trình nghi lễ (0→1, 2s)
+// Tay vươn thẳng lên trong 20% đầu rồi giữ nguyên, kèm rung nhẹ cho sống động
+function _drawRaiseArms(ctx, animTime, t) {
+    const raiseUp = Math.min(1, t / 0.2);
+    const tremor  = Math.sin(animTime * 10) * 0.04 * raiseUp;
+
+    ctx.save(); ctx.translate(-14, 5); ctx.rotate(lerp(-0.25, 1.85, raiseUp) + tremor);
+    ctx.fillStyle = '#8A9E88'; ctx.strokeStyle = '#4a5a48'; ctx.lineWidth = 1.5;
+    rr(ctx, -28, -4, 30, 8, 4); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.arc(-30, 0, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); ctx.restore();
+
+    ctx.save(); ctx.translate(14, 5); ctx.rotate(lerp(0.55, -1.85, raiseUp) - tremor);
+    ctx.fillStyle = '#8A9E88'; ctx.strokeStyle = '#4a5a48'; ctx.lineWidth = 1.5;
+    rr(ctx, 0, -4, 22, 8, 4); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.arc(22, 0, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); ctx.restore();
+}
+
 // Legacy wrapper (dùng cho thumbnail trong Zombie Notes)
 function drawTombRaiserZombie(ctx, x, y, animTime, state, hpPct, deathT) {
     drawZombieBase(ctx, {

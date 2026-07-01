@@ -9,13 +9,14 @@
 // ══════════════════════════════════════════════════════════════
 
 class Projectile {
-    constructor(x, y, row, isIce = false, isYellow = false, isBrown = false, isSpore = false, pierce = false) {
+    constructor(x, y, row, isIce = false, isYellow = false, isBrown = false, isSpore = false, pierce = false, maxRange = Infinity, isFume = false, damage = PLANT_DEFS.peashooter.peaDamage, fumeColor = 'purple') {
         Object.assign(this, {
-            x, y, row, isIce, isYellow, isBrown, isSpore, pierce,
+            x, y, row, isIce, isYellow, isBrown, isSpore, isFume, pierce, maxRange, fumeColor,
+            startX:   x,
             speed:    8,
             dead:     false,
             animTime: Math.random() * Math.PI * 2,
-            damage:   PLANT_DEFS.peashooter.peaDamage,
+            damage,
             hitTargets: pierce ? new Set() : null, // tránh trúng lại cùng 1 mục tiêu khi xuyên
         });
     }
@@ -24,10 +25,15 @@ class Projectile {
         this.x += this.speed * dt / 16.67;
         this.animTime += dt / 150;
         if (this.x > W + 30) this.dead = true;
+        if (this.x - this.startX > this.maxRange) this.dead = true;
     }
 
     draw(ctx) {
-        drawPea(ctx, this.x, this.y, this.animTime,
-                this.isIce, this.isYellow, this.isBrown, this.isSpore);
+        if (this.isFume) {
+            drawFumeBubbles(ctx, this.x, this.y, this.animTime, this.fumeColor);
+        } else {
+            drawPea(ctx, this.x, this.y, this.animTime,
+                    this.isIce, this.isYellow, this.isBrown, this.isSpore);
+        }
     }
 }

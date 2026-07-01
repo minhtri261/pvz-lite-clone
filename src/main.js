@@ -58,7 +58,7 @@ document.addEventListener('keydown', e => {
 
 // ── Gắn sự kiện cho thẻ cây trong HUD ─────────────────────────
 ['sunflower', 'peashooter', 'wallnut', 'cherrybomb', 'potatomine',
- 'chomper', 'repeater', 'sunshooter', 'twinsun', 'peanut', 'puffshroom', 'snowpea', 'cabbage', 'icelettuce', 'gravebuster'].forEach(type => {
+ 'chomper', 'bonkchoy', 'squash', 'repeater', 'sunshooter', 'twinsun', 'peanut', 'puffshroom', 'fumeshroom', 'snowpea', 'cabbage', 'icelettuce', 'gravebuster'].forEach(type => {
     document.getElementById(`card-${type}`).addEventListener('click', () => game.selectCard(type));
 });
 
@@ -115,6 +115,7 @@ function loop(timestamp) {
 // ── Khởi tạo ──────────────────────────────────────────────────
 const game = new Game();
 drawCardThumbnails();
+game._initStartPanels();
 
 // Retry phát nhạc sau bất kỳ tương tác nào (giải quyết autoplay policy)
 document.addEventListener('click', () => audioManager.retryPlay());

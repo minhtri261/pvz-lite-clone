@@ -48,13 +48,13 @@ class PotatoMine extends Plant {
         } else {
             // Kiểm tra kích nổ:
             //   1. Zombie cắn mìn (takeDamage đã set cờ _biteTriggered)
-            //   2. Zombie đi vào vùng ăn (dist -20..58, khớp với Zombie.findTarget)
+            //   2. Zombie đi vào vùng ăn (dist -50..50, khớp với Zombie.findTarget)
             let shouldBoom = this._biteTriggered;
             if (!shouldBoom) {
                 for (const z of game.zombies) {
                     if (!z.dying && z.row === this.row) {
                         const d = z.x - this.cx;
-                        if (d > -20 && d < 58) { shouldBoom = true; break; }
+                        if (d > -50 && d < 50) { shouldBoom = true; break; }
                     }
                 }
             }
@@ -65,7 +65,7 @@ class PotatoMine extends Plant {
                 for (const z of game.zombies) {
                     if (!z.dying && z.row === this.row) {
                         const d = z.x - this.cx;
-                        if (d > -20 && d < 58) {
+                        if (d > -50 && d < 50) {
                             const was = z.dying;
                             z.takeDamage(PLANT_DEFS.potatomine.blastDmg, game.particles);
                             if (!was && z.dying) game.zombiesKilled++;

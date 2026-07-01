@@ -22,12 +22,12 @@ class IceLettuce extends Plant {
 
         const def = PLANT_DEFS.icelettuce;
         for (const z of game.zombies) {
-            if (z.dying || z.row !== this.row || z.chillTimer > 0) continue;
+            if (z.dying || z.row !== this.row) continue;
             const dist = z.x - this.cx;
-            if (dist > -20 && dist < def.range) {
+            if (dist > -40 && dist < PLANT_DEFS.icelettuce.range) {
                 z.applyFreeze(def.freezeMs, def.chillMs);
-                this.dead = true; // dùng 1 lần — biến mất sau khi đóng băng
-                break;
+                this.dead = true;
+                return;
             }
         }
     }

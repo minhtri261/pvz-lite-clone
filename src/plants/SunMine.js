@@ -55,13 +55,13 @@ class SunMine extends Plant {
             this.armTimer += dt;
             if (this.armTimer >= PLANT_DEFS.sunmine.armMs) this.armed = true;
         } else {
-            // Zombie cắn hoặc bước vào vùng (dist -20..58)
+            // Zombie cắn hoặc bước vào vùng (dist -50..40)
             let boom = this._biteTriggered;
             if (!boom) {
                 for (const z of game.zombies) {
                     if (!z.dying && z.row === this.row) {
                         const d = z.x - this.cx;
-                        if (d > -20 && d < 58) { boom = true; break; }
+                        if (d > -50 && d < 40) { boom = true; break; }
                     }
                 }
             }
@@ -70,7 +70,7 @@ class SunMine extends Plant {
                 for (const z of game.zombies) {
                     if (!z.dying && z.row === this.row) {
                         const d = z.x - this.cx;
-                        if (d > -20 && d < 58) {
+                        if (d > -50 && d < 40) {
                             const was = z.dying;
                             z.takeDamage(PLANT_DEFS.sunmine.blastDmg, game.particles);
                             if (!was && z.dying) game.zombiesKilled++;

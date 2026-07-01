@@ -32,7 +32,7 @@ const PLANT_DEFS = {
         cost: 150,
         hp: 100000,             // gần như không có máu (nổ ngay)
         cooldownMs: 50000, // cooldown lâu nhất — 50 giây
-        fuseMs: 1500,      // ngòi nổ cháy trong 1.5 giây rồi phát nổ
+        fuseMs: 1000,      // ngòi nổ cháy trong 1 giây rồi phát nổ
         blastDmg: 2000,    // sát thương đủ tiêu diệt mọi zombie trong vùng 3×3
     },
     potatomine: {
@@ -69,7 +69,7 @@ const PLANT_DEFS = {
         hp: 4000,          // WallNut HP — nhưng khi chết sẽ phát nổ!
         cooldownMs: 30000,
         blastDmg: 1800,    // nổ bằng PotatoMine khi hết máu
-        blastRange: 160,   // 2 ô = 2 × CELL_W
+        blastRange: 100,   // bán kính nổ (px) — trong phạm vi 2 ô (≈ CELL_W × 2)
     },
     sunshroom: {
         name: 'Sun-shroom',
@@ -94,6 +94,15 @@ const PLANT_DEFS = {
         hp: 2200,          // trung bình — ít hơn WallNut (4000) nhưng hơn WallNut thu nhỏ
         cooldownMs: 30000, // cooldown dài như WallNut
     },
+    repeatershroom: {
+        name: 'Repeater-shroom',
+        cost: 0,           // fusion-only: peashroom + peashooter
+        hp: 200,           // yếu như PeaShroom — nấm mỏng manh
+        cooldownMs: 7500,
+        fireRate: 1500,    // bắn burst mỗi 1.5s
+        peaDamage: 20,     // mỗi viên 20 dmg → burst 40 dmg/lần
+        burstDelay: 150,   // khoảng cách giữa 2 viên trong cùng 1 burst (ms)
+    },
     sunnut: {
         name: 'Sun-nut',
         cost: 0,           // fusion-only: wallnut(50) + sunflower(50)
@@ -115,9 +124,7 @@ const PLANT_DEFS = {
     potatoshooter: {
         name: 'Potato Shooter',
         cost: 0,           // fusion-only: peashooter(100) + potatomine(25)
-        hp: 400,
-        cooldownMs: 20000,
-        armMs: 14000,
+        hp: 200,
         blastDmg: 1800,
         fireRate: 1500,    // bắn mỗi 1.5s
         peaDamage: 20,     // đạn nâu, sát thương 20
@@ -168,6 +175,17 @@ const PLANT_DEFS = {
         peaDamage: 20,   // sát thương bằng Peashooter
         range:     240,  // chỉ bắn trong 3 ô (3 × 80px = 240px) — giới hạn tầm
     },
+    fumeshroom: {
+        name: 'Fume-shroom',
+        cost:      200,  // ban ngày: 200 sun
+        nightCost: 100,  // ban đêm: 100 sun (nấm hoạt động tốt hơn ban đêm)
+        hp:        200,  // yếu như PuffShroom
+        cooldownMs: 7500,
+        fireRate:  1500, // tốc độ bắn bằng Peashooter
+        peaDamage: 30,   // sát thương hơn Peashooter
+        range:     320,  // 4 ô (4 × 80px = 320px) — xa hơn PuffShroom
+        pierce:    true, // đạn xuyên qua mọi zombie trên đường bay
+    },
     snowpea: {
         name: 'Snow Pea',
         cost: 0,           // fusion-only: peashooter + icelettuce
@@ -192,7 +210,7 @@ const PLANT_DEFS = {
         cost: 0,
         hp: 300,
         cooldownMs: 20000,
-        range: 60,         // tầm phát hiện zombie phía trước (px) — phải đến sát mới đóng băng
+        range: 40,         // tầm phát hiện zombie phía trước (px) — phải đến sát mới đóng băng
         freezeMs: 5000,    // đóng băng hoàn toàn 5 giây
         chillMs: 10000,    // tổng thời gian chịu hiệu ứng làm lạnh (gồm cả lúc đóng băng)
     },
@@ -220,9 +238,60 @@ const PLANT_DEFS = {
     },
     gravebuster: {
         name: 'Grave Buster',
-        cost: 0,
+        cost: 75,
         hp: 300,
         cooldownMs: 10000, // recharge 10s
-        bustMs: 3000,      // thời gian rễ khoan phá mộ (3 giây)
+        bustMs: 4000,      // thời gian rễ khoan phá mộ (4 giây)
+    },
+    peafume: {
+        name: 'Pea-fume',
+        cost: 0,           // fusion-only: fumeshroom + peashooter
+        hp: 200,           // yếu như FumeShroom
+        cooldownMs: 7500,
+        fireRate: 1500,
+        peaDamage: 50,     // tăng so với FumeShroom theo yêu cầu
+        range: 320,        // 4 ô — bằng FumeShroom
+        pierce: true,
+    },
+    icefume: {
+        name: 'Ice-fume',
+        cost: 0,           // fusion-only: fumeshroom + icelettuce
+        hp: 200,
+        cooldownMs: 7500,
+        fireRate: 1500,
+        peaDamage: 20,     // bằng FumeShroom — chỉ thêm hiệu ứng làm lạnh
+        range: 320,
+        pierce: true,
+    },
+    icefumeshooter: {
+        name: 'Ice Fume Shooter',
+        cost: 0,           // fusion-only: icefume + peashooter HOẶC peafume + icelettuce
+        hp: 200,
+        cooldownMs: 7500,
+        fireRate: 1500,
+        peaDamage: 50,     // bằng PeaFume + thêm hiệu ứng làm lạnh
+        range: 320,
+        pierce: true,
+    },
+    bonkchoy: {
+        name: 'Bonk Choy',
+        cost: 150,
+        hp: 300,
+        cooldownMs: 7000,
+        punchRange: 120,   // tầm đấm 2 bên (px) — đánh được cả trước và sau
+        punchDmg: 20,      // sát thương mỗi cú đấm
+        punchInterval: 100,// ms giữa 2 cú đấm — combo trái/phải liên tục, cực nhanh
+    },
+    squash: {
+        name: 'Squash',
+        cost: 50,
+        hp: 300,
+        cooldownMs: 50000,   // hồi lâu như Cherry Bomb
+        detectRange: 120,    // tầm phát hiện 2 bên (px) — trái -120 / phải +120
+        splashDmg: 1800,     // sát thương cho zombie ở điểm rơi
+        splashRange: 80,     // bán kính sát thương quanh điểm rơi (px)
+        crouchMs: 250,       // thời gian nén người như lò xo trước khi nhảy
+        airMs: 450,          // thời gian bay trên không tới mục tiêu
+        impactMs: 180,       // thời gian giữ hình dáng bị đè bẹp trước khi biến mất
     },
 };

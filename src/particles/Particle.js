@@ -125,6 +125,48 @@ function spawnGraveDebrisParticles(x, y, particles) {
     }
 }
 
+// Mảnh gỗ nâu bay ra khi cánh cửa của Door Zombie bị phá vỡ
+function spawnDoorBreakParticles(x, y, particles) {
+    for (let i = 0; i < 20; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const s = randFloat(3, 10);
+        particles.push(new Particle(
+            x, y - 10,
+            Math.cos(a) * s, Math.sin(a) * s - 4,
+            `hsl(${randInt(20, 32)},${randInt(35, 55)}%,${randInt(15, 35)}%)`, // gỗ nâu sẫm
+            randFloat(4, 9), randFloat(500, 950)
+        ));
+    }
+}
+
+// Mảnh vàng/đá sa thạch bay ra khi quan tài Pharaoh Zombie vỡ
+function spawnSarcophagusBreakParticles(x, y, particles) {
+    for (let i = 0; i < 26; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const s = randFloat(3, 11);
+        particles.push(new Particle(
+            x, y - 14,
+            Math.cos(a) * s, Math.sin(a) * s - 5,
+            `hsl(${randInt(38, 52)},${randInt(70, 95)}%,${randInt(45, 72)}%)`, // vàng kim/sa thạch
+            randFloat(4, 9), randFloat(550, 1000)
+        ));
+    }
+}
+
+// Mảnh nhựa cam/đỏ bay ra khi nón giao thông của Conehead Zombie vỡ
+function spawnConeBreakParticles(x, y, particles) {
+    for (let i = 0; i < 16; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const s = randFloat(3, 9);
+        particles.push(new Particle(
+            x, y - 30,
+            Math.cos(a) * s, Math.sin(a) * s - 4,
+            `hsl(${randInt(8, 28)},90%,${randInt(40, 60)}%)`, // cam-đỏ nhựa nón
+            randFloat(3, 7), randFloat(450, 800)
+        ));
+    }
+}
+
 // Hiệu ứng kết hợp plant (Fusion) — tia vàng + điểm sáng trắng
 function spawnFusionParticles(x, y, particles) {
     // Vòng tia vàng/xanh lá bùng ra

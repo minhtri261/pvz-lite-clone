@@ -92,11 +92,14 @@ class PoleVaultingZombie extends Zombie {
         // Khi hasVault=true, cố tình không ăn (chỉ đi về phía cây để vault)
         const target = this.hasVault ? null : this.findTarget(plants);
         if (target) {
+            // Vừa chạm cây → phát tiếng cắn ngay, không chờ đủ attackRate
+            if (this.state !== 'eating') audioManager.playSFX('bite');
             this.state = 'eating';
             this.eatTimer += this.chilled ? dt * 0.5 : dt;
             if (this.eatTimer >= this.attackRate) {
                 this.eatTimer = 0;
                 target.takeDamage(this.damage);
+                audioManager.playSFX('bite');
             }
         } else {
             this.state    = 'walking';

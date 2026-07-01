@@ -40,6 +40,41 @@ function drawPea(ctx, x, y, animTime, isIce, isYellow = false, isBrown = false, 
     ctx.restore();
 }
 
+// Bảng màu cho từng biến thể chuỗi bong bóng ooooo
+const FUME_BUBBLE_THEMES = {
+    purple: { glow: 'rgba(156,39,176,0.16)', g1: '#E1BEE7', g2: '#9C27B0', g3: '#38006b', stroke: '#2d0060' },
+    green:  { glow: 'rgba(76,175,80,0.18)',  g1: '#DCEDC8', g2: '#4CAF50', g3: '#1B5E20', stroke: '#0d330d' },
+    blue:   { glow: 'rgba(33,150,243,0.18)', g1: '#B3E5FC', g2: '#1E88E5', g3: '#0D47A1', stroke: '#072b63' },
+    cyan:   { glow: 'rgba(0,188,212,0.20)',  g1: '#B2EBF2', g2: '#00ACC1', g3: '#006064', stroke: '#00363a' },
+};
+
+// Chuỗi bong bóng khói của FumeShroom (và biến thể PeaFume/IceFume/IceFumeShooter) — 5 viên ooooo di chuyển cùng nhau
+function drawFumeBubbles(ctx, x, y, animTime, theme = 'purple') {
+    const t = FUME_BUBBLE_THEMES[theme] || FUME_BUBBLE_THEMES.purple;
+    ctx.save(); ctx.translate(Math.round(x), Math.round(y));
+    const offsets = [-18, -9, 0, 9, 18];
+    const radii   = [4.2, 4.8, 5.2, 4.8, 4.2];
+    for (let i = 0; i < 5; i++) {
+        const bx = offsets[i];
+        const by = Math.sin(animTime * 4 + i * 1.1) * 2;
+        const r  = radii[i];
+        // Hào quang mờ
+        ctx.fillStyle = t.glow;
+        ctx.beginPath(); ctx.arc(bx, by, r + 4, 0, Math.PI * 2); ctx.fill();
+        // Bong bóng
+        const g = ctx.createRadialGradient(bx - r * 0.3, by - r * 0.3, r * 0.1, bx, by, r);
+        g.addColorStop(0, t.g1);
+        g.addColorStop(0.45, t.g2);
+        g.addColorStop(1,    t.g3);
+        ctx.fillStyle = g; ctx.strokeStyle = t.stroke; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(bx, by, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        // Điểm sáng nhỏ
+        ctx.fillStyle = 'rgba(255,255,255,0.68)';
+        ctx.beginPath(); ctx.arc(bx - r * 0.32, by - r * 0.32, r * 0.36, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.restore();
+}
+
 function drawSun(ctx, x, y, animTime, alpha) {
     const pulse = 1 + Math.sin(animTime * 4) * 0.07;
     ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.scale(pulse, pulse); ctx.globalAlpha = alpha;

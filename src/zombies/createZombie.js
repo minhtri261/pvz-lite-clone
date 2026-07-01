@@ -11,10 +11,13 @@ function createZombie(type, row) {
         case 'flag':     return new FlagZombie(row);
         case 'conehead': return new ConeheadZombie(row);
         case 'bucket':       return new BucketZombie(row);
+        case 'door':         return new DoorZombie(row);
         case 'polevaulting': return new PoleVaultingZombie(row);
         case 'brickhead':    return new BrickheadZombie(row);
         case 'newspaper':    return new NewspaperZombie(row);
         case 'explorer':     return new ExplorerZombie(row);
         case 'tombraiser':   return new TombRaiserZombie(row);
+        case 'pharaoh':      return new PharaohZombie(row);
+        case 'explorerbucket': return new ExplorerBucketZombie(row);
     }
 }

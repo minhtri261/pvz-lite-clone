@@ -1,76 +1,102 @@
 'use strict';
+// Peanut (Đậu Phộng) — Wall-nut + Peashooter fusion
+//   Ngoại hình copy từ Wall-nut (oval đứng, mắt tròn nhìn phải, lông mày,
+//   băng cứu thương, nước mắt theo HP) nhưng đổi bảng màu sang XANH LÁ
+//   của Peashooter, và nòng súng Peashooter được đặt ngay tại vị trí
+//   miệng (thay cho miệng bình thường của Wall-nut)
 function drawPeanut(ctx, x, y, animTime, hpPct, shootT) {
     const hitShake = hpPct < 0.5 ? Math.sin(animTime * 18) * 1.5 : 0;
     const recoil   = Math.sin(shootT * Math.PI) * -8;
     ctx.save(); ctx.translate(Math.round(x + hitShake), Math.round(y));
 
-    // Bóng
+    // Bóng mờ dưới đất
     ctx.fillStyle = 'rgba(0,0,0,0.25)';
     ctx.beginPath(); ctx.ellipse(0, 30, 22, 7, 0, 0, Math.PI * 2); ctx.fill();
 
-    // ── Nòng súng (vẽ trước, nằm sau thân hạt) ────────────────
-    const bx = 16 + recoil;
-    const barG = ctx.createLinearGradient(bx, -6, bx, 6);
-    barG.addColorStop(0, '#C8A050'); barG.addColorStop(0.5, '#8B5E20'); barG.addColorStop(1, '#5C3010');
-    ctx.fillStyle = barG; ctx.strokeStyle = '#3E1A00'; ctx.lineWidth = 2;
-    rr(ctx, bx, -6, 32, 12, 4); ctx.fill(); ctx.stroke();
-    // Highlight nhỏ
-    ctx.fillStyle = 'rgba(255,220,150,0.22)';
-    rr(ctx, bx + 2, -5, 28, 5, 2); ctx.fill();
-    // Cap nòng
-    ctx.fillStyle = '#7a4010'; ctx.strokeStyle = '#3E1A00'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.arc(bx + 32, 0, 8, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-    ctx.fillStyle = '#1a0800';
-    ctx.beginPath(); ctx.arc(bx + 32, 0, 4, 0, Math.PI * 2); ctx.fill();
-    // ──
+    // ── Nòng súng Peashooter — đặt ở VỊ TRÍ MIỆNG, vẽ trước (gốc nòng bị thân che) ──
+    const bx = -6 + recoil, by = 11, bw = 34, bh = 12;
+    const barG = ctx.createLinearGradient(bx, by - bh / 2, bx, by + bh / 2);
+    barG.addColorStop(0,   '#76C442');
+    barG.addColorStop(0.5, '#43A047');
+    barG.addColorStop(1,   '#2E7D32');
+    ctx.fillStyle = barG; ctx.strokeStyle = '#1B5E20'; ctx.lineWidth = 2;
+    rr(ctx, bx, by - bh / 2, bw, bh, 4); ctx.fill(); ctx.stroke();
+    // Highlight nhỏ trên nòng
+    ctx.fillStyle = 'rgba(200,240,160,0.28)';
+    rr(ctx, bx + 2, by - bh / 2 + 1.5, bw - 6, 3.5, 2); ctx.fill();
+    // Đầu nòng — cap tròn với lỗ tối
+    ctx.fillStyle = '#33691E'; ctx.strokeStyle = '#1B5E20'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(bx + bw, by, bh / 2 + 1, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#0d2600';
+    ctx.beginPath(); ctx.arc(bx + bw, by, 3.5, 0, Math.PI * 2); ctx.fill();
 
-    // ── Thân hạt (vẽ sau, che phần gốc nòng) ─────────────────
-    const wg = ctx.createRadialGradient(-9, -10, 3, 0, 0, 30);
-    wg.addColorStop(0, '#D2A060'); wg.addColorStop(0.55, '#A0522D'); wg.addColorStop(1, '#5C2A08');
-    ctx.fillStyle = wg; ctx.strokeStyle = '#3E1A00'; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.ellipse(0, 0, 27, 29, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    // ── Thân oval đứng — copy Wall-nut, đổi sang bảng màu XANH LÁ Peashooter ──
+    const bg = ctx.createRadialGradient(-10, -12, 2, 0, 0, 31);
+    bg.addColorStop(0,    '#C8E69A'); // highlight xanh sáng
+    bg.addColorStop(0.38, '#8BC34A'); // xanh lá nhạt
+    bg.addColorStop(0.75, '#4CAF50'); // xanh lá vừa
+    bg.addColorStop(1,    '#1B5E20'); // viền tối
+    ctx.fillStyle = bg; ctx.strokeStyle = '#1B5E20'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.ellipse(0, 0, 27, 30, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
 
-    // Gân hạt
-    ctx.strokeStyle = 'rgba(62,26,0,0.65)'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(0, -27); ctx.bezierCurveTo(4, -14, 4, 14, 0, 27); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(-14, -24); ctx.bezierCurveTo(-12, -10, -11, 10, -14, 23); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(-23, 2); ctx.bezierCurveTo(-10, 5, 10, 5, 23, 2); ctx.stroke();
+    // ── Mắt tròn — nhìn sang PHẢI (giống Wall-nut) ────────────
+    ctx.strokeStyle = '#1B5E20'; ctx.lineWidth = 1.5;
+    [[-8, -6], [8, -6]].forEach(([ex, ey]) => {
+        ctx.fillStyle = 'white';
+        ctx.beginPath(); ctx.ellipse(ex, ey, 6.5, 7.5, 0, 0, Math.PI * 2);
+        ctx.fill(); ctx.stroke();
+    });
+    ctx.fillStyle = '#0d0d0d';
+    ctx.beginPath(); ctx.arc(-6, -5.5, 3.8, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(10, -5.5, 3.8, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    ctx.beginPath(); ctx.arc(-5, -7.5, 1.5, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(11, -7.5, 1.5, 0, Math.PI * 2); ctx.fill();
 
-    // Vết nứt theo máu
+    // ── Lông mày cau lại khi máu thấp (giống Wall-nut, không có miệng vì đã là nòng súng) ──
+    if (hpPct <= 0.66) {
+        ctx.strokeStyle = '#1B5E20'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(-13, -17); ctx.lineTo(-5, -14); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo( 13, -17); ctx.lineTo( 5, -14); ctx.stroke();
+    }
+
+    // ── Vết nứt theo máu ───────────────────────────────────────
     if (hpPct < 0.66) {
-        ctx.strokeStyle = 'rgba(60,20,0,0.9)'; ctx.lineWidth = 2;
+        ctx.strokeStyle = 'rgba(27,94,32,0.9)'; ctx.lineWidth = 2;
         ctx.beginPath(); ctx.moveTo(-6, -22); ctx.lineTo(-2, -14); ctx.lineTo(-9, -6); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(-20, 4); ctx.lineTo(-10, 8); ctx.lineTo(-15, 15); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(-20, -14); ctx.lineTo(-14, -8); ctx.lineTo(-20, -2); ctx.stroke();
     }
     if (hpPct < 0.33) {
-        ctx.strokeStyle = 'rgba(60,20,0,0.95)'; ctx.lineWidth = 2.5;
-        ctx.beginPath(); ctx.moveTo(8, -20); ctx.lineTo(4, -10); ctx.lineTo(11, -2); ctx.lineTo(6, 6); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(16, 10); ctx.lineTo(8, 16); ctx.stroke();
+        ctx.strokeStyle = 'rgba(27,94,32,0.95)'; ctx.lineWidth = 2.5;
+        ctx.beginPath(); ctx.moveTo(8, -22); ctx.lineTo(4, -16); ctx.lineTo(11, -10); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(18, -18); ctx.lineTo(13, -12); ctx.stroke();
     }
 
-    // Lông mày + mắt + miệng (tái dùng logic WallNut)
-    const browTilt = hpPct > 0.5 ? 0 : -0.45 * (1 - hpPct * 2);
-    ctx.strokeStyle = '#5C2A08'; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
-    ctx.save(); ctx.translate(-8, -12); ctx.rotate(browTilt + 0.2);
-    ctx.beginPath(); ctx.moveTo(-5, 0); ctx.lineTo(5, 0); ctx.stroke(); ctx.restore();
-    ctx.save(); ctx.translate(8, -12); ctx.rotate(-browTilt - 0.2);
-    ctx.beginPath(); ctx.moveTo(-5, 0); ctx.lineTo(5, 0); ctx.stroke(); ctx.restore();
-    ctx.fillStyle = 'white';
-    ctx.beginPath(); ctx.ellipse(-8, -5, 5, 6.5, browTilt, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(8, -5, 5, 6.5, -browTilt, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#1A237E';
-    ctx.beginPath(); ctx.arc(-7, -4, 3.2, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(9, -4, 3.2, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = 'rgba(255,255,255,0.9)';
-    ctx.beginPath(); ctx.arc(-6, -6, 1.4, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(10, -6, 1.4, 0, Math.PI * 2); ctx.fill();
-    ctx.strokeStyle = '#3E1A00'; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
-    if (hpPct > 0.66)      { ctx.beginPath(); ctx.arc(0, 4, 8, 0.25, Math.PI - 0.25); ctx.stroke(); }
-    else if (hpPct > 0.33) { ctx.beginPath(); ctx.moveTo(-7, 10); ctx.lineTo(7, 10); ctx.stroke(); }
-    else {
-        ctx.beginPath(); ctx.arc(0, 16, 8, Math.PI + 0.3, -0.3); ctx.stroke();
-        ctx.fillStyle = 'rgba(100,180,255,0.8)';
-        ctx.beginPath(); ctx.ellipse(18, -2, 4, 7, -0.3, 0, Math.PI * 2); ctx.fill();
+    // ── Băng cứu thương (HP ≤ 0.66) ──────────────────────────
+    if (hpPct <= 0.66) {
+        const bdx = -12, bdy = -26, bdw = 13, bdh = 9;
+        ctx.fillStyle = '#F8F8F0'; ctx.strokeStyle = '#2E7D32'; ctx.lineWidth = 1;
+        rr(ctx, bdx, bdy, bdw, bdh, 2); ctx.fill(); ctx.stroke();
+        const mx = bdx + bdw / 2, my = bdy + bdh / 2;
+        ctx.fillStyle = '#E01010';
+        ctx.fillRect(mx - 1.5, bdy + 1.5, 3, bdh - 3);
+        ctx.fillRect(bdx + 2, my - 1.3, bdw - 4, 2.6);
     }
+
+    // ── Đang khóc (HP < 0.33) ─────────────────────────────────
+    if (hpPct < 0.33) {
+        ctx.fillStyle = 'rgba(70,145,255,0.80)';
+        ctx.beginPath();
+        ctx.moveTo(-10, 2);
+        ctx.quadraticCurveTo(-14, 8, -10.5, 14);
+        ctx.quadraticCurveTo(-6.5, 8, -10, 2);
+        ctx.closePath(); ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(7, 2);
+        ctx.quadraticCurveTo(3, 8, 6.5, 14);
+        ctx.quadraticCurveTo(11, 8, 7, 2);
+        ctx.closePath(); ctx.fill();
+    }
+
     ctx.restore();
 }

@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plants vs. Zombies — Fan Clone</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -58,6 +61,18 @@
                 <div class="cd-bar"><div class="cd-fill" id="cd-chomper"></div></div>
             </div>
 
+            <div class="pcard" id="card-bonkchoy" data-type="bonkchoy">
+                <canvas class="card-art" id="art-bonkchoy" width="58" height="58"></canvas>
+                <div class="card-name">Bonk Choy</div>
+                <div class="cd-bar"><div class="cd-fill" id="cd-bonkchoy"></div></div>
+            </div>
+
+            <div class="pcard" id="card-squash" data-type="squash">
+                <canvas class="card-art" id="art-squash" width="58" height="58"></canvas>
+                <div class="card-name">Squash</div>
+                <div class="cd-bar"><div class="cd-fill" id="cd-squash"></div></div>
+            </div>
+
             <div class="pcard" id="card-cabbage" data-type="cabbage">
                 <canvas class="card-art" id="art-cabbage" width="58" height="58"></canvas>
                 <div class="card-name">Cabbage-pult</div>
@@ -108,6 +123,12 @@
                 <div class="cd-bar"><div class="cd-fill" id="cd-puffshroom"></div></div>
             </div>
 
+            <div class="pcard" id="card-fumeshroom" data-type="fumeshroom">
+                <canvas class="card-art" id="art-fumeshroom" width="58" height="58"></canvas>
+                <div class="card-name">Fume-shroom</div>
+                <div class="cd-bar"><div class="cd-fill" id="cd-fumeshroom"></div></div>
+            </div>
+
             <div class="pcard" id="card-gravebuster" data-type="gravebuster">
                 <canvas class="card-art" id="art-gravebuster" width="58" height="58"></canvas>
                 <div class="card-name">Grave Buster</div>
@@ -152,22 +173,22 @@
 
     <!-- ══ START SCREEN / LEVEL SELECT ══════════════════════════ -->
     <div id="screen-start" class="fullscreen-overlay">
-        <!-- Left sidebar: Plant Almanac -->
-        <div class="start-sidebar">
-            <button class="sidebar-book-btn" onclick="game.showPlantList()">
-                <span class="sidebar-btn-icon">📖</span>
-                <span class="sidebar-btn-label">Plant<br>Almanac</span>
-            </button>
+
+        <!-- Left panel: Plant Dictionary (populated by JS) -->
+        <div class="start-panel">
+            <div class="panel-hdr">PLANT DICTIONARY</div>
+            <div class="panel-body" id="start-plant-list"></div>
         </div>
 
-        <!-- Center: logo + era/level select -->
-        <div class="screen-box">
-            <div class="pvz-logo">
+        <!-- Center: logo + era/level select + action buttons -->
+        <div class="start-center-col">
+
+            <div class="pvz-logo-compact">
                 <span class="logo-p">Plants</span>
                 <span class="logo-vs">vs.</span>
                 <span class="logo-z">Zombies</span>
+                <div class="logo-sub" style="font-size:11px;margin-top:2px;">Fan Clone</div>
             </div>
-            <p class="logo-sub">Fan Clone</p>
 
             <!-- ══ ERA SELECT ════════════════════════════════ -->
             <div class="era-container">
@@ -213,7 +234,7 @@
                         <span class="era-icon">🏜</span>
                         <div>
                             <div class="era-title-text era-egypt-title">Ancient Egypt</div>
-                            <div class="era-meta">4000 BC · 5 màn</div>
+                            <div class="era-meta">4000 BC · 10 màn</div>
                         </div>
                     </div>
                     <div class="era-section">
@@ -226,31 +247,40 @@
                             <div class="lvl-btn-wrap" id="lvlwrap-15"><button class="lvl-btn locked egypt-btn" id="lvl-btn-15" onclick="game.startLevel(15)"><span class="lvl-num">15</span><span class="lvl-name">Final Stand</span></button></div>
                         </div>
                     </div>
+
+                    <!-- Đêm Sa Mạc (màn 16-20) -->
+                    <div class="era-section">
+                        <div class="era-period-title era-egypt-period">🌙 Đêm Sa Mạc</div>
+                        <div class="era-levels-row">
+                            <div class="lvl-btn-wrap" id="lvlwrap-16"><button class="lvl-btn locked egypt-btn" id="lvl-btn-16" onclick="game.startLevel(16)"><span class="lvl-num">16</span><span class="lvl-name">Dusk</span></button></div>
+                            <div class="lvl-btn-wrap" id="lvlwrap-17"><button class="lvl-btn locked egypt-btn" id="lvl-btn-17" onclick="game.startLevel(17)"><span class="lvl-num">17</span><span class="lvl-name">Shadows</span></button></div>
+                            <div class="lvl-btn-wrap" id="lvlwrap-18"><button class="lvl-btn locked egypt-btn" id="lvl-btn-18" onclick="game.startLevel(18)"><span class="lvl-num">18</span><span class="lvl-name">Eclipse</span></button></div>
+                            <div class="lvl-btn-wrap" id="lvlwrap-19"><button class="lvl-btn locked egypt-btn" id="lvl-btn-19" onclick="game.startLevel(19)"><span class="lvl-num">19</span><span class="lvl-name">Awaken</span></button></div>
+                            <div class="lvl-btn-wrap" id="lvlwrap-20"><button class="lvl-btn locked egypt-btn" id="lvl-btn-20" onclick="game.startLevel(20)"><span class="lvl-num">20</span><span class="lvl-name">Pharaoh</span></button></div>
+                        </div>
+                    </div>
                 </div>
 
             </div><!-- end era-container -->
 
-            <div class="tips-box">
-                <p>☀ Click sun to collect · S = Shovel · ESC = Pause</p>
-                <p>⚗ <strong style="color:#FFE040">Fusion:</strong> Đậu+Đậu=Repeater · Đậu+☀=SunShooter · Đậu+🪨=Peanut</p>
-                <p style="font-size:11px;color:#b0e0b0;">☀+☀=TwinSun · 🪨+🪨=Hồi HP · 🪨+☀=SunNut · ☀+💣=SunMine · Đậu+💣=PotatoShooter</p>
-                <p style="font-size:11px;color:#c8c8ff;">Trồng 2 cây lên cùng 1 ô để kết hợp!</p>
+            <div class="start-tips-mini">
+                <p>⚗ <strong style="color:#FFE040">Fusion:</strong> Đặt 2 cây lên cùng ô để kết hợp thành cây mới!</p>
+                <p style="font-size:9px;color:#90c870;margin-top:3px;">☀ Click sun · S = Xẻng · ESC = Tạm dừng</p>
             </div>
 
-            <!-- Tiện ích cho tester: tiến trình tự lưu, có thể mở khóa hết / reset -->
-            <div class="dev-tools">
-                <button class="dev-btn" onclick="game.unlockAllLevels()">🔓 Mở khóa tất cả màn</button>
-                <button class="dev-btn" onclick="game.resetProgress()">♻ Reset tiến trình</button>
+            <div class="start-action-btns">
+                <button class="start-action-btn danger-btn" onclick="game.resetProgress()">♻ Reset tiến trình</button>
+                <button class="start-action-btn unlock-btn" onclick="game.unlockAllLevels()">🔓 Mở khóa hết</button>
             </div>
+
+        </div><!-- end .start-center-col -->
+
+        <!-- Right panel: Zombie List (populated by JS) -->
+        <div class="start-panel start-panel-zombie">
+            <div class="panel-hdr zombie-hdr">ZOMBIE LIST</div>
+            <div class="panel-body" id="start-zombie-list"></div>
         </div>
 
-        <!-- Right sidebar: Zombie Notes -->
-        <div class="start-sidebar">
-            <button class="sidebar-book-btn sidebar-zombie-btn" onclick="game.showZombieList()">
-                <span class="sidebar-btn-icon">🧟</span>
-                <span class="sidebar-btn-label">Zombie<br>Notes</span>
-            </button>
-        </div>
     </div>
 
     <!-- ══ PLANT ALMANAC ════════════════════════════════════════ -->
@@ -315,11 +345,11 @@
         </div>
     </div>
 
-    <!-- Victory (all 15 levels) -->
+    <!-- Victory (all 20 levels) -->
     <div id="screen-win" class="fullscreen-overlay hidden">
         <div class="screen-box">
             <h1 class="win-title">🌻 Victory! 🌻</h1>
-            <p class="win-sub">You saved the garden across all 15 levels!</p>
+            <p class="win-sub">You saved the garden across all 20 levels!</p>
             <button class="big-btn green-btn" id="btn-winplay">Play Again</button>
         </div>
     </div>
@@ -352,6 +382,11 @@
 <script src="src/data/levels/level13.js"></script>
 <script src="src/data/levels/level14.js"></script>
 <script src="src/data/levels/level15.js"></script>
+<script src="src/data/levels/level16.js"></script>
+<script src="src/data/levels/level17.js"></script>
+<script src="src/data/levels/level18.js"></script>
+<script src="src/data/levels/level19.js"></script>
+<script src="src/data/levels/level20.js"></script>
 <script src="src/data/levels/levelDefs.js"></script>
 
 <!-- §4 Sprites (pure draw functions, no classes) -->
@@ -371,11 +406,14 @@
 <script src="src/sprites/plants/drawTwinSun.js"></script>
 <script src="src/sprites/plants/drawPeanut.js"></script>
 <script src="src/sprites/plants/drawPuffShroom.js"></script>
+<script src="src/sprites/plants/drawFumeShroom.js"></script>
 <script src="src/sprites/plants/drawCabbage.js"></script>
 <script src="src/sprites/plants/drawIceCabbage.js"></script>
 <script src="src/sprites/plants/drawChompNut.js"></script>
 <script src="src/sprites/plants/drawChompMine.js"></script>
 <script src="src/sprites/plants/drawGraveBuster.js"></script>
+<script src="src/sprites/plants/drawBonkChoy.js"></script>
+<script src="src/sprites/plants/drawSquash.js"></script>
 
 <!-- §4b Zombie sprites — drawZombieBase phải load trước vì tất cả zombie khác gọi nó -->
 <script src="src/sprites/zombies/drawZombieBase.js"></script>
@@ -383,11 +421,14 @@
 <script src="src/sprites/zombies/drawConeheadZombie.js"></script>
 <script src="src/sprites/zombies/drawFlagZombie.js"></script>
 <script src="src/sprites/zombies/drawBucketZombie.js"></script>
+<script src="src/sprites/zombies/drawDoorZombie.js"></script>
 <script src="src/sprites/zombies/drawPoleVaultingZombie.js"></script>
 <script src="src/sprites/zombies/drawBrickheadZombie.js"></script>
 <script src="src/sprites/zombies/drawNewspaperZombie.js"></script>
 <script src="src/sprites/zombies/drawExplorerZombie.js"></script>
 <script src="src/sprites/zombies/drawTombRaiserZombie.js"></script>
+<script src="src/sprites/zombies/drawPharaohZombie.js"></script>
+<script src="src/sprites/zombies/drawExplorerBucketZombie.js"></script>
 
 <script src="src/sprites/plants/drawSunNut.js"></script>
 <script src="src/sprites/plants/drawSunMine.js"></script>
@@ -395,6 +436,7 @@
 <script src="src/sprites/plants/drawMineNut.js"></script>
 <script src="src/sprites/plants/drawSunShroom.js"></script>
 <script src="src/sprites/plants/drawPeaShroom.js"></script>
+<script src="src/sprites/plants/drawRepeaterShroom.js"></script>
 <script src="src/sprites/plants/drawNutShroom.js"></script>
 
 <script src="src/sprites/miscSprites.js"></script>
@@ -417,12 +459,17 @@
 <script src="src/plants/TwinSun.js"></script>
 <script src="src/plants/Peanut.js"></script>
 <script src="src/plants/PuffShroom.js"></script>
+<script src="src/plants/FumeShroom.js"></script>
+<script src="src/plants/PeaFume.js"></script>
+<script src="src/plants/IceFume.js"></script>
+<script src="src/plants/IceFumeShooter.js"></script>
 <script src="src/plants/SunNut.js"></script>
 <script src="src/plants/SunMine.js"></script>
 <script src="src/plants/PotatoShooter.js"></script>
 <script src="src/plants/MineNut.js"></script>
 <script src="src/plants/SunShroom.js"></script>
 <script src="src/plants/PeaShroom.js"></script>
+<script src="src/plants/RepeaterShroom.js"></script>
 <script src="src/plants/NutShroom.js"></script>
 <script src="src/plants/SnowPea.js"></script>
 <script src="src/plants/IceLettuce.js"></script>
@@ -431,6 +478,8 @@
 <script src="src/plants/ChompNut.js"></script>
 <script src="src/plants/ChompMine.js"></script>
 <script src="src/plants/GraveBuster.js"></script>
+<script src="src/plants/BonkChoy.js"></script>
+<script src="src/plants/Squash.js"></script>
 <script src="src/plants/createPlant.js"></script>
 
 <!-- §7 Zombie classes (base → subclasses → factory) -->
@@ -439,11 +488,14 @@
 <script src="src/zombies/FlagZombie.js"></script>
 <script src="src/zombies/ConeheadZombie.js"></script>
 <script src="src/zombies/BucketZombie.js"></script>
+<script src="src/zombies/DoorZombie.js"></script>
 <script src="src/zombies/PoleVaultingZombie.js"></script>
 <script src="src/zombies/BrickheadZombie.js"></script>
 <script src="src/zombies/NewspaperZombie.js"></script>
 <script src="src/zombies/ExplorerZombie.js"></script>
 <script src="src/zombies/TombRaiserZombie.js"></script>
+<script src="src/zombies/PharaohZombie.js"></script>
+<script src="src/zombies/ExplorerBucketZombie.js"></script>
 <script src="src/zombies/createZombie.js"></script>
 
 <!-- §8 Other game entities -->

@@ -22,8 +22,8 @@ class Tomb {
         this.maxHp        = hp;
         this.spawnRateMs  = spawnRateMs;
         this.zombieTypes  = zombieTypes && zombieTypes.length ? zombieTypes : ['basic'];
-        // Stagger initial spawn so tombs don't all activate at once
-        this.spawnTimer   = spawnRateMs * (0.35 + Math.random() * 0.35);
+        // First spawn never happens before spawnRateMs; jitter only delays it further (up to 2x)
+        this.spawnTimer   = spawnRateMs * (1.0 + Math.random() * 1.0);
         this.dead         = false;
         this.hitFlash     = 0; // ms remaining for white flash on hit
         this.shakeIntensity = 0; // > 0 → đang bị Grave Buster khoan, rung lắc

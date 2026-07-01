@@ -16,98 +16,146 @@ const LEVEL_DEF_13 = {
     newPlant:  'icelettuce',
     newZombie: 'explorer',
     activeRows:      [0, 1, 2, 3, 4],
-    availablePlants: ['sunflower', 'peashooter', 'cabbage', 'wallnut', 'potatomine', 'chomper', 'puffshroom', 'icelettuce', 'gravebuster'],
+    availablePlants: ['sunflower', 'peashooter', 'cabbage', 'wallnut', 'potatomine', 'chomper', 'puffshroom', 'fumeshroom', 'icelettuce'],
     startingSun: 150,
     tombs: [
-        { col: 8, row: 0, hp: 300, spawnRateMs: 50000, zombieTypes: ['basic'] },
-        { col: 8, row: 1, hp: 300, spawnRateMs: 50000, zombieTypes: ['basic'] },
-        { col: 7, row: 2, hp: 300, spawnRateMs: 50000, zombieTypes: ['basic'] },
-        { col: 9, row: 2, hp: 300, spawnRateMs: 50000, zombieTypes: ['conehead'] },
-        { col: 8, row: 3, hp: 300, spawnRateMs: 50000, zombieTypes: ['basic'] },
-        { col: 8, row: 4, hp: 300, spawnRateMs: 50000, zombieTypes: ['basic'] },
+        { col: 8, row: 0, hp: 400, spawnRateMs: 150000, zombieTypes: ['basic'] },
+        { col: 8, row: 1, hp: 400, spawnRateMs: 150000, zombieTypes: ['basic'] },
+        { col: 7, row: 2, hp: 400, spawnRateMs: 150000, zombieTypes: ['basic'] },
+        { col: 9, row: 2, hp: 400, spawnRateMs: 150000, zombieTypes: ['conehead'] },
+        { col: 8, row: 3, hp: 400, spawnRateMs: 150000, zombieTypes: ['basic'] },
+        { col: 8, row: 4, hp: 400, spawnRateMs: 150000, zombieTypes: ['basic'] },
     ],
     waves: [
         {
-            // Wave 1 — mỗi nhóm cách nhau 20s, trong nhóm cách nhau 0.5s, tăng dần đều
+            // Wave 1 — mỗi nhóm cách nhau 20s, trong nhóm cách nhau 0.2s
             scouts: [
+                //Độ khó 1
                 { type: 'basic', row: null, delay: 0 },
 
+                //1
                 { type: 'basic', row: null, delay: 20000 },
 
+                //2
                 { type: 'basic', row: null, delay: 40000 },
-                { type: 'basic', row: null, delay: 40500 },
+                { type: 'basic', row: null, delay: 40200 },
 
+                //3
                 { type: 'conehead', row: null, delay: 60000 },
+                { type: 'basic', row: null, delay: 60200 },
 
+                //3
                 { type: 'basic', row: null, delay: 80000 },
-                { type: 'basic', row: null, delay: 80500 },
-                { type: 'basic', row: null, delay: 81000 },
+                { type: 'basic', row: null, delay: 80200 },
+                { type: 'basic', row: null, delay: 80400 },
 
+                //4
                 { type: 'basic', row: null, delay: 100000 },
                 { type: 'conehead', row: null, delay: 100500 },
             ],
             surge: [
-                { type: 'flag',  row: null, delay: 0 },    // flag zombie đi trước
-                { type: 'basic', row: null, delay: 1000 },
-                { type: 'basic', row: null, delay: 1500 },
-                { type: 'conehead', row: null, delay: 2000 },
-                { type: 'basic', row: null, delay: 2500 },
-                { type: 'conehead', row: null, delay: 3000 },
-                { type: 'basic', row: null, delay: 3500 },
-                { type: 'basic', row: null, delay: 4000 },
-                { type: 'basic', row: null, delay: 4500 },
-                { type: 'conehead', row: null, delay: 5000 },
-                { type: 'basic', row: null, delay: 5500 },
+                //14 zombies xuất hiện
+                { type: 'flag',  row: null, delay: 0 }, 
+                { type: 'conehead', row: null, delay: 1000 },
+                { type: 'conehead', row: null, delay: 1200 },
+                { type: 'conehead', row: null, delay: 1400 },
+                { type: 'conehead', row: null, delay: 1600 },
+                { type: 'conehead', row: null, delay: 1800 },
+                { type: 'basic', row: null, delay: 2000 },
+                { type: 'basic', row: null, delay: 2200 },
+                { type: 'basic', row: null, delay: 2400 },
+                { type: 'basic', row: null, delay: 2600 },
+                { type: 'basic', row: null, delay: 2800 },
+                { type: 'basic', row: null, delay: 3000 },
+                { type: 'basic', row: null, delay: 3200 },
+                { type: 'basic', row: null, delay: 3400 },
             ],
         },
         {
-            // Wave 2 — mỗi nhóm cách nhau 10s, trong nhóm cách nhau 0.5s, tăng dần đều
+            // Wave 2 — mỗi nhóm cách nhau 10s, trong nhóm cách nhau 0.2s
             scouts: [
-                { type: 'explorer', row: null, delay: 0 },
+                //Độ khó 5
+                { type: 'explorer', row: null, delay: 0 },  // Lần đầu xuất hiện explorer zombie
+                { type: 'basic', row: null, delay: 200 },
+                { type: 'basic', row: null, delay: 400 },
 
-                { type: 'basic',    row: null, delay: 10000 },
-                { type: 'explorer',       row: null, delay: 10500 },
+                //6
+                { type: 'explorer', row: null, delay: 10000 },
+                { type: 'conehead', row: null, delay: 10200 },
+                { type: 'basic', row: null, delay: 10400 },
 
-                { type: 'conehead',     row: null, delay: 20000 },
-                { type: 'explorer', row: null, delay: 20500 },
+                //7
+                { type: 'explorer', row: null, delay: 20000 },
+                { type: 'basic', row: null, delay: 20200 },
+                { type: 'basic', row: null, delay: 20400 },
+                { type: 'basic', row: null, delay: 20600 },
+                { type: 'basic', row: null, delay: 20800 },
 
-                { type: 'basic',    row: null, delay: 30000 },
-                { type: 'conehead',      row: null, delay: 30500 },
-                { type: 'conehead',     row: null, delay: 31000 },
+                //8
+                { type: 'explorer', ow: null, delay: 30000 },
+                { type: 'conehead', row: null, delay: 30200 },
+                { type: 'conehead', row: null, delay: 30400 },
+                { type: 'basic', row: null, delay: 30600 },
 
+                //9
                 { type: 'explorer', row: null, delay: 40000 },
-                { type: 'conehead',    row: null, delay: 40500 },
-                { type: 'conehead',       row: null, delay: 41000 },
+                { type: 'conehead', row: null, delay: 40200 },
+                { type: 'conehead', row: null, delay: 40400 },
+                { type: 'conehead', row: null, delay: 40600 },
 
-                { type: 'conehead',     row: null, delay: 50000 },
-                { type: 'explorer', row: null, delay: 50500 },
-                { type: 'basic',    row: null, delay: 51000 },
-                { type: 'basic',       row: null, delay: 51500 },
-                { type: 'basic', row: null, delay: 52000 },
+                //10
+                { type: 'explorer',     row: null, delay: 50000 },
+                { type: 'explorer', row: null, delay: 50200 },
+                { type: 'basic',    row: null, delay: 50400 },
+                { type: 'basic',       row: null, delay: 50600 },
+                { type: 'basic', row: null, delay: 50800 },
+                { type: 'basic', row: null, delay: 51000 },
 
-                { type: 'conehead',       row: null, delay: 60000 },
-                { type: 'conehead',     row: null, delay: 60500 },
-                { type: 'conehead', row: null, delay: 61000 },
-                { type: 'conehead',    row: null, delay: 61500 },
+                //11
+                { type: 'explorer', row: null, delay: 60000 },
+                { type: 'conehead', row: null, delay: 60200 },
+                { type: 'conehead', row: null, delay: 60400 },
+                { type: 'conehead', row: null, delay: 60600 },
+                { type: 'conehead', row: null, delay: 60800 },
+
+                //12
+                { type: 'conehead', row: null, delay: 70000 },
+                { type: 'conehead', row: null, delay: 70200 },
+                { type: 'conehead', row: null, delay: 70400 },
+                { type: 'conehead', row: null, delay: 70600 },
+                { type: 'conehead', row: null, delay: 70800 },
+                { type: 'conehead', row: null, delay: 71000 },
             ],
             surge: [
-                { type: 'flag',         row: null, delay: 0 },
-                { type: 'conehead',    row: null, delay: 1000 },
-                { type: 'explorer',       row: null, delay: 1500 },
+                //28 zombies xuất hiện
+                { type: 'flag',  row: null, delay: 0 },
+                { type: 'conehead', row: null, delay: 1000 },
+                { type: 'conehead', row: null, delay: 1200 },
+                { type: 'conehead', row: null, delay: 1400 },
+                { type: 'conehead', row: null, delay: 1600 },
+                { type: 'conehead', row: null, delay: 1800 },
                 { type: 'conehead', row: null, delay: 2000 },
-                { type: 'conehead',    row: null, delay: 2500 },
-                { type: 'basic',     row: null, delay: 3000 },
-                { type: 'explorer',       row: null, delay: 3500 },
-                { type: 'conehead',    row: null, delay: 4000 },
-                { type: 'basic',       row: null, delay: 4500 },
-                { type: 'conehead', row: null, delay: 5000 },
-                { type: 'basic',    row: null, delay: 5500 },
-                { type: 'basic',     row: null, delay: 6000 },
-                { type: 'basic', row: null, delay: 6500 },
-                { type: 'conehead',    row: null, delay: 7000 },
-                { type: 'explorer',       row: null, delay: 7500 },
-                { type: 'basic', row: null, delay: 8000 },
-                { type: 'basic',    row: null, delay: 8500 },
+                { type: 'conehead', row: null, delay: 2200 },
+                { type: 'conehead', row: null, delay: 2400 },
+                { type: 'conehead', row: null, delay: 2600 },
+                { type: 'conehead', row: null, delay: 2800 },
+                { type: 'basic', row: null, delay: 3000 },
+                { type: 'basic', row: null, delay: 3200 },
+                { type: 'basic', row: null, delay: 3400 },
+                { type: 'basic', row: null, delay: 3600 },
+                { type: 'basic', row: null, delay: 3800 },
+                { type: 'basic', row: null, delay: 4000 },
+                { type: 'basic', row: null, delay: 4200 },
+                { type: 'basic', row: null, delay: 4400 },
+                { type: 'basic', row: null, delay: 4600 },
+                { type: 'explorer', row: null, delay: 4800 },
+                { type: 'explorer', row: null, delay: 5000 },
+                { type: 'explorer', row: null, delay: 5200 },
+                { type: 'explorer', row: null, delay: 5400 },
+                { type: 'explorer', row: null, delay: 5600 },
+                { type: 'explorer', row: null, delay: 5800 },
+                { type: 'explorer', row: null, delay: 6000 },
+                { type: 'explorer', row: null, delay: 6200 },
             ],
         },
     ],

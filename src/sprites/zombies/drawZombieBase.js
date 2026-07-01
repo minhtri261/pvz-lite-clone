@@ -18,13 +18,16 @@
 //      └─ replaces default shirt+tie; receives zombie for hpPct access
 //    drawArmsFn   (ctx, animTime)                      => void
 //      └─ replaces default arm pose; use for raised-arm / special grips
+//    drawShieldFn (ctx, animTime, state)               => void
+//      └─ drawn after arms/neck but before head — covers torso/arms/legs
+//         while leaving the head fully visible above it (e.g. Door Zombie)
 //
 //  zombie.effects strings:
 //    'burn' | 'poison' | 'frozen'
 //    Future: 'butter' | 'hypno' | 'electric' | 'curse' | 'stun' | 'shield'
 //
 //  Render order (layer 1, inside body-sway transform):
-//    shadow → legs → torso → outfit → arms → neck → head → hat → effects
+//    shadow → legs → torso → outfit → arms → neck → shield → head → hat → effects
 //  Render order (layer 2, dying rotation only, no body sway):
 //    gear
 //
@@ -223,6 +226,7 @@ function drawZombieBase(ctx, zombie) {
     const drawGearFn  = render.drawGearFn  || null;
     const drawOutfitFn = render.drawOutfitFn || null;
     const drawArmsFn   = render.drawArmsFn   || null;
+    const drawShieldFn = render.drawShieldFn || null;
 
     const walk   = state === 'walking' ? Math.sin(animTime * 5.5) : 0;
     const eatBob = state === 'eating'  ? Math.abs(Math.sin(animTime * 7)) * 10 : 0;
@@ -244,6 +248,7 @@ function drawZombieBase(ctx, zombie) {
     if (drawArmsFn) drawArmsFn(ctx, animTime);
     else            _drawArms(ctx, animTime);
     _drawNeck(ctx);
+    if (drawShieldFn) drawShieldFn(ctx, animTime, state);
 
     const hy = -36 + eatBob;
     if (drawHeadFn) drawHeadFn(ctx, hy, animTime, hpPct, rageEyes);

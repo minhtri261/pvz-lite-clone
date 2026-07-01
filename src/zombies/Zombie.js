@@ -113,16 +113,72 @@ class Zombie {
         }
     }
 
+    // Sát thương cho zombie có 2 lớp HP ĐỘC LẬP: khiên (báo/cửa/…) rồi
+    // thân — khác _takeArmoredDamage (nón/xô/gạch) ở chỗ shieldHp và hp
+    // là 2 pool tách biệt ngay từ đầu (hp không cộng dồn với shieldHp,
+    // subclass tự đặt hp = ZOMBIE_DEFS.basic.maxHp khi khởi tạo).
+    // Dùng bởi NewspaperZombie, DoorZombie — và mọi zombie cầm khiên
+    // tương tự được thêm sau này.
+    //
+    // shieldField/hasShieldField: tên field HP khiên + cờ còn khiên.
+    // onBreak(particles): gọi đúng 1 lần khi khiên vừa vỡ (đổi rage
+    // stat, nổ mảnh vỡ…).
+    //
+    // opts:
+    //   lobbed {bool} — đạn ném vòng cung (Cabbage…): rơi từ trên cao
+    //                    xuống đầu nên bỏ qua khiên, đánh thẳng vào hp
+    //   pierce {bool} — đạn xuyên (FumeShroom, Peanut…): trừ ĐỒNG THỜI
+    //                    cả khiên và hp, không chọn một trong hai
+    // Mặc định (không opts): khiên chặn toàn bộ sát thương trước, hp chỉ
+    // giảm khi khiên đã vỡ (sát thương dư sau khi phá khiên dồn vào hp).
+    // Sau mọi nhánh: hp <= 0 → chết ngay, không quan tâm shieldHp còn hay hết.
+    _takeShieldedDamage(amount, particles, opts, shieldField, hasShieldField, onBreak) {
+        if (this.dying) return;
+        this.hitFlash = 0.1;
+        const { lobbed = false, pierce = false } = opts || {};
+
+        if (lobbed) {
+            this._applyBodyDamage(amount, particles);
+            return;
+        }
+
+        const hasShield = this[hasShieldField] && this[shieldField] > 0;
+
+        if (pierce) {
+            if (hasShield) {
+                this[shieldField] -= amount;
+                if (this[shieldField] <= 0) {
+                    this[hasShieldField] = false;
+                    if (onBreak) onBreak(particles);
+                }
+            }
+            this._applyBodyDamage(amount, particles);
+            return;
+        }
+
+        if (hasShield) {
+            this[shieldField] -= amount;
+            if (this[shieldField] <= 0) {
+                const overflow = -this[shieldField]; // sát thương thừa sau khi phá khiên
+                this[hasShieldField] = false;
+                if (onBreak) onBreak(particles);
+                if (overflow > 0) this._applyBodyDamage(overflow, particles);
+            }
+        } else {
+            this._applyBodyDamage(amount, particles);
+        }
+    }
+
     // Tìm cây gần nhất phía trước mặt zombie (trong phạm vi cắn)
-    // Phạm vi: zombie.x - plant.cx nằm trong khoảng (-20, 58)
+    // Phạm vi: zombie.x - plant.cx nằm trong khoảng (-40, 40)
     findTarget(plants) {
         let best = null;
         for (const p of plants) {
             if (p.row === this.row && !p.isDead) {
                 const dist = this.x - p.cx;
-                // dist > -20: cây không quá xa bên phải
-                // dist < 58: cây chưa ở sau lưng zombie
-                if (dist > -20 && dist < 58 && (!best || p.cx > best.cx)) best = p;
+                // dist > -40: cây không quá xa bên phải
+                // dist < 40: cây chưa ở sau lưng zombie
+                if (dist > -40 && dist < 40 && (!best || p.cx > best.cx)) best = p;
             }
         }
         return best; // cây gần zombie nhất được ưu tiên
@@ -154,6 +210,10 @@ class Zombie {
 
         const target = this.findTarget(plants);
         if (target) {
+            // Vừa chạm cây (chuyển từ đi → ăn) → phát tiếng cắn ngay, không
+            // chờ đủ attackRate mới có tiếng đầu tiên (chỉ ảnh hưởng âm
+            // thanh, không đổi nhịp gây sát thương thật)
+            if (this.state !== 'eating') audioManager.playSFX('bite');
             // Có cây trước mặt → đứng lại tấn công
             this.state = 'eating';
             // Hiệu ứng làm lạnh: tốc độ ăn chậm hơn 50%
@@ -161,6 +221,7 @@ class Zombie {
             if (this.eatTimer >= this.attackRate) {
                 this.eatTimer = 0;
                 target.takeDamage(this.damage);
+                audioManager.playSFX('bite');
             }
         } else {
             // Không có cây → tiếp tục đi

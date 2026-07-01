@@ -6,42 +6,31 @@
 //    1. CÒN BÁO: speed=0.28, attackRate=1000 (bình thường như Basic)
 //    2. MẤT BÁO: speed=0.5 (!), attackRate=2000 → chạy nhanh gấp đôi!
 //
-//  Cơ chế báo:
-//    - Báo có HP riêng (100), tất cả đạn đều gây sát thương cho báo VÀ thân
-//    - Khi báo HP ≤ 0 → báo rách, zombie điên loạn và chạy nhanh
-//    - HP thân vẫn bị trừ bình thường — zombie có thể chết trước khi mất báo
+//  Hai lớp HP độc lập: paperHp (báo) và hp = 270 (thân, bằng Basic).
+//  Quy tắc sát thương (xem _takeShieldedDamage trong Zombie.js):
+//    - Đạn thường (Pea, SnowPea…): báo chặn hết, hp không giảm tới khi báo rách
+//    - Đạn ném vòng cung (Cabbage…): bỏ qua báo, đánh thẳng vào hp
+//    - Đạn xuyên (FumeShroom, Peanut…): trừ đồng thời cả báo và hp
+//    - Báo rách (paperHp ≤ 0) → zombie điên loạn, chạy nhanh gấp đôi
 // ══════════════════════════════════════════════════════════════
 
 class NewspaperZombie extends Zombie {
     constructor(row) {
         super('newspaper', row);
-        this.paperHp  = ZOMBIE_DEFS.newspaper.paperHp; // 100
+        this.paperHp  = ZOMBIE_DEFS.newspaper.paperHp; // 800
         this.hasPaper = true;
+        // hp tách biệt khỏi paperHp — luôn là HP thân Basic (270), không
+        // cộng dồn vào maxHp như cách Zombie() khởi tạo mặc định
+        this.hp    = ZOMBIE_DEFS.basic.maxHp;
+        this.maxHp = ZOMBIE_DEFS.basic.maxHp;
     }
 
-    // Override: damage cả báo lẫn thân cùng lúc
-    takeDamage(amount, particles) {
-        if (this.dying) return;
-        this.hitFlash = 0.1;
-
-        // Trừ HP báo (riêng biệt, không ảnh hưởng thân)
-        if (this.hasPaper && this.paperHp > 0) {
-            this.paperHp -= amount;
-            if (this.paperHp <= 0) {
-                this.hasPaper   = false;
-                this.speed      = ZOMBIE_DEFS.newspaper.ragespeed;      // 0.5
-                this.attackRate = ZOMBIE_DEFS.newspaper.rageAttackRate; // 2000
-                this.damage     = ZOMBIE_DEFS.newspaper.rageDamage;     // 250 — cắn mạnh hơn để bù nhịp cắn chậm
-            }
-        }
-
-        // Trừ HP thân bình thường
-        this.hp -= amount;
-        if (this.hp <= 0) {
-            this.dying = true;
-            this.state = 'dying';
-            spawnDeathParticles(this.x, this.y - 20, particles);
-        }
+    takeDamage(amount, particles, opts) {
+        this._takeShieldedDamage(amount, particles, opts, 'paperHp', 'hasPaper', () => {
+            this.speed      = ZOMBIE_DEFS.newspaper.ragespeed;      // 0.5
+            this.attackRate = ZOMBIE_DEFS.newspaper.rageAttackRate; // 2000
+            this.damage     = ZOMBIE_DEFS.newspaper.rageDamage;     // 250 — cắn mạnh hơn để bù nhịp cắn chậm
+        });
     }
 
     get render() {

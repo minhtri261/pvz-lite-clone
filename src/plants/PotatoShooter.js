@@ -3,8 +3,9 @@
 //  PotatoShooter.js — Đậu Khoai (PeaShooter + PotatoMine fusion)
 //
 //  Hai chức năng:
-//    1. Bắn đạn nâu (20 dmg) ngay từ đầu — không cần arm
-//    2. Sau 14s kích hoạt: zombie dẫm lên → nổ 1800 damage
+//    1. Bắn đạn nâu (20 dmg) ngay từ đầu
+//    2. Dome nổi lên ngay khi kết hợp (không còn trạng thái ngủ dưới
+//       đất) → zombie dẫm lên là nổ 1800 damage ngay
 //
 //  Khi nổ: cây biến mất (không còn bắn nữa)
 //  Đạn màu nâu (isBrown = true), tầm bắn không giới hạn
@@ -17,8 +18,7 @@ class PotatoShooter extends Plant {
         super('potatoshooter', col, row);
         this.shootTimer      = 0;
         this.shootAnim       = 0;
-        this.armTimer        = 0;
-        this.armed           = false;
+        this.armed           = true; // nổi dome lên ngay khi kết hợp, không còn trạng thái ngủ dưới đất
         this.exploding       = false;
         this.explodeT        = 0;
         this._biteTriggered  = false;
@@ -40,9 +40,8 @@ class PotatoShooter extends Plant {
                 this.shootTimer = 0;
                 this.shootAnim  = 1;
                 // isBrown = true → đạn màu nâu đất
-                const projY = this.armed ? this.cy + 8 : this.cy + 14;
                 game.projectiles.push(
-                    new Projectile(this.cx + 38, projY, this.row, false, false, true)
+                    new Projectile(this.cx + 38, this.cy + 8, this.row, false, false, true)
                 );
             }
         }
@@ -54,35 +53,30 @@ class PotatoShooter extends Plant {
             return;
         }
 
-        // ── Kích hoạt mine ─────────────────────────────────────
-        if (!this.armed) {
-            this.armTimer += dt;
-            if (this.armTimer >= PLANT_DEFS.potatoshooter.armMs) this.armed = true;
-        } else {
-            let boom = this._biteTriggered;
-            if (!boom) {
-                for (const z of game.zombies) {
-                    if (!z.dying && z.row === this.row) {
-                        const d = z.x - this.cx;
-                        if (d > -20 && d < 58) { boom = true; break; }
+        // ── Mine đã nổi dome ngay từ đầu — chỉ chờ zombie dẫm lên ──
+        let boom = this._biteTriggered;
+        if (!boom) {
+            for (const z of game.zombies) {
+                if (!z.dying && z.row === this.row) {
+                    const d = z.x - this.cx;
+                    if (d > -20 && d < 58) { boom = true; break; }
+                }
+            }
+        }
+        if (boom) {
+            this._biteTriggered = false;
+            for (const z of game.zombies) {
+                if (!z.dying && z.row === this.row) {
+                    const d = z.x - this.cx;
+                    if (d > -20 && d < 58) {
+                        const was = z.dying;
+                        z.takeDamage(PLANT_DEFS.potatoshooter.blastDmg, game.particles);
+                        if (!was && z.dying) game.zombiesKilled++;
                     }
                 }
             }
-            if (boom) {
-                this._biteTriggered = false;
-                for (const z of game.zombies) {
-                    if (!z.dying && z.row === this.row) {
-                        const d = z.x - this.cx;
-                        if (d > -20 && d < 58) {
-                            const was = z.dying;
-                            z.takeDamage(PLANT_DEFS.potatoshooter.blastDmg, game.particles);
-                            if (!was && z.dying) game.zombiesKilled++;
-                        }
-                    }
-                }
-                spawnBigExplosionParticles(this.cx, this.cy - 5, game.particles);
-                this.exploding = true;
-            }
+            spawnBigExplosionParticles(this.cx, this.cy - 5, game.particles);
+            this.exploding = true;
         }
     }
 

@@ -36,7 +36,8 @@ const ZOMBIE_DEFS = {
         attackRate: 1000,
     },
     newspaper: {
-        maxHp: 1070 ,          // bằng basic zombie
+        maxHp: 1070 ,          // tổng tham khảo (800 báo + 270 thân) — constructor tự đặt
+                               // lại hp/maxHp = basic.maxHp (270), xem NewspaperZombie.js
         speed: 0.28,         // tốc độ ban đầu (bằng basic)
         damage: 100,
         attackRate: 1000,    // nhịp tấn công ban đầu (bằng basic)
@@ -55,20 +56,51 @@ const ZOMBIE_DEFS = {
     },
     explorer: {
         maxHp: 270,        // bằng basic — nhà khảo cổ dày dạn
-        speed: 0.4,       // cao hơn basic
+        speed: 0.5,       // cao hơn basic
         damage: 100,       // sát thương cắn khi đuốc đã tắt (hành xử như Basic)
         attackRate: 1000, // nhịp cắn khi đuốc đã tắt (hành xử như Basic)
         burnDamage: 10000000,    //  sát thương đốt mỗi tick (cây nào trong tầm sẽ bị đốt cháy ngay lập tức)
         burnRate: 500,     // tick đốt mỗi 0.5s → 140 dps (mạnh hơn Basic 100 dps)
+    },
+    door: {
+        maxHp: 1670,      // tổng tham khảo (1400 cửa + 270 thân) — constructor tự đặt
+                          // lại hp/maxHp = basic.maxHp (270), xem DoorZombie.js
+        speed: 0.28,      // bằng basic — hành xử như Basic ngoài lớp giáp cửa
+        damage: 100,
+        attackRate: 1000,
+        doorHp: 1400,     // cánh cửa hấp thụ 1400 điểm sát thương trước khi vỡ
     },
     tombraiser: {
         maxHp: 270,       // bằng basic
         speed: 0.26,      // hơi chậm hơn basic — bận đào mộ
         damage: 100,
         attackRate: 1000,
-        tombCreateInterval: 20000, // cứ 20s kể từ lúc spawn, tạo 1 lăng mộ phía trước
+        tombCreateInterval: 20000, // cứ 20s kể từ lúc spawn (hoặc từ lần tạo mộ trước), làm nghi lễ tạo mộ
+        raiseDurationMs: 2000,     // đứng lại + giơ 2 tay lên trời trong 2s khi làm nghi lễ
+        tombOffsetRange: 20,       // mộ xuất hiện lệch ngẫu nhiên ±20px quanh vị trí đang đứng (tổng 40px)
         tombHp: 280,               // máu của lăng mộ vừa tạo
         tombSpawnRateMs: 40000,    // lăng mộ vừa tạo sinh zombie mỗi 40s
         tombZombieTypes: ['conehead'], // lăng mộ vừa tạo chỉ sinh Conehead Zombie
+    },
+    pharaoh: {
+        maxHp: 1500,       // tổng tham khảo (1200 quan tài + 300 thân) — constructor tự
+                            // đặt lại hp/maxHp = bodyHp (300), xem PharaohZombie.js
+        speed: 0.2,        // tốc độ khi còn quan tài — chậm, lê quan tài đi
+        damage: 100,       // sát thương khi còn quan tài — đập cây bằng chính quan tài
+        attackRate: 1000,
+        sarcophagusHp:  1200, // quan tài hấp thụ TOÀN BỘ sát thương trước khi vỡ (không ngoại lệ)
+        bodyHp:         300,  // HP thân xác ướp sau khi quan tài vỡ
+        revealSpeed:    0.5,  // tốc độ sau khi lộ xác ướp — nhanh hơn hẳn
+        revealDamage:   200,  // sát thương sau khi lộ xác ướp
+    },
+    explorerbucket: {
+        maxHp: 1370,       // tổng tham khảo (1100 xô + 270 thân, giống cách BucketZombie
+                           // tính) — constructor giữ nguyên, xem ExplorerBucketZombie.js
+        speed: 0.5,        // bằng Explorer Zombie
+        damage: 100,       // sát thương khi đuốc đã tắt (hành xử như Basic)
+        attackRate: 1000,  // nhịp cắn khi đuốc đã tắt (hành xử như Basic)
+        burnDamage: 10000000, // bằng Explorer — đốt cháy cây ngay lập tức
+        burnRate: 500,         // bằng Explorer — tick đốt mỗi 0.5s
+        bucketHp: 1100,        // lấy y nguyên từ Buckethead Zombie
     },
 };

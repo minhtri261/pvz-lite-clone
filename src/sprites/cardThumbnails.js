@@ -14,11 +14,14 @@ function drawCardThumbnails() {
         ['art-cherrybomb', c => { c.save(); c.translate(29, 34); c.scale(0.6, 0.6);   drawCherryBomb(c, 0, 0, 0.3, 0, false, 0); c.restore(); }],
         ['art-potatomine', c => { c.save(); c.translate(29, 36); c.scale(0.75, 0.75); drawPotatoMine(c, 0, 0, 0, true, false, 0); c.restore(); }],
         ['art-chomper',    c => { c.save(); c.translate(29, 36); c.scale(0.72, 0.72); drawChomper(c, 0, 0, 0.5, false, 0, false); c.restore(); }],
+        ['art-bonkchoy',   c => { c.save(); c.translate(29, 38); c.scale(0.62, 0.62); drawBonkChoy(c, 0, 0, 0.5, false, 0, -1, 1); c.restore(); }],
+        ['art-squash',     c => { c.save(); c.translate(29, 40); c.scale(0.62, 0.62); drawSquash(c, 0, 0, 0.5, 'idle', 0, 0); c.restore(); }],
         ['art-repeater',   c => { c.save(); c.translate(18, 36); c.scale(0.55, 0.55); drawRepeater(c, 0, 0, 0.5, 0, 0); c.restore(); }],
         ['art-sunshooter', c => { c.save(); c.translate(29, 36); c.scale(0.58, 0.58); drawSunShooter(c, 0, 0, 0.5, 0, false); c.restore(); }],
         ['art-twinsun',    c => { c.save(); c.translate(29, 38); c.scale(0.62, 0.62); drawTwinSun(c, 0, 0, 0.5, false); c.restore(); }],
         ['art-peanut',     c => { c.save(); c.translate(20, 32); c.scale(0.65, 0.65); drawPeanut(c, 0, 0, 0.5, 1, 0); c.restore(); }],
         ['art-puffshroom', c => { c.save(); c.translate(22, 38); c.scale(0.65, 0.65); drawPuffShroom(c, 0, 0, 0.5, 0); c.restore(); }],
+        ['art-fumeshroom', c => { c.save(); c.translate(20, 38); c.scale(0.58, 0.58); drawFumeShroom(c, 0, 0, 0.5, 0); c.restore(); }],
         ['art-snowpea',    c => { c.save(); c.translate(20, 36); c.scale(0.56, 0.56); drawSnowPea(c, 0, 0, 0.5, 0); c.restore(); }],
         ['art-icelettuce', c => { c.save(); c.translate(29, 34); c.scale(0.85, 0.85); drawIceLettuce(c, 0, 0, 0.5, 0); c.restore(); }],
         ['art-cabbage',    c => { c.save(); c.translate(22, 38); c.scale(0.60, 0.60); drawCabbage(c, 0, 0, 0.3, 1, 0); c.restore(); }],
@@ -37,11 +40,14 @@ function drawCardThumbnails() {
                     : id === 'art-icelettuce' ? '#0a2a3a'
                     : id === 'art-potatomine' ? '#3a2808'
                     : id === 'art-chomper'    ? '#2a0a3a'
+                    : id === 'art-bonkchoy'   ? '#1a3a08'
+                    : id === 'art-squash'     ? '#15340a'
                     : id === 'art-repeater'  ? '#1a4a0a'
                     : id === 'art-sunshooter'? '#3a2a00'
                     : id === 'art-twinsun'   ? '#3a3000'
-                    : id === 'art-peanut'    ? '#4a2a00'
+                    : id === 'art-peanut'    ? '#0a3a14'
                     : id === 'art-puffshroom'? '#2a0a3a'
+                    : id === 'art-fumeshroom'? '#130020'
                     : id === 'art-gravebuster'? '#3a3414'
                     :                           '#2a6a14';
         rr(c, 0, 0, 58, 58, 5); c.fill();

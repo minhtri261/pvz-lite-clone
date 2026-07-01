@@ -75,6 +75,7 @@ function drawPuffShroom(ctx, x, y, animTime, shootT, stackCount = 1) {
     } else {
         ctx.save();
         ctx.translate(Math.round(x), Math.round(y));
+        ctx.scale(0.76, 0.76);
         _drawPuffShroomBody(ctx, animTime, shootT);
         ctx.restore();
     }

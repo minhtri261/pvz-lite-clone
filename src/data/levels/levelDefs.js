@@ -1,10 +1,11 @@
 'use strict';
 // ══════════════════════════════════════════════════════════════
-//  levelDefs.js — Gộp 6 định nghĩa màn vào một mảng duy nhất
-//  File này phải load SAU level1.js ... level6.js
+//  levelDefs.js — Gộp 20 định nghĩa màn vào một mảng duy nhất
+//  File này phải load SAU level1.js ... level20.js
 //  Game.js truy cập: LEVEL_DEFS[currentLevelId - 1]
 // ══════════════════════════════════════════════════════════════
 const LEVEL_DEFS = [LEVEL_DEF_1,  LEVEL_DEF_2,  LEVEL_DEF_3,  LEVEL_DEF_4,
                     LEVEL_DEF_5,  LEVEL_DEF_6,  LEVEL_DEF_7,  LEVEL_DEF_8,
                     LEVEL_DEF_9,  LEVEL_DEF_10, LEVEL_DEF_11, LEVEL_DEF_12,
-                    LEVEL_DEF_13, LEVEL_DEF_14, LEVEL_DEF_15];
+                    LEVEL_DEF_13, LEVEL_DEF_14, LEVEL_DEF_15, LEVEL_DEF_16,
+                    LEVEL_DEF_17, LEVEL_DEF_18, LEVEL_DEF_19, LEVEL_DEF_20];

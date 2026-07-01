@@ -24,10 +24,14 @@ function drawSunMine(ctx, x, y, animTime, armed, exploding, explodeT, producePul
         ctx.fillStyle = 'rgba(0,0,0,0.15)';
         ctx.beginPath(); ctx.ellipse(2, 28, 14, 4, 0, 0, Math.PI * 2); ctx.fill();
 
-        ctx.fillStyle = '#6B4818';
+        const moundG = ctx.createRadialGradient(-3, 22, 1, 0, 24, 14);
+        moundG.addColorStop(0,   '#FFD600');
+        moundG.addColorStop(0.6, '#F9A825');
+        moundG.addColorStop(1,   '#E65100');
+        ctx.fillStyle = moundG;
         ctx.beginPath(); ctx.ellipse(0, 24, 13, 5, 0, 0, Math.PI * 2); ctx.fill();
 
-        ctx.strokeStyle = '#5D4037'; ctx.lineWidth = 2.8; ctx.lineCap = 'round';
+        ctx.strokeStyle = '#BF360C'; ctx.lineWidth = 2.8; ctx.lineCap = 'round';
         ctx.beginPath();
         ctx.moveTo(0, 20);
         ctx.quadraticCurveTo(5, 12, 3, 3);
@@ -64,7 +68,11 @@ function drawSunMine(ctx, x, y, animTime, armed, exploding, explodeT, producePul
         ctx.fillStyle = 'rgba(0,0,0,0.22)';
         ctx.beginPath(); ctx.ellipse(1, 27, 20, 6, 0, 0, Math.PI * 2); ctx.fill();
 
-        ctx.fillStyle = '#6B4818';
+        const moundG2 = ctx.createRadialGradient(-4, 20, 1, 0, 22, 19);
+        moundG2.addColorStop(0,   '#FFD600');
+        moundG2.addColorStop(0.6, '#F9A825');
+        moundG2.addColorStop(1,   '#E65100');
+        ctx.fillStyle = moundG2;
         ctx.beginPath(); ctx.ellipse(0, 22, 18, 7, 0, 0, Math.PI * 2); ctx.fill();
 
         // ── Dome MÀU VÀNG (thay cho nâu-vàng của PotatoMine) ─────
@@ -99,7 +107,7 @@ function drawSunMine(ctx, x, y, animTime, armed, exploding, explodeT, producePul
         const fuseBaseX = 2;
         const fuseBaseY = bodyY - bodyR + 4;
 
-        ctx.strokeStyle = '#5D4037'; ctx.lineWidth = 2.8; ctx.lineCap = 'round';
+        ctx.strokeStyle = '#BF360C'; ctx.lineWidth = 2.8; ctx.lineCap = 'round';
         ctx.beginPath();
         ctx.moveTo(fuseBaseX, fuseBaseY);
         ctx.quadraticCurveTo(fuseBaseX + 5, fuseBaseY - 8, fuseBaseX + 3, fuseBaseY - 17);

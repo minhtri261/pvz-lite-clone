@@ -10,6 +10,25 @@ function drawSunNut(ctx, x, y, animTime, hpPct, producePulse) {
     ctx.fillStyle = 'rgba(0,0,0,0.25)';
     ctx.beginPath(); ctx.ellipse(0, 30, 22, 7, 0, 0, Math.PI * 2); ctx.fill();
 
+    // ── Cánh hoa hướng dương (lấy từ SunFlower) — viền quanh thân ──
+    const petalSc = producePulse > 0 ? 1 + Math.sin(animTime * 8) * 0.04 : 1;
+    ctx.save(); ctx.scale(petalSc, petalSc);
+    for (let i = 0; i < 8; i++) {
+        const a = (i / 8) * Math.PI * 2 + animTime * 0.25;
+        ctx.save(); ctx.rotate(a);
+        const pg = ctx.createLinearGradient(0, -41, 0, -26);
+        pg.addColorStop(0, '#FFF176'); pg.addColorStop(1, '#FDD835');
+        ctx.fillStyle = pg; ctx.strokeStyle = '#F57F17'; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.ellipse(0, -33, 7.5, 15, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); ctx.restore();
+    }
+    for (let i = 0; i < 8; i++) {
+        const a = (i / 8) * Math.PI * 2 + Math.PI / 8 + animTime * 0.25;
+        ctx.save(); ctx.rotate(a);
+        ctx.fillStyle = '#FFCA28'; ctx.strokeStyle = '#F57F17'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.ellipse(0, -28, 5.5, 10.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); ctx.restore();
+    }
+    ctx.restore();
+
     // ── Thân oval đứng — VÀNG ─────────────────────────────────
     // Thay bảng màu nâu caramel → vàng sunflower
     const bg = ctx.createRadialGradient(-10, -12, 2, 0, 0, 31);
